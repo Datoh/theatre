@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Théâtre: Textes de la troupe les jeudis en folie</title>
+    <style>
+        :root {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: white;
+            --bg-header: #34495e;
+            --text-primary: #333;
+            --text-muted: #666;
+            --accent-1: #c0392b;
+            --accent-2: #2980b9;
+            --accent-3: #27ae60;
+            --accent-4: #8e44ad;
+            --accent-5: #d68910;
+            --shadow: rgba(0,0,0,0.08);
+            --shadow-hover: rgba(0,0,0,0.16);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: #0d0d0d;
+                --bg-secondary: #2a2a2a;
+                --bg-header: #0d0d0d;
+                --text-primary: #ffffff;
+                --text-muted: #cccccc;
+                --accent-1: #ff6b6b;
+                --accent-2: #74b9ff;
+                --accent-3: #55efc4;
+                --accent-4: #dda0dd;
+                --accent-5: #ffd93d;
+                --shadow: rgba(0,0,0,0.4);
+                --shadow-hover: rgba(0,0,0,0.6);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background-color: var(--bg-header);
+            color: white;
+            padding: 20px 16px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .plays {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 20px;
+            padding: 24px 16px;
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        .play-btn {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 24px 20px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 14px;
+            border-left: 6px solid var(--accent);
+            box-shadow: 0 2px 8px var(--shadow);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .play-btn:hover,
+        .play-btn:focus-visible {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px var(--shadow-hover);
+            outline: none;
+        }
+
+        .play-btn:active {
+            transform: translateY(0);
+        }
+
+        .play-btn.one { --accent: var(--accent-1); }
+        .play-btn.two { --accent: var(--accent-2); }
+        .play-btn.three { --accent: var(--accent-3); }
+        .play-btn.four { --accent: var(--accent-4); }
+        .play-btn.five { --accent: var(--accent-5); }
+
+        .play-icon {
+            flex-shrink: 0;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .play-title {
+            font-size: 20px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .play-sub {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .arrow {
+            margin-left: auto;
+            font-size: 22px;
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎭 Théâtre: Textes de la troupe les jeudis en folie</h1>
+    </div>
+
+    <main class="plays">
+        <a class="play-btn one" href="2025-aqhom.html">
+            <span class="play-icon">🕰️</span>
+            <span>
+                <span class="play-title">2025: À quelle heure on ment ?</span>
+                <span class="play-sub" style="display:block">Lire et apprendre le texte</span>
+            </span>
+            <span class="arrow">›</span>
+        </a>
+
+        <a class="play-btn two" href="2026-lucla.html">
+            <span class="play-icon">🏠</span>
+            <span>
+                <span class="play-title">2026: Les uns chez les autres</span>
+                <span class="play-sub" style="display:block">Lire et apprendre le texte</span>
+            </span>
+            <span class="arrow">›</span>
+        </a>
+
+        <a class="play-btn three" href="2026-agcdp.html">
+            <span class="play-icon">🍳</span>
+            <span>
+                <span class="play-title">2026: À grands coups de poêle !</span>
+                <span class="play-sub" style="display:block">Lire et apprendre le texte</span>
+            </span>
+            <span class="arrow">›</span>
+        </a>
+
+        <a class="play-btn four" href="2026-atlc.html">
+            <span class="play-icon">🎯</span>
+            <span>
+                <span class="play-title">2026: À tous les coups !</span>
+                <span class="play-sub" style="display:block">Lire et apprendre le texte</span>
+            </span>
+            <span class="arrow">›</span>
+        </a>
+
+        <a class="play-btn five" href="2026-cmo.html">
+            <span class="play-icon">💪</span>
+            <span>
+                <span class="play-title">2026: Coach me oui !!!</span>
+                <span class="play-sub" style="display:block">Lire et apprendre le texte</span>
+            </span>
+            <span class="arrow">›</span>
+        </a>
+    </main>
+</body>
+</html>
