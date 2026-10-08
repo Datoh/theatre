@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pièce de théâtre</title>
+    <style>
+        :root {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: white;
+            --bg-header: #34495e;
+            --text-primary: #333;
+            --text-secondary: #555;
+            --text-muted: #666;
+            --text-light: #7f8c8d;
+            --border-color: #ddd;
+            --border-light: #ecf0f1;
+            --highlight-bg: #d6ebf7;
+            --highlight-border: #3498db;
+            --shadow-light: rgba(0,0,0,0.05);
+            --shadow-medium: rgba(0,0,0,0.08);
+            --shadow-dark: rgba(0,0,0,0.1);
+            --modal-overlay: rgba(0,0,0,0.5);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: #0d0d0d;
+                --bg-secondary: #3d3d3d;
+                --bg-header: #0d0d0d;
+                --text-primary: #ffffff;
+                --text-secondary: #f5f5f5;
+                --text-muted: #e0e0e0;
+                --text-light: #cccccc;
+                --border-color: #555555;
+                --border-light: #4a4a4a;
+                --highlight-bg: #2a5d8a;
+                --highlight-border: #a8daff;
+                --shadow-light: rgba(0,0,0,0.3);
+                --shadow-medium: rgba(0,0,0,0.4);
+                --shadow-dark: rgba(0,0,0,0.5);
+                --modal-overlay: rgba(0,0,0,0.7);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh; /* Dynamic viewport height for mobile */
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--bg-header);
+            color: white;
+            padding: 12px 16px;
+            text-align: center;
+            box-shadow: 0 2px 4px var(--shadow-dark);
+            z-index: 100;
+            order: 1;
+            flex-shrink: 0;
+            min-height: 50px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .fullscreen-btn {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+        }
+
+        .fullscreen-btn:hover {
+            opacity: 0.7;
+        }
+
+        .fullscreen-btn:active {
+            opacity: 0.5;
+        }
+
+        /* Tab Navigation */
+        .tabs {
+            display: flex;
+            background-color: #d5d5d5;
+            border-top: 2px solid var(--border-color);
+            box-shadow: 0 -4px 8px var(--shadow-light);
+            order: 3;
+            z-index: 999;
+            flex-shrink: 0;
+            min-height: 60px;
+            height: 60px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 16px 0;
+            text-align: center;
+            background-color: #e8e8e8;
+            border: none;
+            color: #555;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tab.active {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .tabs {
+                background-color: #2c3e50;
+            }
+            
+            .tab {
+                background-color: #3d3d3d;
+                color: #95a5a6;
+            }
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background-color: var(--bg-primary);
+            -webkit-overflow-scrolling: touch;
+            order: 2;
+            min-height: 0;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 16px;
+            animation: fadeIn 0.3s;
+        }
+
+        #read-tab,
+        #learn-tab {
+            padding: 0;
+        }
+        
+        #learn-tab.active {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Settings Tab */
+        .settings-content {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px var(--shadow-dark);
+        }
+
+        .settings-group {
+            margin-bottom: 24px;
+        }
+
+        .settings-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .settings-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .text-size-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .text-size-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .text-size-btn:hover {
+            border-color: #3498db;
+        }
+
+        .text-size-btn.active {
+            background-color: #3498db;
+            border-color: #3498db;
+            color: white;
+        }
+
+        /* Text size variations */
+        body.text-small {
+            font-size: 14px;
+        }
+
+        body.text-small .dialogue-text {
+            font-size: 14px;
+        }
+
+        body.text-small .dialogue-character {
+            font-size: 12px;
+        }
+
+        body.text-normal {
+            font-size: 16px;
+        }
+
+        body.text-normal .dialogue-text {
+            font-size: 16px;
+        }
+
+        body.text-normal .dialogue-character {
+            font-size: 14px;
+        }
+
+        body.text-large {
+            font-size: 18px;
+        }
+
+        body.text-large .dialogue-text {
+            font-size: 18px;
+        }
+
+        body.text-large .dialogue-character {
+            font-size: 16px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        /* Read Tab */
+        .scene-block {
+            background-color: transparent;
+            border-radius: 8px;
+            padding: 0 16px 16px 16px;
+            margin-bottom: 16px;
+        }
+
+        .dialogue {
+            margin-bottom: 12px;
+            line-height: 1.6;
+            background-color: var(--bg-secondary);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        .dialogue-character {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .dialogue-text {
+            color: var(--text-secondary);
+        }
+
+        .dialogue.highlight {
+            background-color: var(--highlight-bg);
+            border: 2px solid var(--highlight-border);
+        }
+
+        /* Learn Tab */
+        .learn-controls {
+            background-color: var(--bg-secondary);
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -2px 4px var(--shadow-dark);
+            flex-shrink: 0;
+        }
+
+        .learn-scene-header {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            box-shadow: 0 2px 4px var(--shadow-dark);
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            margin-bottom: 12px;
+        }
+
+        .learn-scene-header:active {
+            background-color: #2980b9;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-back {
+            background-color: #3498db;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-back:active {
+            background-color: #2980b9;
+        }
+
+        .btn-next {
+            background-color: #3498db;
+            color: white;
+            flex: 2;
+        }
+
+        .btn-next:active {
+            background-color: #2980b9;
+        }
+
+        .btn-back:disabled,
+        .btn-next:disabled {
+            background-color: var(--border-light);
+            color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .learn-content-area {
+            background-color: transparent;
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .dialogue.my-character {
+            background-color: var(--highlight-bg);
+            border: 2px solid var(--highlight-border);
+        }
+
+        /* Navigation Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--modal-overlay);
+            z-index: 1000;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--bg-secondary);
+            width: 90%;
+            max-width: 400px;
+            max-height: 70vh;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            background-color: var(--bg-header);
+            color: white;
+            padding: 16px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .modal-body {
+            overflow-y: auto;
+            max-height: calc(70vh - 60px);
+        }
+
+        .nav-item {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .nav-item:active {
+            background-color: var(--border-light);
+        }
+
+        .nav-item.current {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .nav-item.current {
+                background-color: #1e3a4a;
+            }
+        }
+
+        .nav-act {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .nav-scene {
+            color: var(--text-light);
+            padding-left: 20px;
+        }
+
+        .arrow-icon {
+            float: right;
+            color: #95a5a6;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Raw play text
+        const rawPlayText = `#À grands coups de poêle !
+##Acte 1
+###Scène 1
+Blandine       : (Blandine qui porte une blouse de ménage dépoussière les meubles avec son plumeau. Elle porte sur les oreilles un casque audio et fredonne un air de rap. Blandine commence à chanter.) Y'a pas de problème, tcha tcha, y'a pas de problème. / Y'a que des emmerdes, tcha tcha, que des emmerdes. / Moi, j't'aime pas, tcha tcha, mais toi tu m'aimes. / C'est trop la merde, tcha tcha, trop la merde. (Arnaud entre par la porte d'entrée. Il enlève son manteau et pose sa mallette. Blandine ne le voit pas tout de suite.)
+Arnaud         : Bonjour Blandine. Marie n'est pas là ? (Blandine ne l'entend pas et continue sa chanson.)
+Blandine       : Faut arrêter les embrouilles, tcha tcha, les embrouilles. / Moi, j'm'en bats les... (Blandine arrête de chanter dès qu'elle voit Arnaud.) Ah ? C'est vous. J'vous avais pas entendu. (Elle coupe le son de son smartphone.)
+Arnaud         : Je disais, vous n'avez pas vu ma femme ?
+Blandine       : Bah si j'l'ai vue. Elle était là, y'a un quart d'heure.
+Arnaud         : Elle est sortie ?
+Blandine       : Oui, à l'épicerie, y'avait plus d'olives.
+Arnaud         : Et alors ? Ça ne pouvait pas attendre ?
+Blandine       : Un apéro sans olives c'est pas un apéro.
+Arnaud         : Un apéro ? Quel apéro ?
+Blandine       : Bah, l'apéro de tout à l'heure... Mince, j'ai fait la gaffe. Votre femme voulait pas que j'le dise. Elle voulait vous faire la surprise...
+Arnaud         : Eh bien on dirait que c'est raté. Elle a invité du monde ce soir ?
+Blandine       : Oui son frère David et votre sœur Monique. Ça fait quinze ans que vous êtes mariés, alors elle a prévu un petit apéro dînatoire, un truc tout simple sans chichi.
+Arnaud         : Eh merde...
+Blandine       : Ça vous fait pas plaisir ?
+Arnaud         : J'avais complètement oublié notre anniversaire de mariage...
+Blandine       : Ça c'est nul.
+Arnaud         : Oui je sais.
+Blandine       : Vous lui avez même pas acheté un petit cadeau ?
+Arnaud         : Eh non, je vous dis que j'avais complètement oublié. Il est quelle heure ? (en regardant sa montre) Bientôt 19 heures, j'ai peut-être encore le temps d'aller chez un fleuriste.
+Blandine       : Il a oublié le cadeau... ça c'est vraiment naze...
+Arnaud         : Eh oh ! C'est bon !
+Blandine       : Mouais... si j'étais votre femme, j'serais pas contente, mais pas contente du tout ! J'crois même que j'vous ferais la gueule un bon coup.
+Arnaud         : Eh bien ça tombe bien, vous n'êtes pas ma femme ! Vous êtes là pour faire le ménage, alors continuez votre travail et laissez... (Marie entre par la porte d'entrée, elle est choquée. Elle pose son manteau.)
+Arnaud         : Ah te voilà. Tu en fais une tête, ça ne va pas ?
+Blandine       : J'vous l'avais dit qu'elle vous ferait la gueule...
+Marie          : (on voit sur son visage que ça ne va pas) Si si, ça va...
+Arnaud         : C'est quoi le problème ? L'épicier n'a plus d'olives ? Ce n'est pas bien grave on prendra autre chose à l'apéro.
+Blandine       : Désolée madame, j'voulais pas l'dire pour l'apéro mais il m'a forcée à causer.
+Marie          : Blandine, vous pouvez nous laisser deux minutes s'il vous plaît ?
+Blandine       : Pas de problème, j'vais nettoyer la salle de bain, j'sais pas ce que vous avez fait là-dedans, mais c'est tout dégueu. (Blandine sort en chantant.) Y'a pas de problème, tcha tcha, y'a pas de problème. / Y'a que des emmerdes, tcha tcha, que des emmerdes.
+Arnaud         : Elle pousse le bouchon un peu loin tout de même ! Tu as vu comment elle nous parle ?
+Marie          : J'ai vu... (effrayée) C'est horrible ! Horrible !
+Arnaud         : Hein ? Faut pas exagérer, ce n'est pas la peine de te mettre dans cet état, Blandine est peut-être un peu rustre mais...
+Marie          : Je m'en moque de Blandine ! J'ai vu le commissaire Bernard !
+Arnaud         : Le commissaire Bernard ?! Mais enfin ! Ce n'est pas possible !
+Marie          : Il était dans l'épicerie, chez Momo ! C'était lui ! C'est foutu !
+Arnaud         : Mais... Et qu'est-ce qu'il ferait ici à Paris ? À l'époque on vivait à Châteauroux. Tu es sûre que c'est lui ? Il a certainement changé depuis le temps, c'était quand déjà ?
+Marie          : 16 ans, juste un an avant notre mariage.
+Arnaud         : En 16 ans on change voyons ! Tu as cru que c'était le commissaire Bernard mais c'est sans doute quelqu'un qui lui ressemble...
+Marie          : Je te dis que c'est lui ! Il a vieilli, mais c'est lui ! Je ne suis pas folle !
+Arnaud         : (déçu et inquiet) Ah... Et il t'a vue ?
+Marie          : J'ai essayé de l'éviter mais oui, il m'a vue. Il me regardait même avec insistance, alors j'ai paniqué, je suis sortie de l'épicerie rapidement sans rien acheter. Il m'a reconnue ! C'est foutu !
+Arnaud         : Marie calme-toi... Réfléchissons...
+Marie          : On a quitté Châteauroux juste après le drame pour changer de vie et il réapparaît !
+Arnaud         : Le drame, le drame, tu exagères.
+Marie          : J'ai tout de même tué mon ancien mari...
+Arnaud         : Chut !
+Marie          : (Elle chuchote) J'ai tout de même tué mon ancien mari il y a 16 ans ! Alors, permets-moi d'appeler ça un drame si je veux !
+Arnaud         : Bon d'accord, c'était un drame...
+Marie          : Et si ça ne te dérange pas, j'ajoute que tu étais mon complice.
+Arnaud         : Chut ! Mais chut !
+Marie          : (Elle chuchote) Quand j'ai tué Richard, c'est toi qui as eu l'idée de déguiser le meurtre en accident.
+Arnaud         : Mais chut ! Ce n'était pas un meurtre ! (Blandine entre. Le couple ne parle plus.)
+Blandine       : Faut pas vous gêner pour moi, vous pouvez continuer à causer. C'est quoi c't'histoire de meurtre ?
+Arnaud         : C'est rien, c'est... dans une série policière, il y a eu un meurtre : Bang ! Bang ! Et puis de quoi je me mêle ! Depuis quand on ne peut plus parler tranquillement chez soi ?!
+Blandine       : Vous faites bien ce que vous voulez. Dites faudra racheter de l'eau de javel, y'en a plus. Et c'est important de désinfecter ! Faire briller sans désinfecter c'est pas du boulot, ça !
+Arnaud         : C'est ça, c'est ça...
+Blandine       : Vous prendrez un bidon de 5 litres, c'est mieux... Et du PQ aussi, y'en a plus guère. (Blandine retourne dans la salle de bain en chantant.) Moi, j't'aime pas, tcha tcha, mais toi tu m'aimes. / C'est trop la merde, tcha tcha, trop la merde.
+Arnaud         : (il chuchote) Ce n'était pas un meurtre, c'était de la légitime défense ! Il avait une maîtresse et il voulait se débarrasser de toi !
+Marie          : Je te rappelle que moi aussi j'avais un amant : toi...
+Arnaud         : Mais là, ça n'a absolument rien à voir ! Nous, on était purs, innocents, on s'aimait. Lui, c'était un pervers, un sale type, il était violent. Lors d'une dispute, vous vous êtes battus, il a perdu, voilà tout...
+Marie          : Tu as une manière de voir les choses toi...
+Arnaud         : D'ailleurs, je n'ai jamais compris pourquoi tu t'étais mariée avec lui...
+Marie          : Quand je me suis mariée avec Richard, je ne savais pas qu'il était dangereux, je ne savais pas que c'était une ordure ! (Blandine entre.)
+Blandine       : Ça a l'air vachement drôle vot' série. Des meurtres, des gens tués... et après on se demande d'où vient toute cette violence aux infos ! Voilà, faut pas chercher plus loin. Bon, faudra aussi des sacs d'aspirateur, il aspire plus rien, j'crois que j'irai plus vite avec un balai.
+Arnaud         : Eh bien c'est ça, du balai !
+Blandine       : J'sais pas si vous savez, mais ça existe les aspirateurs sans sac, c'est vachement mieux... Moi j'dis ça, j'dis rien. (Blandine sort.) Faut arrêter les embrouilles, tcha tcha, les embrouilles. / Moi, j'm'en bats les...
+Arnaud         : Marie, regardons les choses en face. Il y a 16 ans, le commissaire Bernard a conclu que ton mari était mort d'un accident. Il avait trop bu et complètement saoul, il était tombé dans l'escalier.
+Marie          : Bien fait pour lui.
+Arnaud         : Le flic n'a jamais su qu'en vous bagarrant tu as tué ton mari avec ta poêle à crêpes...
+Marie          : Un bon coup de poêle sur la nuque. J'ai pas fait exprès mais ça a été radical...
+Arnaud         : Il ne l'a jamais su ! Alors je vais te dire, même si jamais un jour, par hasard, on devait rencontrer ce flic, il n'y aurait aucune raison d'avoir peur, aucune !
+Marie          : Aucune raison d'avoir peur ? Je te signale tout de même que si après le meurtre on a quitté Châteauroux, c'est qu'on avait très peur !
+Arnaud         : Ce n'est pas qu'on avait peur mais surtout on n'avait pas le choix ! Je te rappelle qu'au moment du drame, les flics n'ont jamais su que nous étions amants. D'ailleurs ils ne me connaissaient pas. Que se serait-il passé si le commissaire avait appris que toi et moi on était amants ? Et qu'un an après le décès de ton mari, tu t'étais remariée ? Il aurait eu de sérieux doutes ! C'est uniquement pour ça qu'on a quitté Châteauroux. Et de toute façon, c'est de l'histoire ancienne maintenant, l'affaire a été classée sans suite il y a 16 ans !
+Marie          : N'empêche que pour déguiser le meurtre tu avais mis une bouteille de whisky à côté de Richard pour faire croire qu'il l'avait entièrement bue.
+Arnaud         : Et alors ? C'est ce que la police a noté sur le procès-verbal.
+Marie          : C'est vrai... Mais la police n'a jamais appris que mon mari était allergique au whisky !
+Arnaud         : Chut ! Mais chut !
+Marie          : Richard savait très bien qu'il était allergique. Jamais il n'aurait pris une goutte de whisky ! Il n'a donc pas pu se saouler et tomber dans l'escalier ! Élémentaire mon cher Watson !
+Arnaud         : Mais chut ! Je ne savais pas qu'il était allergique au whisky ! Rappelle-toi ! Tu m'as appelé : « Arnaud ! C'est horrible, je viens de tuer mon mari ! Je l'ai tué avec ma poêle ! Qu'est-ce qu'on fait ? » Et moi : « Pas de panique chérie, j'arrive tout de suite ! »... Pas de panique, tu parles... Quand j'ai vu le cadavre... j'ai vomi... Après, j'ai nettoyé mon... et je me suis dit « Arnaud, trouve ! Trouve une solution ! » Toi, tu étais dans le jardin, tu ne pouvais pas supporter la vue du cadavre.
+Marie          : Non, c'était à cause du vomi, désolée, l'odeur m'insupporte.
+Arnaud         : Et j'ai trouvé la solution : j'ai traîné ton mari jusqu'en haut de l'escalier, je l'ai poussé, il est tombé comme une vieille savate sans vie. Après j'ai ouvert le bar, j'ai pris un alcool fort : du whisky. J'avoue, j'ai bu une petite gorgée pour me donner du courage, j'ai versé la bouteille dans l'escalier et une fois qu'elle était vide je l'ai mise près du cadavre.
+Marie          : Du whisky... La grosse boulette... Tu aurais mieux fait de vider une bouteille d'eau-de-vie sur le mort...
+Arnaud         : De toute façon l'affaire est classée ! Alors commissaire Bernard ou pas commissaire Bernard, on s'en fout ! C'est pas ce flic qui va nous faire peur ! (On sonne à la porte.)
+Marie          : Ça doit être ta sœur.
+Arnaud         : Monique ? Déjà ? (Arnaud ouvre la porte. Le commissaire Bernard entre.)
+Le commissaire : Bonjour. Commissaire Bernard. (Arnaud déglutit.) Enfin, plus exactement « ancien commissaire ». Je viens de prendre ma retraite. Je peux ? Je ne serai pas long. (On voit qu'Arnaud a peur.) Je... Eh bien dites donc, on dirait que je vous fais peur.
+Arnaud         : Mais, pas de peur du tout, entrez chez vous, vous êtes ici chez moi.
+Le commissaire : C'est bien vous madame qui étiez tout à l'heure dans l'épicerie ?
+Marie          : L'épicerie ? Quelle épicerie ?
+Le commissaire : Celle du bout de la rue.
+Marie          : Où ça ?
+Le commissaire : Elle est à 200 mètres à vol d'oiseau, chez Momo.
+Marie          : Qui ça ?
+Le commissaire : Momo. De toute façon, il n'y a qu'une seule épicerie dans la rue. Alors, c'était bien vous ?
+Marie          : Moi ? Je ne sais pas.
+Le commissaire : Eh bien moi je le sais, je vous y ai vue.
+Marie          : Ah ?
+Le commissaire : Vous étiez en train de regarder les bocaux d'olives.
+Arnaud         : Tu regardais les bocaux d'olives ?
+Marie          : Je... oui, c'est possible.
+Le commissaire : Et d'un seul coup vous avez laissé les olives dans le rayon et vous êtes sortie précipitamment.
+Arnaud         : Tu es sortie précipitamment ?
+Le commissaire : Vous veniez peut-être d'apprendre une mauvaise nouvelle ?
+Arnaud         : Voilà ! C'est exactement ça ! Ma femme était dans l'épicerie, je lui ai envoyé un SMS et hop ! Elle est sortie immédiatement.
+Le commissaire : Ah ? Rien de grave j'espère ?
+Arnaud         : Non, non, rassurez-vous, rien d'important.
+Marie          : C'est, c'est... C'est, c'est...
+Arnaud         : C'est notre chat, il s'appelle Saissait... Il s'appelait, car il vient juste de mourir... Alors forcément, j'ai tout de suite prévenu ma femme. Elle a beaucoup de peine, elle est très choquée, elle l'adorait... (Marie fait semblant d'avoir de la peine.)
+Le commissaire : Ah, je suis désolé madame. Je n'arrive pas au bon moment. (Arnaud fait semblant d'être très triste.)
+Arnaud         : C'est qu'on l'aimait notre chat, hein ?
+Marie          : Oh oui... pauvre Sissi.
+Arnaud         : Saissait.
+Marie          : Pauvre Saissait. Mourir comme ça, à la fin de sa vie, c'est terrible pour un chat.
+Le commissaire : Que lui est-il arrivé ?
+Arnaud         : (Arnaud lève les bras) Ooh ! C'est terrible, terrible... terrible...
+Le commissaire : Oui ?
+Arnaud         : Il était là, sur le canapé, il dormait, il semblait heureux. Et d'un seul coup ! Paf !
+Le commissaire : Paf ?
+Arnaud         : Il a ouvert les yeux, il a dit « miaou, miaou, miaou » trois fois, et paf !!! Explosion interne. C'était fini, je n'ai rien pu faire.
+Le commissaire : Eh bien... et il est où ?
+Marie          : On l'a rangé.
+Arnaud         : On l'a mis dans une boîte en carton, dans notre chambre.
+Marie          : Oui, sous notre lit. C'est pour le vétérinaire, c'est mieux, on l'emmènera demain matin. Pauvre Saissait.
+Arnaud         : (surjoué) Saissait ! Pourquoi s'en aller si soudainement ? (Blandine entre.) Saissait, c'est si triste. Oh Saissait. Saissait...
+Blandine       : C'est sec... (silence) C'est sec, j'ai sorti vos chemises du lave-linge, tout est sec.
+Marie          : Je, oui, merci Blandine.
+Blandine       : Par contre, faudra acheter de la lessive, y'en a presque plus. Y'a vraiment rien dans cet appart ! Aucune organisation ! (Blandine sort, elle retourne vers la salle de bain.)
+Marie          : C'est Blandine. Elle vient faire du ménage. Elle est très gentille, elle est... très gentille. (Le commissaire sort un gant de sa poche.)
+Le commissaire : Très bien. Bon, venons au fait, je suis venu chez vous, uniquement pour vous rapporter votre gant, vous l'avez perdu en sortant de l'épicerie. Il est bien à vous n'est-ce pas ?
+Marie          : Je... Oui, je crois... (Le commissaire lui donne son gant.)
+Le commissaire : Je l'ai vu tomber de votre manteau. J'ai demandé à la caissière si elle vous connaissait, et elle m'a dit que vous êtes une bonne cliente, elle m'a donné votre adresse et comme elle est bavarde comme une pie, elle m'a aussi raconté plein de choses sans importance. Donc, voilà l'objet de ma visite.
+Marie          : Eh bien merci beaucoup, c'est gentil.
+Arnaud         : (mielleux) Merci monsieur le commissaire, c'est tellement aimable, tellement sympathique, tellement...
+Le commissaire : Ce n'est rien, c'est normal, on peut s'aider entre voisins. (Marie et Arnaud sont surpris, ils ouvrent grand les yeux.)
+Arnaud         : (avec Marie) … Entre voisins ?
+Marie          : (avec Arnaud) … Entre voisins ?
+Le commissaire : Je viens d'emménager dans un appartement pas loin du vôtre.
+Arnaud         : (amer) Ah ? Mais, mais c'est formidable ça...
+Le commissaire : Tenez, de votre fenêtre on peut le voir. (il montre de la fenêtre) Il est de l'autre côté de la cour. Juste en face. C'est celui avec le petit balcon, il est très chouette.
+Arnaud         : Mais c'est formidable ça...
+Le commissaire : Avant de prendre ma retraite, j'habitais à Châteauroux.
+Arnaud         : Mais c'est formidable ça...
+Le commissaire : Vous connaissez Châteauroux ?
+Marie          : (paniquée) Euh un peu, mais pas beaucoup du tout...
+Le commissaire : J'ai hérité de cet appartement et comme je suis à la retraite, je vais pouvoir visiter Paris. Ça a toujours été mon rêve. En fait, cet appartement appartenait à une vieille tante. Ma tante Suzette.
+Marie          : Ah ? Elle va bien ?
+Le commissaire : Elle est morte... Si je viens d'hériter, c'est forcément qu'elle n'est plus de ce monde...
+Marie          : Forcément, forcément... Excusez-moi, c'est à cause de Saissait, je n'ai plus les idées très claires.
+Le commissaire : Ma pauvre tante est morte d'un accident.
+Marie          : Ah ?
+Le commissaire : Un terrible accident. Vous ne devinerez jamais.
+Arnaud         : Elle est tombée dans l'escalier ? (sa femme lui donne un coup de coude) Je veux dire, elle est tombée d'une chaise ?
+Le commissaire : Oh non, c'est pire.
+Arnaud         : D'un escabeau ?
+Le commissaire : Non plus.
+Arnaud         : D'une grande échelle ? D'un échafaudage ?
+Le commissaire : Non. Un accident de poêle... (Marie et Arnaud sont choqués.) Un poêle à bois en fonte. Elle faisait faire des travaux dans son appartement et cet imbécile de chauffagiste avait suspendu le poêle à des sangles pour le déplacer. Une sangle a lâché, ma tante Suzette était juste en dessous...
+Marie          : Ouuuh...
+Le commissaire : Comme vous dites... Elle s'est fait écraser par le poêle. Il paraît qu'elle était dans un état... Elle était plate comme une crêpe, Suzette...
+Marie          : C'est affreux.
+Le commissaire : Eh oui, j'en suis encore tout retourné... Elle qui était gaie comme un pinson, la pauvre... Bon, je vais vous laisser. Je comprends que vous vivez un moment difficile. Madame, Monsieur.
+Arnaud         : Au revoir, bonne soirée et merci pour le gant ! (Le commissaire sort et il entre à nouveau mais Arnaud qui ne l'a pas vu s'adresse à sa femme. Arnaud est choqué par les dernières nouvelles.)
+Arnaud         : Oh là là ! C'est la fin ! C'est la catastrophe !
+Le commissaire : Une autre mauvaise nouvelle ?
+Arnaud         : Aaah !... Je, non tout va bien, très bien, merci et vous ?
+Le commissaire : Pourtant vous venez de dire « Oh là là ! C'est la fin ! C'est la catastrophe ! » (Le dialogue suivant est rapide, Arnaud parle sans réfléchir.)
+Arnaud         : Mais non, voyons.
+Le commissaire : Mais si, j'ai très bien entendu.
+Arnaud         : Mais non, je n'ai pas dit « Oh là là, c'est la fin », j'ai dit, j'ai dit, j'ai...
+Le commissaire : Oui ?
+Arnaud         : J'ai dit : « Oh Lola Séraphin ».
+Le commissaire : Lola Séraphin ?
+Marie          : Oui, il a dit : « Oh Lola Séraphin »...
+Le commissaire : Vous avez dit : « Oh Lola Séraphin, c'est la catastrophe » ?
+Arnaud         : Voilà, exactement.
+Le commissaire : Ah, d'accord, excusez-moi, j'avais mal entendu... Et qui est cette Lola Séraphin ?
+Arnaud         : C'est, c'est...
+Le commissaire : Je ne vous parle pas de votre chat mais de Lola Séraphin.
+Marie          : C'est sa sœur ! Sa sœur jumelle ! (Arnaud surpris, ouvre grand les yeux.)
+Arnaud         : Voilà ! C'est ma sœur... jumelle... Le nom de son mari c'est Séraphin, donc ma sœur s'appelle Lola Séraphin. Voilà, voilà...
+Le commissaire : Ah très bien ! Excusez-moi, c'est un défaut professionnel, je ne peux pas m'empêcher de poser des questions.
+Marie          : Ce n'est pas grave, on comprend.
+Le commissaire : Et pourquoi est-ce une catastrophe ?
+Arnaud         : Il n'y a pas de catastrophe, tout va pour le mieux, je vous assure.
+Le commissaire : « Oh Lola Séraphin, c'est la catastrophe ». C'est ce que vous avez dit.
+Marie          : Oui, Lola vient d'apprendre une très mauvaise nouvelle.
+Le commissaire : Son chat est mort ?
+Arnaud         : Non c'est son mari. (Marie donne un coup de coude à Arnaud.)
+Marie          : Son mari est... il est parti. Il vient de la quitter. Il ne reviendra pas.
+Arnaud         : Oui, ma pauvre sœur jumelle... (surjoué) Oh ! Lola Séraphin ! Quelle catastrophe !
+Le commissaire : Eh bien on dirait que les mauvaises nouvelles s'accumulent chez vous... Bon, au fait, je suis revenu car j'avais oublié de vous demander quelque chose. (On lit l'inquiétude sur le visage d'Arnaud et Marie.)
+Marie          : Oui ? Une autre question ?
+Le commissaire : Est-ce qu'un soir vous seriez libre ?
+Marie          : Libre ? (Blandine entre.)
+Le commissaire : Je pensais vous inviter un soir pour un apéritif, histoire d'apprendre à se connaître entre voisins.
+Arnaud         : (amer) Mais c'est formidable... Oui, je suis pas mal pris en ce moment, mais pourquoi pas ?
+Blandine       : Bah ce soir y'a un apéro ici ! Vous avez qu'à venir ! Ils fêtent leurs 15 ans de mariage !
+Arnaud         : Mais non ! (Le commissaire est surpris par ce refus.) Mais non pas 15 ans ! Pas 15 ans, voyons...
+Blandine       : Ah bon ? Je croyais pourtant que vous vous étiez rencontrés y'a 16 ans et que vous vous êtes mariés un an après, c'est madame qui m'avait raconté ça.
+Marie          : Mais pas du tout Blandine. Pas du tout !
+Arnaud         : C'est beaucoup plus récent ! Beaucoup plus ! On s'est mariés, il y a exactement 10 ans.
+Marie          : Voilà ! 10 pas 15 ! 10 !
+Blandine       : Oh comme vous voulez, vous savez moi et les chiffres on est pas copains. Vous vous êtes rencontrés dans quelle ville déjà ? Chât... (Elle voulait dire Châteauroux mais elle est interrompue.)
+Arnaud         : Il est mort ! Le chat est mort ! On en parle plus ! C'est fini ! Blandine, vous n'avez rien d'autre à faire ?!
+Blandine       : Si si, j'vais bosser. Alors on compte un apéro en plus ?
+Le commissaire : Oh je ne voudrais pas vous déranger.
+Arnaud         : Voilà ! Dans quelque temps, on fixera une date.
+Blandine       : Allez faut pas faire de chichi ! On s'ra bien contents d'avoir quelqu'un en plus pour l'apéro ! (Blandine file vers la cuisine.) Bon ! Un apéro en plus alors ! Un ! (Blandine va dans la cuisine.)
+Le commissaire : Eh bien merci pour l'invitation. Je vais venir mais si vous le permettez je vais d'abord passer chez moi, j'ai des choses à faire. Je vous dis donc à tout à l'heure... C'est drôle, mais... Madame, votre visage me rappelle quelqu'un... J'ai l'impression que je vous ai déjà vue quelque part... Excusez-moi, j'ai une cervelle d'oiseau, on s'est déjà rencontrés non ?
+Marie          : Euh non, je ne crois pas et j'ai tellement changé depuis 16...
+Arnaud         : (Arnaud interrompt rapidement sa femme) Elle ne vous connaît pas ! On ne se connaît pas !
+Le commissaire : Vous dites que vous avez changé depuis 16 ?
+Arnaud         : Depuis ces histoires (prononcer : depuis 16 histoires), elle a changé. Depuis ces histoires de... oh et puis c'est compliqué, on vous racontera tout ça à l'apéritif.
+Le commissaire : Très bien, à tout à l'heure. Madame, Monsieur. (Le commissaire sort. Arnaud et Marie soulagés soufflent.)
+Arnaud         : Oh là là ! C'est la...
+Marie          : Mais chut ! Ne recommence pas ! Chut ! (Le couple regarde la porte pour être sûr que le commissaire ne rentre pas.)
+Arnaud         : Non, c'est bon il est parti.
+Marie          : Tu crois qu'il m'a reconnue ?
+Arnaud         : Mais j'en suis sûr ! Il sait que c'est nous ! Je ne crois pas une seconde à son histoire d'héritage ! Il est venu s'installer face à notre appartement pour pouvoir nous espionner !!!
+Marie          : Mais pas forcément ! Sa tante Suzette a peut-être fini plate comme une crêpe, c'est tout à fait possible !
+Arnaud         : Il nous observe ! Il nous nargue en nous tendant des pièges pour voir notre réaction ! Il nous traque !
+Marie          : Mais quels pièges ?
+Arnaud         : Tu n'as pas remarqué ? Il a fait allusion plusieurs fois au meurtre en plaçant un mot par-ci par-là.
+Marie          : Oui, tu as peut-être raison... Il nous a demandé si on connaissait Châteauroux...
+Arnaud         : Et d'un !
+Marie          : Il a dit que sa tante était morte d'un « accident ».
+Arnaud         : Et de deux !
+Marie          : Il a dit aussi le mot « poêle »...
+Arnaud         : Oui et il a aussi dit le mot crêpe ! Plate comme une crêpe Suzette ! Il sait que tu as tué ton mari avec une poêle à crêpes !
+Marie          : Et en partant, il me demande si on s'est déjà rencontrés...
+Arnaud         : Il n'est pas venu ici pour visiter Paris ! Il est là pour nous piéger ! Et si jamais on commet une erreur, il nous arrêtera !!! (Marie s'approche de la fenêtre.)
+Marie          : (Marie regarde par la fenêtre) C'est foutu ! Arnaud, j'ai peur... Et si on se trompait ? Sa tante est peut-être vraiment morte et il n'a pas du tout l'intention de... AAAH ! Il nous espionne ! Là ! De son balcon ! Avec des jumelles ! (Arnaud se précipite vers la fenêtre et jette un œil vers l'appartement du commissaire.)
+Arnaud         : Aaaaah ! Restons naturels ! Il nous regarde ! Faisons comme si on n'avait rien à se reprocher ! Il nous voit avec ses jumelles mais il ne nous entend pas ! (Marie maladroitement met sa main dans ses cheveux et fait semblant de se coiffer.)
+Arnaud         : (chuchote) Mais qu'est-ce que tu fais ?
+Marie          : (son visage exprime la peur) J'essaie d'être naturelle.
+Arnaud         : Mais c'est nul ! Fais semblant de rire ! Rigole !
+Marie          : Quoi ?
+Arnaud         : Ris ! Montrons qu'on n'a pas peur ! Éclate de rire ! Vas-y bon sang !
+Marie          : (forcé) Ah ah ah ! Que c'est drôle ! Ah ah ah ! Hi hi hi ! (Blandine sort de sa cuisine. Elle les observe.)
+Arnaud         : Continue ! (forcé) Ah ah ah ! C'est la meilleure de l'année ! Ah ah ah !
+Marie          : Oh oh oh ! Hi hi hi ! On est naturels, là ?
+Arnaud         : Oui, très. Ah ah ah ! Hi hi hi ! Oh oh oh !
+Blandine       : Dites, quand vous aurez fini de vous pisser dessus, vous me direz ? (Arnaud jette un œil à la fenêtre.)
+Arnaud         : Il n'est plus là. (Arnaud tire le rideau.)
+Blandine       : Bah pourquoi vous tirez le rideau ? C'est débile.
+Arnaud         : Parce que je suis ici, chez moi et je fais ce que je veux ! Non mais ! Et qu'est-ce qui vous a pris d'inviter ce flic ! De quoi je me mêle ?!
+Blandine       : Dites donc ! Et si moi je trouve que c'est sympa de l'inviter ?! Ça s'appelle être civilisé ! Eh pis si vous êtes pas content je vais lui dire que vous me déclarez pas et que vous me payez au black ! Il va vous coller une amende et ça sera bien fait pour vous ! Bon je retourne à la cuisine, parce que c'est pas vous qu'allez préparer l'apéro, vous savez rien faire de vos dix doigts ! (Blandine entre dans la cuisine.)
+Arnaud         : Non mais... non mais tu as vu comment elle me parle ?
+Marie          : Elle est un peu impulsive... Gentille mais impulsive. Dis Arnaud, quand le commissaire va revenir, si jamais il allait jeter un coup d'œil sous notre lit ? Tu y as pensé à ça ?
+Arnaud         : Bah pourquoi il irait sous notre lit ?
+Marie          : Pour voir le chat...
+Arnaud         : Tu sais bien qu'on n'a jamais eu de chat... Mais oui, tu as raison ! Il faut mettre une boîte en carton sous notre lit ! Oh là là, il faut penser à tout ! Est-ce qu'on a une boîte ?
+Marie          : Non... Viens avec moi, on file à l'épicerie, j'en ai vu là-bas. Allez vite ! Avant qu'il ne revienne ! (Arnaud et Marie prennent leur manteau et sortent rapidement.)
+Arnaud         : (En sortant) Mais pourquoi elle a invité ce flic !!!
+##Acte 2
+###Scène 1
+Blandine       : (Blandine sort de la cuisine et entre dans le salon.) Ils sont partis ? Eh bien tant mieux, parce que lui, il commence à me gaver. S'il continue, j'le vire... (Elle tire les rideaux.) Eh bien voilà on voit quand même mieux ce qu'on dit. (On sonne à la porte avec insistance.) Voilà, voilà. J'arrive ! C'est bon ! J'arrive !!! (Blandine ouvre la porte. Monique entre. Elle porte un jogging moche et voyant et a un gros bandage sur un auriculaire.)
+Monique        : Salut Blandine... Il est pas là mon frère ?
+Blandine       : Non, ils sont partis tous les deux.
+Monique        : Ils sont où ?
+Blandine       : J'sais pas, ils font ce qu'ils veulent, ils vont pas me demander la permission à chaque fois.
+Monique        : Ouais c'est sûr. J'ai un p'tit cadeau pour leurs 15 ans de mariage. (elle lui tend un petit paquet cadeau) Tenez, c'est pas grand-chose. C'est un marteau. Je l'avais acheté pour moi et je me suis foutu un coup sur un doigt, sur l'auri... sur le petit, le rikiki. Ça m'a fait un mal de chien, du coup j'arrête le bricolage pour de bon.
+Blandine       : C'est gentil, fallait pas... mais c'est pas à moi qu'il faut le donner, c'est à eux. (Elle lui redonne le paquet.)
+Monique        : Ah ouais c'est vrai, j'suis bête. Ça va leur plaire comme cadeau ? J'suis pas trop sûre de moi sur ce coup-là.
+Blandine       : Je pense qu'ils seront très contents. Ça sert toujours un marteau.
+Monique        : Ouais c'est sûr, c'est ce que j'me suis dit. J'avais pensé aussi à un tournevis mais le marteau c'est mieux, surtout pour enfoncer des clous. (Monique pose son paquet sur le meuble.)
+Blandine       : Non mais c'est bien, faut pas vous inquiéter.
+Monique        : À l'anniversaire d'Arnaud je lui avais pris une bassine mais j'suis pas sûre qu'il avait vraiment aimé, ça craint.
+Blandine       : Ah bon ? C'est étonnant...
+Monique        : Pourtant c'est vachement pratique une bassine pour mettre de l'eau.
+Blandine       : Oui, c'est pratique.
+Monique        : Ou pour passer la serpillière, c'est vachement bien. Vous avez une bassine, vous pour passer la serpillière ?
+Blandine       : Je prends un seau mais c'est pareil.
+Monique        : Ah ouais, un seau... C'est pas con un seau. Du coup, je garde l'idée pour son prochain anniversaire.
+Blandine       : Alors, ça va, vous le boulot en ce moment ?
+Monique        : Ouais, ça va. J'ai pas de taf mais là, j'suis sur un gros coup, ça va faire mal.
+Blandine       : Ah ?
+Monique        : J'ai été dans une agence d'intérim et j'ai laissé un CV en béton. Y'a plein de trucs vachement bien sur ce CV... En fait, c'est pas le mien, j'l'ai piqué à une copine. Elle, elle a bossé dans plein de boîtes, du coup ça va leur plaire à l'intérim.
+Blandine       : Ils vous ont appelée ?
+Monique        : Non mais j'sens que c'est pour bientôt, sont pas cons quand même, on laisse pas passer une occase comme ça.
+Blandine       : C'est sûr... Oh et puis il n'y a pas que le travail dans la vie.
+Monique        : Ouais, ce qui compte surtout c'est le fric.
+Blandine       : Vous trouvez ? Pourtant, comme on dit : « l'argent ne fait pas le bonheur ».
+Monique        : Peut-être mais le bonheur sans fric c'est un bonheur qu'a comme un goût de misère.
+Blandine       : Moi, l'argent je m'en fiche. Ça ne m'a jamais vraiment intéressée. (Monique en parlant s'approche de la fenêtre.)
+Monique        : Ah ? Dites, c'est normal qu'un type regarde par ici avec des jumelles ?
+Blandine       : Où ça ?
+Monique        : Là, dans l'appart juste en face. (Blandine s'approche et regarde par la fenêtre.)
+Blandine       : Je vois rien. Vous avez vu quelqu'un ? (Monique regarde à nouveau.)
+Monique        : Ouais un type avec des jumelles. Ah ? Il est plus là. Ça doit être un voyeur, méfiez-vous. Les voyeurs c'est les pires, ils regardent avec leurs yeux. J'serais vous je me mettrais pas toute nue pour faire le ménage, les voyeurs ils regardent ça.
+Blandine       : Mais je ne fais jamais le ménage toute nue ! J'ai toujours ma blouse.
+Monique        : Ouais c'est pas con. Restez toujours habillée alors. (On sonne à la porte.)
+Blandine       : Voilà, voilà. J'arrive ! C'est sûrement David, le frère de madame. (Blandine ouvre la porte et David entre. Il semble un peu déprimé. Il tient une bouteille qui est enveloppée d'un paquet cadeau.)
+Monique        : Salut David.
+David          : Bonjour Blandine, salut Monique. Dites, vous n'auriez pas de l'aspirine ? J'ai un mal de tête. (Il pose la bouteille sur un meuble.)
+Blandine       : Vous êtes malade ?
+David          : Oui, je souffre de la pire des maladies. (Blandine fait la grimace.)
+David          : La maladie d'amour. Ma femme a rencontré un homme.
+Blandine       : Aïe...
+David          : Elle part avec Lu.
+Blandine       : Avec lui ?
+David          : Non avec Lu.
+Monique        : Lu ? Les gâteaux ?
+David          : Lu est son prof de Chinois. Elle prend des cours particuliers. Elle part avec, elle me quitte. Elle est tombée amoureuse de lui.
+Blandine       : De Lu ?
+David          : Oui de lui. Ils partent s'installer à Pékin la semaine prochaine. J'ai essayé de la retenir mais Lu n'a pas voulu...
+Monique        : Moi, mon mari s'est barré, y'a tout juste cinq ans, faut dire que j'avais déconné à plein tube, mais toi, t'es sûr que ta femme veut plus de toi ?
+David          : J'ai demandé à Lu / Si elle voulait encore de moi / Il m'a dit « j'ai pas l'habitude » / « De m'occuper des cas comme ça » (Remarque de l'auteur : un petit air connu, non ?)
+Monique        : Ouais, ça craint cette histoire, elle reviendra pas. Comme mon mari, pareil. Tu verras, on s'habitue vite. Du coup, dans trois semaines tu y penseras même plus, une femme de partie, dix de perdues. (La porte s'ouvre. Marie et Arnaud entrent. Arnaud tient une boîte en carton.)
+Arnaud         : Ah, salut. Merci d'être venus, c'est sympa.
+Monique        : Salut, comment ça va ?
+Marie          : Ça va... et vous ? David, tu en fais une drôle de tête.
+Monique        : C'est sa femme, elle part en Chine, du coup, comme c'est pas la porte d'à côté, il fait la tronche.
+Marie          : Qu'est-ce que c'est que ces bêtises ?
+David          : Béa part avec Lu. Je ne lui plais plus.
+Marie          : Mais qu'est-ce que tu... (La porte s'ouvre. Le commissaire entre. Il tient un bouquet de fleurs.)
+Le commissaire : Tenez madame. (Il offre son bouquet de fleurs à Marie. Arnaud cache sa boîte en carton derrière son dos.)
+Marie          : Oh, c'est gentil, il ne fallait pas...
+Blandine       : Oh elles sont drôlement belles ! Monsieur lui, il n'a rien offert à madame, il avait oublié la date d'anniversaire.
+Arnaud         : Mais pas du tout ! Pas du tout ! Allez donc chercher l'apéro au lieu de dire des bêtises... C'est vrai quoi ! Comment aurais-je pu oublier notre anniversaire de mariage !
+Blandine       : 15 ans ça s'oublie pas pourtant...
+Arnaud         : 10 pas 15 ! 10 !
+Blandine       : On s'en fout, c'est pareil ! J'suis pas là pour faire des maths, moi ! (Blandine va dans la cuisine. Monique voit qu'Arnaud tient sa boîte en carton derrière son dos.)
+Monique        : C'est quoi ce carton ?
+Arnaud         : Quoi ? Quel carton ?
+Monique        : Derrière ton dos. Tu planques un truc ?
+Arnaud         : Mais non ! C'est, c'est...
+Le commissaire : Vous n'êtes peut-être pas au courant mais Saissait est mort... Il est dans ce carton ?
+Arnaud         : Mais non, mais oui, il avait l'habitude de faire un tour dans la rue à cette heure-là, alors...
+Marie          : Alors, on est allés le promener... dans son carton. Pauvre Saissait. Donne-le, je vais aller le ranger sous le lit... (Marie prend le carton et va dans la chambre.) Allez, viens Saissait, viens avec maman, la promenade est terminée...
+Arnaud         : (Arnaud gêné, tousse) Bon, je... Je vous présente Monique, ma sœur et David le frère de ma femme. Monsieur le commissaire Bernard est notre nouveau voisin.
+Le commissaire : Ancien commissaire... Je suis désormais à la retraite. (Ils se serrent la main.)
+Monique        : Moi, c'est Monique. Chômeuse chez Pôle Emploi.
+David          : Bonjour. David. David le cocu si vous préférez...
+Le commissaire : Je... Je viens juste d'emménager juste en face de cet appartement, de l'autre côté de la cour. J'aime beaucoup le quartier.
+Monique        : Ouais mais faites gaffe quand même, y'a un voyeur qu'habite de l'autre côté, un gros vicieux.
+Le commissaire : Ah ? Eh bien...
+Arnaud         : Mais non, mais non. Je... installez-vous, je vous en prie... Blandine !!! Blandine !!! (Blandine entre.)
+Blandine       : Voilà, voilà, j'arrive c'est pas la peine de gueuler !! Est-ce que je crie comme un putois, moi ?! (Marie revient.)
+Marie          : Allons, ne restez pas debout, asseyez-vous donc. (Tout le monde s'assoit, même Blandine.)
+Marie          : Blandine ? Que faites-vous ?
+Blandine       : Quoi ? Qu'est-ce qu'y a ?... Ah oui, je vais chercher l'apéro. (Elle se lève et va dans la cuisine. David se lève pour récupérer la bouteille qui était sur le meuble.)
+David          : Au fait, je ne suis pas venu les mains vides.
+Monique        : Moi non plus, mais j'vous donne pas le cadeau maintenant, je garde la surprise pour la fin. (David offre la bouteille à Arnaud.)
+Arnaud         : Laisse-moi deviner, c'est une bouteille ?
+Monique        : Moi c'est un marteau, ça sera vachement plus dur à deviner. (Arnaud enlève le papier cadeau.)
+Arnaud         : Ah, du whisky ? (gêné) C'est sympa, merci... Blandine !!!! Blandine !!! (Blandine entre avec deux bouteilles.)
+Blandine       : Qu'est-ce qu'y a encore ?! (Elle pose les deux bouteilles sur la table. Arnaud lui donne la bouteille de whisky.)
+Arnaud         : Allez me cacher ça, me ranger ça, s'il vous plaît.
+Blandine       : Vous voulez pas en boire un coup ?
+Arnaud         : Non, non merci, plus tard.
+Le commissaire : Vous n'aimez pas le whisky ?
+Arnaud         : Si si, mais là, non.
+Le commissaire : J'ai connu un ancien collègue qui ne pouvait pas en boire... Il était allergique... Il en est mort, le pauvre.
+Marie          : (paniquée) Euh, je vais à la cuisine, je reviens...
+Blandine       : Si vous voulez apporter les amuse-gueules, ils sont dans le four. (Blandine s'installe à la place de Marie.)
+Monique        : Moi pareil, j'ai un pote Bébert, dès qu'il mange des cacahuètes, il gonfle, il gonfle comme une autruche et après il devient tout rouge. Il arrête pas d'en bouffer pour nous faire marrer.
+Le commissaire : Eh bien, c'est un drôle d'oiseau votre ami...
+Arnaud         : Je... le temps est un peu plus frais, non ? Ils annoncent quoi à la météo ? De la pluie ?
+Blandine       : Oui il va flotter comme vache qui pisse avec en plus un froid de canard. Un vrai temps de chien.
+Monique        : Moi, j'aime pas la pluie, quand on a pas de capuche, ça mouille la tête, ça craint.
+David          : (triste) Béa elle, elle aime la pluie... Il pleut souvent en Chine ?
+Monique        : Je sais pas ça doit dépendre du temps qu'il fait.
+Le commissaire : Euh, excusez-moi, mais Béa, c'est votre femme ?
+David          : Oui. Elle aime les langues, elle est partie avec son professeur de Chinois... Elle m'a quitté. (On voit que David est très préoccupé, il n'écoute pas la conversation qui suit.)
+Le commissaire : Désolé... Eh bien... deux couples brisés dans la même famille, vous n'avez vraiment pas de chance.
+Monique        : Non, moi ça compte plus, c'est trop vieux, mon mari s'est barré y'a cinq ans.
+Le commissaire : Je parle de votre sœur, la sœur jumelle de monsieur.
+Monique        : Quelle sœur jumelle ? Tiens en parlant de jumelles, le voyeur d'en face, il doit être complètement débile car...
+Arnaud         : Blandine ! Blandine !
+Blandine       : Bah gueulez pas, j'suis là !
+Arnaud         : Hein ? Ah !
+Blandine       : Allez, c'est pas tout ça mais y'a du boulot. J'vais voir si madame a pas besoin d'un p'tit coup de main. (Blandine va dans la cuisine, elle croise Marie qui entre avec un plateau sur lequel sont posés des amuse-bouches.)
+Marie          : Voilà, voilà... C'est prêt...
+Blandine       : Faites gaffe de pas faire tomber le plateau. Je vais chercher la suite. (Blandine entre dans la cuisine.)
+Monique        : Ah cool ! J'ai la dalle en plus. C'est quoi ? On dirait des petites crêpes ?
+Marie          : (gênée) Euh, non, non. Ce sont des petits fours, des petites galettes de semoule très exactement.
+Monique        : Ouais, c'est des crêpes quoi.
+Arnaud         : (énervé) Puisqu'on te dit que ce ne sont pas des crêpes !!
+Monique        : Eh oh, ça va, j'm'en tape de toute façon, je vais en prendre, elles ont l'air vachement bonnes vos petites crêpes.
+David          : Excusez-moi, il faut que j'aille prendre l'air... Je vais aller marcher un peu.
+Marie          : Ça ne va pas ? Tu veux que je vienne avec toi ?
+David          : Non, merci. J'ai juste besoin de respirer et d'être seul. Désolé. (David sort.)
+Monique        : C'est à cause de sa femme, elle s'est barrée, ça craint.
+Marie          : Béa a quitté David ? C'est sûr ?
+Monique        : Ouais avec son prof de Chinois, il s'appelle Lu comme Lulu mais moitié moins.
+Le commissaire : (à Arnaud) Et votre sœur jumelle comment va-t-elle ? Elle ne souffre pas trop de sa séparation ?
+Marie          : (paniquée) Blandine !!!! Il faut que j'aille l'aider ! (Marie va rapidement dans la cuisine.)
+Arnaud         : Elle adore cuisiner...
+Le commissaire : Oui, je vois ça. Comment s'appelle-t-elle déjà votre sœur ? Ah oui : Lola Séraphin.
+Monique        : C'est qui cette Lola ?
+Arnaud         : C'est ma sœur, c'est ta sœur, c'est notre sœur. Oh là là, oh Lola...
+Monique        : J'ai une sœur moi ?! Depuis quand ?!
+Le commissaire : Vous... Vous n'étiez pas au courant ? Comment est-ce possible ?
+Arnaud         : Monique ! Il va falloir être courageuse maintenant ! J'ai quelque chose d'important à te dire ! Tu es prête ?
+Monique        : Euh j'sais pas trop là, pourquoi ? (Arnaud se positionne derrière Monique qui est toujours assise. Arnaud commence à lui masser les épaules.)
+Arnaud         : Détends-toi... Tu es toute nouée... Monique ?
+Monique        : Ouais ? C'est moi.
+Arnaud         : Monique !
+Monique        : Ouais.
+Arnaud         : Monique ! Je vais te dire quelque chose qui va te surprendre. Qui va beaucoup te surprendre...
+Monique        : D'accord, vas-y j'suis prête.
+Arnaud         : Maman... tu te rappelles maman ?
+Monique        : Bah ouais, carrément.
+Arnaud         : Maman a accouché deux fois. Voilà ! C'est dit !
+Monique        : Bah ça je savais, toi en premier et moi après ça fait deux. J'suis pas trop conne quand même, j'sais compter jusqu'à cent.
+Arnaud         : Elle a accouché deux fois mais elle a eu trois enfants ! Voilà !
+Monique        : Trois ? Comment elle a fait ? Elle a triché ?
+Arnaud         : Toi, moi et Lola, ma sœur jumelle ! Voilà !
+Monique        : Ah bon ?... Et pourquoi je la connais pas moi, ma frangine ?
+Arnaud         : C'est, c'est... excusez-moi je pense toujours à notre chat... C'est là que ça se complique ! Détends-toi, bon sang t'es toute tendue ! (il la masse de plus en plus fort) Maman avait un amant ! Voilà c'est dit !
+Le commissaire : Pour l'instant je vous suivais, mais là sincèrement j'ai du mal... Quel est le rapport entre un amant et le fait que votre sœur Monique ne connaît pas votre sœur jumelle ?
+Arnaud         : Voilà ! C'est ce que je dis ! C'est là que ça se complique vraiment ! Maman était avec papa.
+Monique        : Et papa était avec maman...
+Arnaud         : Ne complique pas, toi ! Je disais maman était avec papa et avec Louis. Je dirais même avec « Grand » Louis. C'était son amant.
+Monique        : Et pourquoi « Grand » Louis ?
+Arnaud         : Car il était grand ! Très grand ! S'il avait été petit son surnom aurait été petit Louis, s'il avait été gros ?
+Monique        : Gros Louis ?
+Arnaud         : Gagné ! Et lui il était grand ! Donc Grand Louis était l'amant de maman. Et maman est tombée enceinte.
+Monique        : De lui ?
+Arnaud         : De lui ou de papa on ne sait pas. On n'a jamais su. Et c'est trop tard maintenant.
+Monique        : Alors, tu es le fils de Gros Louis ?
+Arnaud         : De Grand Louis ! Eh puis non ! Je n'en sais rien ! Je te dis qu'on ne sait pas !
+Monique        : D'accord, on sait pas... Et ta sœur jumelle, elle le sait elle qu'elle est née ?
+Arnaud         : Mais non ! Mais oui évidemment ! Donc quand on est nés tous les deux, le même jour...
+Monique        : Vous êtes nés le même jour ?
+Arnaud         : Forcément puisqu'on est jumeaux !
+Monique        : Ah ouais, forcément.
+Arnaud         : Je disais, quand on est nés tous les deux...
+Monique        : Le même jour.
+Arnaud         : Tais-toi ! Laisse-moi finir ! Quand on est nés, maman était bien embêtée...
+Le commissaire : Et pourquoi cela ?
+Arnaud         : Car le Grand Louis criait : Ce sont mes enfants ! Mes enfants ! Ils sont à moi ! Je les veux ! Il était très remonté...
+Monique        : Il est gonflé le type, ça se trouve ils sont pas à lui, ils sont à papa et maman ces deux enfants !
+Arnaud         : Voilà ! C'est pour cette raison que maman était bien embêtée...
+Le commissaire : Donc ?
+Arnaud         : Donc, donc... Maman qui était très généreuse a donné un enfant à Grand Louis, c'était Lola, comme ça, il était content.
+Monique        : Et du coup, il a arrêté de gueuler tout le temps et de gonfler tout le monde !
+Arnaud         : Voilà ! Lola a ensuite été élevée par Grand Louis et moi j'ai été élevé par maman et papa. Et on a tous gardé le secret. Monique n'a jamais été au courant.
+Monique        : Jamais ! J'le jure sur la tête de ma sœur !
+Le commissaire : Et votre père dans tout ça ?
+Arnaud         : Papa était content.
+Le commissaire : Il était content ?
+Arnaud         : Oui très, très content.
+Le commissaire : Et Grand Louis aussi ?
+Arnaud         : Oui, très, très content, aussi.
+Le commissaire : Et votre maman ?
+Arnaud         : Très, très contente. Tout le monde était content.
+Monique        : Moi aussi j'suis contente, c'est une belle histoire. J'peux la voir quand Lola ?
+Arnaud         : Mais... mais on ne peut pas voir Lola, allons !
+Le commissaire : Et pour quelle raison ? Vous m'avez dit qu'elle venait de vivre un malheur : son mari l'a quittée. Ce serait peut-être l'occasion de la rencontrer pour la réconforter, non ?
+Monique        : Ouais ! Moi, j'veux la réconforter ! J'veux voir ma frangine !
+Arnaud         : Oh là là, Oh Lola !
+Le commissaire : Vous voulez un conseil ? Appelez-la, appelez-la tout de suite. Ne faites pas l'autruche, votre sœur a vraiment très envie de la voir.
+Arnaud         : Mais enfin, je ne pense pas que ce soit une bonne idée, elle a beaucoup de problèmes et...
+Monique        : Appelle-la ! Allez ! C'est ma sœur, j'veux la voir ! Allez ! Fais pas ton péteux !
+Le commissaire : Faites-le, croyez-moi vous ne regretterez pas.
+Arnaud         : Je, oui, oui... (en regardant le public) Je ne vais pas regretter... (Arnaud sort son téléphone portable. Il appuie sur une touche et fait semblant de parler à sa sœur.) Ça sonne... Allô, Lola ?... Allô ? Oui, c'est moi, c'est Arnaud, ton frère jumeau... Euh comment vas-tu ?... (Surjoué) Quoi ?!... Tu ne vas pas bien du tout ?!! (il regarde le commissaire et Monique) Elle ne va pas bien, je crois qu'il vaut mieux qu'elle reste toute seule chez elle et...
+Le commissaire : Surtout pas. Passez-moi votre téléphone, il faut l'inviter, c'est important pour elle et aussi pour votre sœur Monique.
+Monique        : Ouais, passe ton portable, je vais lui parler !
+Arnaud         : (Paniqué) Lola ! Viens tout de suite ! On prend l'apéro !!! (Monique veut lui prendre son téléphone.)
+Monique        : Passe-la-moi !
+Arnaud         : Mais non ! De toute façon elle a raccroché !
+Monique        : Du coup, elle va venir ?
+Arnaud         : Oui, oui...
+Le commissaire : Eh bien tant mieux ! C'est une bonne nouvelle. On va l'attendre.
+Arnaud         : (Au public) On risque d'attendre longtemps... (Blandine entre avec un plateau sur lequel sont posés des petits fours.)
+Blandine       : Dites, c'est normal que madame est en train de péter les plombs dans la cuisine ? Parce que là, elle fait que des conneries. Elle vient de mettre un pot de mayonnaise et des yaourts dans le four en disant c'est foutu, c'est foutu. Moi j'sais pas si c'est foutu mais j'sais qu'elle est capable d'allumer le gaz pour tout faire péter ! Alors magnez-vous et plus vite que ça !
+Arnaud         : Merci Blandine. Je reviens ! (Arnaud part précipitamment dans la cuisine.)
+Le commissaire : C'est certainement à cause de la mort de Saissait. C'est un véritable choc pour elle.
+Blandine       : Saissait ?
+Le commissaire : C'est ça. Saissait.
+Blandine       : C'est qui Saissait ?
+Le commissaire : Saissait c'est son chat.
+Blandine       : Son chat ?
+Le commissaire : Oui son chat Saissait. Il est mort. Pauvre femme, elle y était très attachée.
+Blandine       : Bah c'est quoi ces conneries ? Ils ont jamais eu de chat, qui c'est qui vous a raconté ça ?
+Le commissaire : Comment ça, ils n'ont jamais eu de chat ?... Ils n'ont pas un chat qui s'appelle Saissait et qui est mort aujourd'hui ?
+Blandine       : Bien sûr que non. Monsieur dit toujours « les animaux c'est bien chez les autres mais je n'en veux pas chez moi, ça crotte partout. »
+Monique        : Ouais c'est vrai ça ! Mon frère aime pas les animaux. Il aime ni les chats, ni les chiens, ni les poissons rouges, ni les tortues, ni les perruches, ni les hamsters, ni les cochons d'Inde, ni les cochons roses, ni les vaches, ni les chevals, ni les...
+Le commissaire : Ça va, j'ai compris ! Mais alors ?... Qui repose sous leur lit dans la boîte en carton ?!
+Blandine       : J'en sais rien moi ! Faudra leur demander. Bon, en parlant de lit, j'ai des draps à plier. (au commissaire) J'peux pas faire ça toute seule, ça vous dit de m'aider un peu ?
+Le commissaire : (Surpris) Qui ça ? Moi ?
+Monique        : Non moi j'veux bien. J'aime bien plier les draps. Quand on les tend on peut faire comme des grosses vagues avec, ça m'éclate.
+Blandine       : Eh bien suivez-moi alors.
+Monique        : Cool, trop bien. (Blandine et Monique sortent par la porte qui mène aux chambres et à la salle de bain. David entre par la porte d'entrée.)
+Le commissaire : Alors ? Comment ça va ? Vous allez mieux ?
+David          : Oui, j'ai marché un peu... J'ai essayé d'oublier un instant et franchement ne plus penser à Lu ne m'a pas déplu.
+Le commissaire : (En lui tendant un verre) Tenez, prenez un verre, ça vous fera le plus grand bien.
+David          : Je vais prendre un jus de fruits, je ne bois jamais d'alcool. Trop dangereux.
+Le commissaire : Allez, juste un petit verre ça ne vous fera pas de mal.
+David          : L'ex-mari de Marie buvait trop, il en est mort. (David se sert un verre de jus de fruits.)
+Le commissaire : Ah ? Votre sœur a déjà été mariée ?
+David          : Oui malheureusement...
+Le commissaire : Comment ça « malheureusement » ?
+David          : Son mari était un sale type. Il était malhonnête, violent, dangereux. Une vraie ordure, quoi... Je ne souhaite la mort de personne mais de vous à moi, je n'ai pas versé une larme le jour de son enterrement.
+Le commissaire : La maladie l'a emporté ?
+David          : Non, il est tombé seul chez lui, dans l'escalier. Il s'est brisé la nuque.
+Le commissaire : Ah ?... Mais vous venez de me dire qu'il est mort à cause de l'alcool.
+David          : Oui il était ivre mort quand il a fait sa chute mortelle.
+Le commissaire : Ah, je comprends... Tiens, ça me rappelle une enquête que j'ai menée il y a une quinzaine d'années à Châteauroux...
+David          : À Châteauroux ? C'est drôle ça.
+Le commissaire : Qu'est-ce qui est drôle ?
+David          : Ma sœur et son ancien mari, Richard, vivaient à Châteauroux.
+Le commissaire : Vraiment ?... (Le commissaire réfléchit) Mais... Mais c'est ça ! Le visage de votre sœur ne m'était pas inconnu ! Je m'en rappelle très bien maintenant !
+David          : Quoi ? C'est vous qui avez enquêté sur la mort de son ex ?
+Le commissaire : Mais oui ! J'en suis persuadé !
+David          : Eh bien, le monde est petit monsieur le commissaire.
+Le commissaire : Dites, je peux vous poser une question ?... Est-ce que vous trouvez ça normal que votre sœur promène son chat mort dans une boîte en carton ? Et avait-elle un chat au moins ? Elle ne serait pas un peu... (tapote sur sa tête)
+David          : Quoi ? Mais... Vous pensez que ma sœur n'a pas toute sa raison ? Détrompez-vous, Marie est une personne très équilibrée ! (Marie toujours angoissée entre en titubant. Elle tient fébrilement un plateau sur lequel sont posés des fruits : oranges, pommes, etc.)
+Marie          : Excusez-moi de vous avoir abandonnés. Vous voulez des fruits ?
+Le commissaire : Vous savez quoi ? On s'est déjà rencontrés tous les deux !
+Marie          : (Choquée) Qui ça ? Vous et moi ?
+Le commissaire : Mais oui ! On se connaît ! À Châteauroux, j'ai enquêté sur la mort de votre ancien mari !
+Marie          : Je... c'est foutu, c'est foutu... (Marie s'évanouit. Le plateau et les fruits tombent sur le sol. Le commissaire et David se précipitent vers Marie qui est allongée sur le sol.)
+David          : Marie ?!!! Elle a perdu connaissance !
+Le commissaire : Madame ?! Réveillez-vous ! C'est moi ! N'ayez pas peur, c'est la police !
+##Acte 3
+###Scène 1
+Arnaud         : (Le lendemain matin. Arnaud entre dans le salon, il porte une robe de chambre.) Marie ? Tu es là ? (Marie, qui n'est pas habillée comme la veille, sort de la cuisine. Elle tient une tasse de café.)
+Marie          : Ça fait une heure que je suis levée, je n'ai presque pas dormi de la nuit. Dis-moi Arnaud, c'est foutu, c'est ça ? On va aller en prison ?
+Arnaud         : Mais non, mais non, qu'est-ce que tu vas imaginer !
+Marie          : Le commissaire sait tout, c'est foutu !
+Arnaud         : Mais non, il ne sait pas tout ! Hier soir quand tu as eu ton malaise, je lui ai dit que tu étais souffrante et que tu avais besoin de te reposer. Il a compris et il est aussitôt rentré chez lui. Il nous a enfin foutu la paix !
+Marie          : Je ne me rappelle plus rien. Et qu'est-ce que David a dit au policier ? (Arnaud s'approche de la fenêtre.)
+Arnaud         : Mais rien du tout. Il avait un peu le cafard et il ne voulait pas te laisser seule, je lui ai proposé la chambre d'amis.
+Marie          : Ah ? Il a dormi ici ?
+Arnaud         : Oui, il dort encore. Blandine et Monique sont rentrées juste après le départ du flic. J'ai filé tous les petits fours à Monique, elle était contente. (Arnaud regarde par la fenêtre.) Bon, maintenant, il faut qu'on se détende et qu'on... Aaaah ! C'est pas vrai ! Il nous espionne ! Il est encore avec ses jumelles !!! (Aussitôt Marie et Arnaud font semblant de rire. David entre, il porte les mêmes vêtements que la veille, et regarde Marie et Arnaud qui ne l'ont pas vu.)
+Marie          : (rire forcé) Ah ah ah ! Ah ah ah ! Hi hi hi !
+Arnaud         : (rire forcé) Oh oh oh ! Ah ah ah ! C'est la meilleure de l'année ! Ah ah ah !
+Marie          : (rire forcé) Ouiii ! Ah ah ah ! Ah ah ah ! Que c'est drôle !
+Arnaud         : (rire forcé) Oh oh oh ! Ah ah ah !
+David          : Salut. Qu'est-ce qui se passe ? J'ai manqué quelque chose ?
+Arnaud         : (peur, avec Marie) Aaaaah !
+Marie          : (peur, avec Arnaud) Aaaaah ! (Arnaud précipitamment ferme les rideaux de la fenêtre.)
+Arnaud         : (gêné) Euh, ça va David ? Bien dormi ?
+David          : Oui, j'ai pris un anxiolytique et j'ai dormi comme un bébé. Pourquoi vous rigoliez comme ça ?
+Arnaud         : (gêné) Pour rien, c'est... on te racontera plus tard. (Marie présente un visage déprimé.)
+David          : Vous avez l'air bizarre tous les deux, il s'est passé quelque chose ?
+Arnaud         : Mais non, il ne s'est rien passé du tout, tout va très bien ! Hein Marie, tout va très... (Marie sanglote.)
+Marie          : Bouhh... mais non ! Ça ne va pas du tout !
+David          : Marie, tu veux me raconter ?
+Arnaud         : Mais elle n'a rien à raconter ! Je te dis que tout va très bien !
+Marie          : David il faut que tu nous aides ! C'est foutu !
+Arnaud         : Mais non !!
+Marie          : Oh ça suffit maintenant ! David on est dans la merde ! J'ai tué mon ancien mari !
+David          : Hein ?!!
+Arnaud         : C'était un accident !!! Un accident !!!
+Marie          : Arnaud ! La ferme ! David viens avec moi, je vais tout te raconter ! Ici, on ne peut pas parler ! (Rapidement, Marie entraîne David dans la cuisine. Arnaud est seul.)
+Arnaud         : Et voilà... ça va encore être de ma faute... (Blandine, qui porte une blouse de ménage différente de la veille, entre par la porte d'entrée. Elle chante.)
+Blandine       : Y'a pas de problème, tcha tcha, y'a pas de problème. / Y'a que des emmerdes, tcha tcha, que des emmerdes.
+Arnaud         : Mais qu'est-ce que vous foutez là, vous ?!
+Blandine       : D'après vous ? J'viens prendre le thé ou j'viens faire le ménage ?
+Arnaud         : Mais vous l'avez déjà fait hier ! Le ménage c'est une fois tous les deux jours ! C'est dans le contrat !
+Blandine       : Eh oh mollo ! Et puis, quel contrat ? Vous avez pas honte, vous ? Y'a pas de contrat, « monsieur veut pas m'embaucher, monsieur me prend au black », monsieur est un gros radin, oui !
+Arnaud         : Mais dites donc ! On ne me parle pas comme ça, hein ! Et contrat ou pas contrat, le ménage, c'est un jour sur deux !
+Blandine       : Peut-être mais comme j'ai dit à madame, demain j'peux pas, j'vais à un mariage, alors je rattrape aujourd'hui.
+Arnaud         : Mais enfin vous n'avez rien à rattraper puisque c'est propre ! Vous allez me faire le plaisir de rentrer chez vous immédiatement !
+Blandine       : Très bien... Mais autant vous l'dire tout de suite : je vais aller aux Prud'hommes et faudra pas se plaindre après ! J'vous colle un procès moi ! Et j'sais pas ce que vous magouillez en racontant des mensonges au flic à propos d'un chat tout mort mais ça a pas l'air très net tout ça ! Ouais ! Vous êtes pas net du tout, vous ! (Blandine sort par la porte d'entrée. David sort de la cuisine, il tient une tasse de café. Il regarde Arnaud avec compassion.)
+David          : Eh bien...
+Arnaud         : Quoi ?
+David          : Mon pauvre vieux...
+Arnaud         : Quoi ? Qu'est-ce qu'il y a ?!
+David          : On peut dire que tous les deux, vous vous êtes mis dans un beau merdier...
+Arnaud         : Ça je sais, merci. (Marie sort de la cuisine. Avec son mouchoir, elle essuie quelques larmes.)
+David          : La partie n'est pas perdue mais si vous ne réagissez pas immédiatement, dans quelques mois je serai obligé d'aller vous voir au parloir...
+Arnaud         : Mais arrête ! Et tu crois qu'on ne réagit pas ? On ne fait que ça ! Mais ce flic est un vrai pot de colle !
+David          : Et je n'ai toujours pas compris pourquoi, il y a 16 ans, tu n'as pas expliqué à la police qu'il s'agissait d'une dispute qui avait mal tourné...
+Marie          : Je paniquais ! Je ne savais pas quoi faire alors j'ai appelé Arnaud et c'est lui qui a décidé d'effacer les preuves pour faire croire à un simple accident !
+David          : En mettant une bouteille de whisky près de Richard alors qu'il était allergique et n'en buvait jamais... Bravo, bien joué...
+Arnaud         : C'est bon hein ! J'ai voulu rendre service et maintenant ça va me retomber dessus !
+David          : En tout cas, si vous ne voulez pas aller en taule, il vous faut un plan... Il va falloir mentir au policier de manière intelligente.
+Arnaud         : Mais c'est ce qu'on fait ! On n'arrête pas de lui mentir !
+David          : J'ai dit de manière « intelligente »... Bon, il faut réfléchir... Le commissaire ne sait pas que vous étiez amants lorsque ton ancien mari est mort. Il ne faut donc pas qu'il l'apprenne.
+Marie          : Oui, promis.
+David          : Il faut aussi qu'il continue à croire que vous vous êtes mariés il y a 10 ans, soit 6 ans après le décès de Richard. Il ne faut pas non plus qu'il découvre que Richard était allergique au whisky... Si jamais il reparle de cette histoire, on se met tous d'accord : Richard buvait de la vodka. On est d'accord ?
+Marie          : Oui, oui, de la vodka.
+David          : Il va falloir jouer serré. N'oubliez pas qu'il vous observe avec ses jumelles et qu'il essaie de vous piéger.
+Arnaud         : Ça on a bien compris !
+David          : Marie m'a dit que tu as inventé l'existence d'une sœur jumelle...
+Arnaud         : Ouais... Lola Séraphin...
+Marie          : Là, du coup on est foutus ! Il va découvrir qu'elle n'existe pas et il verra qu'on lui cache la vérité !
+David          : Sauf si Lola vient vous rendre visite, et là ce sera la preuve que vous êtes de bonne foi...
+Arnaud         : Nous rendre visite ? Eh, tu débloques ou quoi ? Juste un petit détail : Lola n'existe pas...
+David          : Mais si elle existe...
+Arnaud         : Tu me prends pour un débile ou quoi ? Je sais très bien que je n'ai pas de sœur jumelle !
+David          : Mais si... Tu vas faire exister Lola... Tu vas prendre l'apparence de ta sœur imaginaire et comme ça le policier n'aura plus de doutes...
+Arnaud         : Hein ? C'est une blague ? Ne comptez pas sur moi pour me déguiser en femme ! Je refuse !
+Marie          : Arnaud ! Tu préfères aller en taule ?!
+Arnaud         : Mais...
+David          : Arnaud, tu n'as pas le choix. Et ne t'inquiète pas, on va te coacher et je te promets : le flic n'y verra que du feu.
+Marie          : Tu trouveras une robe qui appartenait à ma mère dans l'armoire de la chambre et une perruque aussi.
+Arnaud         : Mais je ne mettrai pas la robe de ta mère ! Il n'en est pas question !
+David          : D'accord... Comme tu veux. Eh bien je vais vous laisser alors. Et on se retrouvera au parloir. Allez, bon courage. (David commence à partir.)
+Marie          : Arnaud ! Va mettre ta robe immédiatement !!!
+Arnaud         : Ça va ! Ça va ! (Arnaud va dans la chambre. David s'approche de la fenêtre et il tire un peu le rideau pour observer.)
+David          : Il regarde toujours par ici avec ses jumelles... il est tenace.
+Marie          : Oh là là...
+David          : Ce n'est pas grave, laissons les rideaux fermés.
+Marie          : Je n'en peux plus de ce policier... Il va finir par me rendre folle...
+David          : Tiens en parlant de ça... Hier, il m'a posé des questions : il avait l'air d'avoir un doute sur l'existence du chat...
+Marie          : Oh là là. Qu'est-ce que je dois dire s'il m'en reparle ?
+David          : On ne change rien à votre histoire : Vous aviez un chat, il est mort hier et Arnaud l'emmène ce matin chez le vétérinaire. S'il pose des questions, je lui confirmerai tout ça, ne t'inquiète pas.
+Marie          : D'accord... Et tu penses vraiment que c'est une bonne idée qu'Arnaud se transforme en Lola ?
+David          : Bien sûr. Il sera très convaincant, j'en suis certain...
+Marie          : Il y a autre chose qui m'inquiète...
+David          : Quoi donc ?
+Marie          : Est-ce que la robe de maman va lui aller ?... (Arnaud revient de la chambre. Il porte une robe qui n'est plus à la mode et une perruque laide et mise de travers. Il avance vers sa femme, sa démarche reste la même. Pour gagner du temps lors du changement de costume : dans la scène précédente, l'acteur peut déjà porter cette robe cachée sous la robe de chambre.)
+Marie          : Aaaah ! Arnaud ?!
+Arnaud         : Je préviens tout de suite : si l'un de vous se fout de moi, je l'enlève tout de suite !
+David          : (hypocrite, se retient de rire) Mais... tu es très beau, je veux dire très belle, pourquoi veux-tu qu'on se moque de toi ?
+Marie          : Elle est vraiment moche.
+Arnaud         : Eh oh je te signale que je n'ai pas encore changé de sexe ! Et je sais que je suis moche avec ça !
+Marie          : Non, ce n'est pas toi, c'est la robe, elle n'est pas terrible... Mais ce n'est pas grave, elle fera bien l'affaire.
+David          : Mais oui ça ira. Sauf si tu veux te présenter au concours Miss France...
+Arnaud         : J'ai dit on ne se moque pas !
+Marie          : Attends ta perruque est de travers (Marie commence à ajuster la perruque)... mais ne bouge pas !
+Arnaud         : Elle me gratte cette perruque !
+David          : Ce n'est pas le moment de faire ta chochotte.
+Arnaud         : Je ne fais pas ma chochotte, je dis qu'elle me gratte ! Tu en as déjà mis une perruque comme ça ? Tu veux l'essayer ?!
+David          : Non merci, contrairement à toi, elle ne m'irait pas...
+Marie          : (Marie a fini d'ajuster la perruque) Voilà c'est quand même mieux.
+Arnaud         : (il doute) … Vous trouvez qu'elle me va ?
+David          : Mais comment ! Bien sûr qu'elle te va ! Tu sais quoi ? Tu es même très sexy...
+Arnaud         : Là, tu te fous de moi ?
+David          : Je te jure que non ! Hein, Marie qu'il est canon avec cette perruque ?
+Marie          : Tous les goûts sont dans la nature...
+Arnaud         : Ah tu vois que je suis horrible avec !
+Marie          : Mais enfin ! Tu dois juste ressembler à une femme, tu n'es pas là pour draguer les hommes !
+David          : C'est vrai ça, sois raisonnable, retiens-toi... (Arnaud fait quelques pas, sa démarche reste la sienne.)
+Arnaud         : Et pour la robe, on fait quoi ?
+David          : Ce n'est pas la robe qui ne va pas...
+Arnaud         : Quoi ? Elle me grossit, c'est ça ?
+David          : C'est ta démarche... Vas-y marche un peu. (Arnaud marche « virilement » de long en large.)
+Arnaud         : Qu'est-ce qu'elle a ma démarche ?
+David          : Elle est parfaite... elle est parfaite : on dirait un vieux cow-boy travesti qui sort du saloon...
+Arnaud         : De quoi ?
+Marie          : Tu ne peux pas essayer d'être plus féminine ! Fais un effort bon sang !
+David          : Il ne fait aucun effort...
+Arnaud         : Je fais ce que je peux ! (Arnaud transforme sa démarche, désormais il se déhanche de manière exagérée.) Et là, c'est mieux, hein ? Je sens que je suis beaucoup plus féminine.
+David          : « Plus féminine » ? Ce n'est pas ce qui me vient à l'esprit, moi je dirais « plus ridicule »...
+Marie          : David a raison tu es ridicule ! Tu as déjà vu des femmes marcher comme ça ?!
+Arnaud         : Eh bien puisque je suis ridicule, j'enlève cette robe immédiatement et j'abandonne !
+Marie          : Tu n'abandonneras rien ! Tu veux aller en taule, c'est ça ?!
+Arnaud         : (Arnaud essaie d'enlever sa robe) Au moins en taule je ne serai pas ridicule !
+Marie          : Tu veux peut-être aller en prison, mais ce sera sans moi ! Alors tu gardes cette robe !
+David          : Il ne pense qu'à lui, quel égoïste...
+Arnaud         : Toi la ferme ! Tu commences à me gonfler sérieusement ! Depuis un quart d'heure, tu prends plaisir à essayer de me dominer en me donnant des leçons ! « Monsieur je sais tout » !
+Marie          : Oh ! David essaie simplement de nous aider et tu oses l'insulter ?!!
+Arnaud         : Je ne l'insulte pas ! Je lui dis juste qu'il me gonfle et que je n'ai pas besoin de ses conseils débiles !!!
+David          : Laisse Marie, laisse... Après tout, il a peut-être raison, il n'a pas besoin de moi...
+Arnaud         : Parfaitement, je n'ai pas besoin de toi pour être crédible dans cette robe ! Je vais me débrouiller tout seul, merci ! Dans cinq minutes on me prendra pour une vraie femme !`;
+    </script>
+
+    <div class="header">
+        <h1 id="play-title"></h1>
+        <button class="fullscreen-btn" id="fullscreen-btn" title="Plein écran">⛶</button>
+    </div>
+
+    <div class="tabs">
+        <button class="tab" data-tab="read">Lire</button>
+        <button class="tab" data-tab="learn">Apprendre</button>
+        <button class="tab" data-tab="settings">Paramètres</button>
+    </div>
+
+    <div class="content">
+        <!-- Read Tab -->
+        <div class="tab-content" id="read-tab">
+            <div id="read-content"></div>
+        </div>
+
+        <!-- Learn Tab -->
+        <div class="tab-content" id="learn-tab">
+            <div class="learn-scene-header" onclick="openNavigation('learn')">
+                <span id="learn-current-scene">Acte 1, Scène 1</span>
+                <span id="line-counter" style="margin-left: auto; margin-right: 8px;">0 / 0</span>
+                <span class="arrow-icon">▼</span>
+            </div>
+            <div class="learn-content-area" id="learn-content"></div>
+            <div class="learn-controls">
+                <div class="button-group">
+                    <button class="btn-back" onclick="restartScene()">⏮ Début</button>
+                    <button class="btn-next" onclick="nextLine()">Suivant ▶</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings-tab">
+            <div class="settings-content">
+                <div class="settings-group">
+                    <label class="settings-label" for="character-select">Mon personnage</label>
+                    <select id="character-select">
+                        <option value="">-- Choisissez votre personnage --</option>
+                    </select>
+                </div>
+                <div class="settings-group">
+                    <label class="settings-label">Taille du texte</label>
+                    <div class="text-size-buttons">
+                        <button class="text-size-btn" data-size="small">Petit</button>
+                        <button class="text-size-btn active" data-size="normal">Normal</button>
+                        <button class="text-size-btn" data-size="large">Grand</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Modal -->
+    <div class="modal" id="navigation-modal" onclick="closeNavigation(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">Navigation</div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        // Parse the play text
+        function parsePlayText(text) {
+            const lines = text.split('\n');
+            const playData = {
+                title: '',
+                acts: []
+            };
+
+            let currentAct = null;
+            let currentScene = null;
+
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line) return;
+
+                // Title (# Title)
+                if (line.startsWith('#') && !line.startsWith('##')) {
+                    playData.title = line.substring(1).trim();
+                }
+                // Act (## Act X)
+                else if (line.startsWith('##') && !line.startsWith('###')) {
+                    currentAct = {
+                        title: line.substring(2).trim(),
+                        scenes: []
+                    };
+                    playData.acts.push(currentAct);
+                    currentScene = null;
+                }
+                // Scene (### Scene X)
+                else if (line.startsWith('###')) {
+                    if (currentAct) {
+                        currentScene = {
+                            title: line.substring(3).trim(),
+                            dialogues: []
+                        };
+                        currentAct.scenes.push(currentScene);
+                    }
+                }
+                // Dialogue (Character : Text)
+                else if (line.includes(':')) {
+                    const colonIndex = line.indexOf(':');
+                    const character = line.substring(0, colonIndex).trim();
+                    const text = line.substring(colonIndex + 1).trim();
+                    
+                    if (currentScene && character && text) {
+                        currentScene.dialogues.push({
+                            character: character,
+                            text: text
+                        });
+                    }
+                }
+            });
+
+            return playData;
+        }
+
+        // Parse the play data
+        const playData = parsePlayText(rawPlayText);
+
+        // Update page title
+        document.title = playData.title || 'Pièce de théâtre';
+
+        // State management
+        let currentTab = 'read';
+        let selectedCharacter = '';
+        let learnState = {
+            actIndex: 0,
+            sceneIndex: 0,
+            lineIndex: 0
+        };
+        let readState = {
+            actIndex: 0,
+            sceneIndex: 0
+        };
+
+        // Storage management functions (localStorage works with file://)
+        function setStorage(name, value) {
+            try {
+                localStorage.setItem(name, value);
+            } catch (e) {
+                console.error('Error saving to localStorage:', e);
+            }
+        }
+
+        function getStorage(name) {
+            try {
+                return localStorage.getItem(name);
+            } catch (e) {
+                console.error('Error reading from localStorage:', e);
+                return null;
+            }
+        }
+
+        // Extract unique characters
+        function getCharacters() {
+            const characters = new Set();
+            playData.acts.forEach(act => {
+                act.scenes.forEach(scene => {
+                    scene.dialogues.forEach(dialogue => {
+                        characters.add(dialogue.character);
+                    });
+                });
+            });
+            return Array.from(characters).sort();
+        }
+
+        // Generate a consistent color for each character
+        const characterColors = {};
+        
+        // Color palettes for light and dark modes
+        const colorPalettesLight = [
+            '#c0392b', // dark red
+            '#2980b9', // dark blue
+            '#27ae60', // dark green
+            '#d68910', // dark orange
+            '#8e44ad', // dark purple
+            '#16a085', // dark turquoise
+            '#d35400', // dark carrot
+            '#2c3e50', // very dark blue
+            '#117a65', // very dark green
+            '#922b21', // very dark red
+            '#6c3483', // dark wisteria
+            '#1e8449', // dark nephritis
+        ];
+
+        const colorPalettesDark = [
+            '#ff6b6b', // bright red
+            '#74b9ff', // bright blue
+            '#55efc4', // bright green
+            '#ffd93d', // bright yellow
+            '#dda0dd', // bright plum
+            '#6bcf7f', // bright mint
+            '#ffa07a', // bright salmon
+            '#87ceeb', // sky blue
+            '#98d8c8', // light teal
+            '#ff9999', // light coral
+            '#c39bd3', // light purple
+            '#90ee90', // light green
+        ];
+
+        function isDarkMode() {
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+
+        function getCharacterColor(character) {
+            if (!characterColors[character]) {
+                const colorPalette = isDarkMode() ? colorPalettesDark : colorPalettesLight;
+                const characters = Object.keys(characterColors);
+                const colorIndex = characters.length % colorPalette.length;
+                characterColors[character] = colorPalette[colorIndex];
+            }
+            return characterColors[character];
+        }
+
+        // Listen for theme changes and update colors
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                // Reset character colors to apply new palette
+                Object.keys(characterColors).forEach(key => delete characterColors[key]);
+                
+                // Re-render current tab
+                if (currentTab === 'read') {
+                    renderReadTab();
+                } else if (currentTab === 'learn') {
+                    renderLearnTab();
+                }
+            });
+        }
+
+        // Update page title with character if selected
+        function updateTitle() {
+            const baseTitle = playData.title;
+            const displayTitle = selectedCharacter ? `${baseTitle} - ${selectedCharacter}` : baseTitle;
+            document.getElementById('play-title').textContent = displayTitle;
+        }
+
+        // Initialize the app
+        function init() {
+            // Load settings first
+            loadSettings();
+            
+            // Setup UI
+            populateCharacterSelect();
+            updateTitle();
+            setupTabs();
+            
+            // Restore saved tab or default to 'read'
+            const savedTab = getStorage('currentTab') || 'read';
+            switchTab(savedTab);
+        }
+
+        // Populate character dropdown
+        function populateCharacterSelect() {
+            const select = document.getElementById('character-select');
+            const characters = getCharacters();
+            characters.forEach(char => {
+                const option = document.createElement('option');
+                option.value = char;
+                option.textContent = char;
+                select.appendChild(option);
+            });
+
+            select.addEventListener('change', (e) => {
+                selectedCharacter = e.target.value;
+                saveSettings();
+                updateTitle();
+                
+                // Re-render current tab
+                if (currentTab === 'read') {
+                    renderReadTab();
+                } else if (currentTab === 'learn') {
+                    renderLearnTab();
+                }
+            });
+            
+            // Text size buttons
+            document.querySelectorAll('.text-size-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const size = this.dataset.size;
+                    applyTextSize(size);
+                    setStorage('textSize', size);
+                });
+            });
+
+            // Fullscreen button
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            if (fullscreenBtn) {
+                fullscreenBtn.addEventListener('click', toggleFullscreen);
+            }
+        }
+
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
+                // Enter fullscreen
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                } else if (elem.mozRequestFullScreen) {
+                    elem.mozRequestFullScreen();
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                }
+            } else {
+                // Exit fullscreen
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        // Setup tab navigation
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+        }
+
+        // Switch between tabs
+        function switchTab(tabName) {
+            currentTab = tabName;
+            setStorage('currentTab', tabName);
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-tab') === tabName) {
+                    tab.classList.add('active');
+                }
+            });
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+
+            // Render specific tab content if needed
+            if (tabName === 'learn') {
+                renderLearnTab();
+            } else if (tabName === 'read') {
+                renderReadTab();
+            }
+        }
+
+        // Render Read Tab
+        function renderReadTab() {
+            const container = document.getElementById('read-content');
+            container.innerHTML = '';
+
+            playData.acts.forEach((act, actIndex) => {
+                act.scenes.forEach((scene, sceneIndex) => {
+                    const sceneTitle = document.createElement('div');
+                    sceneTitle.className = 'learn-scene-header';
+                    
+                    const titleSpan = document.createElement('span');
+                    titleSpan.textContent = `${act.title}, ${scene.title}`;
+                    
+                    const arrowSpan = document.createElement('span');
+                    arrowSpan.className = 'arrow-icon';
+                    arrowSpan.textContent = '▼';
+                    
+                    sceneTitle.appendChild(titleSpan);
+                    sceneTitle.appendChild(arrowSpan);
+                    sceneTitle.onclick = () => {
+                        readState.actIndex = actIndex;
+                        readState.sceneIndex = sceneIndex;
+                        setStorage('readState', readState);
+                        openNavigation('read');
+                    };
+                    
+                    container.appendChild(sceneTitle);
+
+                    const sceneBlock = document.createElement('div');
+                    sceneBlock.className = 'scene-block';
+
+                    scene.dialogues.forEach(dialogue => {
+                        const dialogueDiv = document.createElement('div');
+                        dialogueDiv.className = 'dialogue';
+                        
+                        if (selectedCharacter && dialogue.character === selectedCharacter) {
+                            dialogueDiv.classList.add('highlight');
+                        }
+
+                        const charSpan = document.createElement('span');
+                        charSpan.className = 'dialogue-character';
+                        charSpan.textContent = dialogue.character;
+                        charSpan.style.color = getCharacterColor(dialogue.character);
+
+                        const textSpan = document.createElement('span');
+                        textSpan.className = 'dialogue-text';
+                        textSpan.textContent = dialogue.text;
+
+                        dialogueDiv.appendChild(charSpan);
+                        dialogueDiv.appendChild(textSpan);
+                        sceneBlock.appendChild(dialogueDiv);
+                    });
+
+                    container.appendChild(sceneBlock);
+                });
+            });
+            
+            // Validate readState indices
+            if (readState.actIndex >= playData.acts.length) {
+                readState.actIndex = 0;
+            }
+            if (readState.sceneIndex >= playData.acts[readState.actIndex].scenes.length) {
+                readState.sceneIndex = 0;
+            }
+            
+            // Scroll to the saved scene position
+            setTimeout(() => {
+                const sceneBlocks = document.querySelectorAll('#read-content .scene-block');
+                let totalSceneIndex = 0;
+                for (let i = 0; i < readState.actIndex; i++) {
+                    totalSceneIndex += playData.acts[i].scenes.length;
+                }
+                totalSceneIndex += readState.sceneIndex;
+                
+                if (sceneBlocks[totalSceneIndex]) {
+                    sceneBlocks[totalSceneIndex].scrollIntoView({ behavior: 'auto', block: 'start' });
+                }
+            }, 0);
+        }
+
+        // Render Learn Tab
+        function renderLearnTab(clearContent = true) {
+            const content = document.getElementById('learn-content');
+            if (clearContent) {
+                content.innerHTML = '';
+            }
+
+            // Check if no character is selected
+            if (!selectedCharacter) {
+                content.innerHTML = '<div style="padding: 40px 20px; text-align: center;"><p style="color: var(--text-secondary); font-size: 18px; margin-bottom: 16px;">Aucun personnage sélectionné</p><p style="color: var(--text-muted); font-size: 14px;">Veuillez sélectionner un personnage dans l\'onglet Paramètres pour commencer l\'apprentissage.</p></div>';
+                document.getElementById('line-counter').textContent = '0 / 0';
+                const nextButton = document.querySelector('.btn-next');
+                const backButton = document.querySelector('.btn-back');
+                if (nextButton) nextButton.disabled = true;
+                if (backButton) backButton.disabled = true;
+                return;
+            }
+
+            // Validate learnState indices
+            if (learnState.actIndex >= playData.acts.length) {
+                learnState.actIndex = 0;
+            }
+            if (learnState.sceneIndex >= playData.acts[learnState.actIndex].scenes.length) {
+                learnState.sceneIndex = 0;
+            }
+
+            // Get current scene
+            const act = playData.acts[learnState.actIndex];
+            const scene = act.scenes[learnState.sceneIndex];
+
+            // Update scene header
+            document.getElementById('learn-current-scene').textContent = 
+                `${act.title}, ${scene.title}`;
+
+            const lines = scene.dialogues;
+
+            if (lines.length === 0) {
+                content.innerHTML = '<p style="color: #95a5a6; text-align: center;">Aucune réplique dans cette scène.</p>';
+                document.getElementById('line-counter').textContent = '0 / 0';
+                return;
+            }
+
+            // Find character's lines and their indices
+            const characterLines = [];
+            lines.forEach((dialogue, index) => {
+                if (dialogue.character === selectedCharacter) {
+                    characterLines.push(index);
+                }
+            });
+
+            if (characterLines.length === 0) {
+                content.innerHTML = '<p style="color: #95a5a6; text-align: center;">Aucune réplique pour ce personnage dans cette scène.</p>';
+                document.getElementById('line-counter').textContent = '0 / 0';
+                return;
+            }
+
+            // Update counter based on character's lines
+            document.getElementById('line-counter').textContent = 
+                `${learnState.lineIndex} / ${characterLines.length}`;
+
+            // When clearContent is true (initial load or restart), show all dialogues up to current state
+            // When clearContent is false (appending), show only the new dialogues
+            let startIndex, endIndex;
+            
+            if (clearContent) {
+                // Show all dialogues from start up to current lineIndex
+                startIndex = 0;
+                if (learnState.lineIndex === 0) {
+                    endIndex = characterLines[0];
+                } else {
+                    const currentCharLineIndex = Math.min(learnState.lineIndex - 1, characterLines.length - 1);
+                    endIndex = learnState.lineIndex < characterLines.length 
+                        ? characterLines[learnState.lineIndex] 
+                        : lines.length;
+                }
+            } else {
+                // Append mode: show only new dialogues
+                if (learnState.lineIndex === 0) {
+                    startIndex = 0;
+                    endIndex = characterLines[0];
+                } else {
+                    const currentCharLineIndex = Math.min(learnState.lineIndex - 1, characterLines.length - 1);
+                    startIndex = characterLines[currentCharLineIndex];
+                    endIndex = learnState.lineIndex < characterLines.length 
+                        ? characterLines[learnState.lineIndex] 
+                        : lines.length;
+                }
+            }
+
+            // Display the dialogues in the range
+            for (let i = startIndex; i < endIndex; i++) {
+                const dialogue = lines[i];
+                const dialogueDiv = document.createElement('div');
+                dialogueDiv.className = 'dialogue';
+                
+                // Highlight selected character's lines
+                if (dialogue.character === selectedCharacter) {
+                    dialogueDiv.classList.add('my-character');
+                }
+
+                const charSpan = document.createElement('span');
+                charSpan.className = 'dialogue-character';
+                charSpan.textContent = dialogue.character;
+                charSpan.style.color = getCharacterColor(dialogue.character);
+
+                const textSpan = document.createElement('span');
+                textSpan.className = 'dialogue-text';
+                textSpan.textContent = dialogue.text;
+
+                dialogueDiv.appendChild(charSpan);
+                dialogueDiv.appendChild(textSpan);
+                content.appendChild(dialogueDiv);
+            }
+            
+            // Update button state
+            const nextButton = document.querySelector('.btn-next');
+            const backButton = document.querySelector('.btn-back');
+            if (nextButton) {
+                nextButton.disabled = learnState.lineIndex >= characterLines.length;
+            }
+            if (backButton) {
+                backButton.disabled = learnState.lineIndex === 0;
+            }
+        }
+
+        // Next line in Learn mode
+        function nextLine() {
+            const act = playData.acts[learnState.actIndex];
+            const scene = act.scenes[learnState.sceneIndex];
+            const lines = scene.dialogues;
+
+            // If no character selected, advance one line at a time
+            if (!selectedCharacter) {
+                if (learnState.lineIndex < lines.length - 1) {
+                    learnState.lineIndex++;
+                    saveSettings();
+                    renderLearnTab();
+                }
+                return;
+            }
+
+            // Find character's lines
+            const characterLines = [];
+            lines.forEach((dialogue, index) => {
+                if (dialogue.character === selectedCharacter) {
+                    characterLines.push(index);
+                }
+            });
+
+            // Advance to next step
+            if (learnState.lineIndex < characterLines.length) {
+                const oldLineIndex = learnState.lineIndex;
+                learnState.lineIndex++;
+                saveSettings();
+                renderLearnTab(false); // Don't clear content, just append
+                
+                // Scroll to the first newly added dialogue
+                setTimeout(() => {
+                    const content = document.getElementById('learn-content');
+                    const newDialogues = content.querySelectorAll('.dialogue');
+                    
+                    // Calculate the index of the first new dialogue
+                    let firstNewIndex = 0;
+                    if (oldLineIndex === 0) {
+                        // On first click, scroll to the character's first line
+                        firstNewIndex = characterLines[0];
+                    } else {
+                        const prevCharLineIndex = oldLineIndex - 1;
+                        const prevEndIndex = oldLineIndex < characterLines.length 
+                            ? characterLines[oldLineIndex] 
+                            : lines.length;
+                        firstNewIndex = prevEndIndex;
+                    }
+                    
+                    if (newDialogues[firstNewIndex]) {
+                        newDialogues[firstNewIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 50);
+            }
+        }
+
+        // Restart scene in Learn mode
+        function restartScene() {
+            learnState.lineIndex = 0;
+            saveSettings();
+            renderLearnTab(true); // Clear content and restart
+        }
+
+        // Open navigation modal
+        function openNavigation(source) {
+            const modal = document.getElementById('navigation-modal');
+            const modalBody = document.getElementById('modal-body');
+            modalBody.innerHTML = '';
+
+            playData.acts.forEach((act, actIndex) => {
+                const actItem = document.createElement('div');
+                actItem.className = 'nav-item nav-act';
+                actItem.textContent = act.title;
+                actItem.onclick = () => navigateToScene(actIndex, 0, source);
+                modalBody.appendChild(actItem);
+
+                act.scenes.forEach((scene, sceneIndex) => {
+                    const sceneItem = document.createElement('div');
+                    sceneItem.className = 'nav-item nav-scene';
+                    sceneItem.textContent = scene.title;
+                    sceneItem.onclick = () => navigateToScene(actIndex, sceneIndex, source);
+
+                    if (source === 'learn' && actIndex === learnState.actIndex && sceneIndex === learnState.sceneIndex) {
+                        sceneItem.classList.add('current');
+                    }
+
+                    modalBody.appendChild(sceneItem);
+                });
+            });
+
+            modal.classList.add('active');
+        }
+
+        // Close navigation modal
+        function closeNavigation(event) {
+            if (event.target.id === 'navigation-modal') {
+                document.getElementById('navigation-modal').classList.remove('active');
+            }
+        }
+
+        // Navigate to a specific scene
+        function navigateToScene(actIndex, sceneIndex, source) {
+            if (source === 'learn') {
+                learnState.actIndex = actIndex;
+                learnState.sceneIndex = sceneIndex;
+                learnState.lineIndex = 0;
+                saveSettings();
+                renderLearnTab();
+            } else if (source === 'read') {
+                readState.actIndex = actIndex;
+                readState.sceneIndex = sceneIndex;
+                saveSettings();
+                
+                // Scroll to the scene block
+                const sceneBlocks = document.querySelectorAll('#read-content .scene-block');
+                let totalSceneIndex = 0;
+                for (let i = 0; i < actIndex; i++) {
+                    totalSceneIndex += playData.acts[i].scenes.length;
+                }
+                totalSceneIndex += sceneIndex;
+                
+                if (sceneBlocks[totalSceneIndex]) {
+                    sceneBlocks[totalSceneIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
+            closeNavigation({ target: { id: 'navigation-modal' } });
+        }
+
+        // Save settings to localStorage
+        function saveSettings() {
+            setStorage('selectedCharacter', selectedCharacter);
+            setStorage('readState', JSON.stringify(readState));
+            setStorage('learnState', JSON.stringify(learnState));
+        }
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const savedCharacter = getStorage('selectedCharacter');
+            if (savedCharacter) {
+                selectedCharacter = savedCharacter;
+                const select = document.getElementById('character-select');
+                if (select) {
+                    select.value = savedCharacter;
+                }
+            }
+
+            const savedReadState = getStorage('readState');
+            if (savedReadState) {
+                try {
+                    readState = JSON.parse(savedReadState);
+                } catch (e) {
+                    console.error('Error parsing readState:', e);
+                }
+            }
+
+            const savedLearnState = getStorage('learnState');
+            if (savedLearnState) {
+                try {
+                    learnState = JSON.parse(savedLearnState);
+                } catch (e) {
+                    console.error('Error parsing learnState:', e);
+                }
+            }
+            
+            // Load and apply text size
+            const textSize = getStorage('textSize') || 'normal';
+            applyTextSize(textSize);
+        }
+        
+        // Apply text size to body
+        function applyTextSize(size) {
+            document.body.classList.remove('text-small', 'text-normal', 'text-large');
+            document.body.classList.add(`text-${size}`);
+            
+            // Update button states
+            document.querySelectorAll('.text-size-btn').forEach(btn => {
+                if (btn.dataset.size === size) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // Initialize the app when DOM is ready
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pièce de théâtre</title>
+    <style>
+        :root {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: white;
+            --bg-header: #34495e;
+            --text-primary: #333;
+            --text-secondary: #555;
+            --text-muted: #666;
+            --text-light: #7f8c8d;
+            --border-color: #ddd;
+            --border-light: #ecf0f1;
+            --highlight-bg: #d6ebf7;
+            --highlight-border: #3498db;
+            --shadow-light: rgba(0,0,0,0.05);
+            --shadow-medium: rgba(0,0,0,0.08);
+            --shadow-dark: rgba(0,0,0,0.1);
+            --modal-overlay: rgba(0,0,0,0.5);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: #0d0d0d;
+                --bg-secondary: #3d3d3d;
+                --bg-header: #0d0d0d;
+                --text-primary: #ffffff;
+                --text-secondary: #f5f5f5;
+                --text-muted: #e0e0e0;
+                --text-light: #cccccc;
+                --border-color: #555555;
+                --border-light: #4a4a4a;
+                --highlight-bg: #2a5d8a;
+                --highlight-border: #a8daff;
+                --shadow-light: rgba(0,0,0,0.3);
+                --shadow-medium: rgba(0,0,0,0.4);
+                --shadow-dark: rgba(0,0,0,0.5);
+                --modal-overlay: rgba(0,0,0,0.7);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh; /* Dynamic viewport height for mobile */
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--bg-header);
+            color: white;
+            padding: 12px 16px;
+            text-align: center;
+            box-shadow: 0 2px 4px var(--shadow-dark);
+            z-index: 100;
+            order: 1;
+            flex-shrink: 0;
+            min-height: 50px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .fullscreen-btn {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+        }
+
+        .fullscreen-btn:hover {
+            opacity: 0.7;
+        }
+
+        .fullscreen-btn:active {
+            opacity: 0.5;
+        }
+
+        /* Tab Navigation */
+        .tabs {
+            display: flex;
+            background-color: #d5d5d5;
+            border-top: 2px solid var(--border-color);
+            box-shadow: 0 -4px 8px var(--shadow-light);
+            order: 3;
+            z-index: 999;
+            flex-shrink: 0;
+            min-height: 60px;
+            height: 60px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 16px 0;
+            text-align: center;
+            background-color: #e8e8e8;
+            border: none;
+            color: #555;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tab.active {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .tabs {
+                background-color: #2c3e50;
+            }
+            
+            .tab {
+                background-color: #3d3d3d;
+                color: #95a5a6;
+            }
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background-color: var(--bg-primary);
+            -webkit-overflow-scrolling: touch;
+            order: 2;
+            min-height: 0;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 16px;
+            animation: fadeIn 0.3s;
+        }
+
+        #read-tab,
+        #learn-tab {
+            padding: 0;
+        }
+        
+        #learn-tab.active {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Settings Tab */
+        .settings-content {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px var(--shadow-dark);
+        }
+
+        .settings-group {
+            margin-bottom: 24px;
+        }
+
+        .settings-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .settings-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .text-size-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .text-size-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .text-size-btn:hover {
+            border-color: #3498db;
+        }
+
+        .text-size-btn.active {
+            background-color: #3498db;
+            border-color: #3498db;
+            color: white;
+        }
+
+        /* Text size variations */
+        body.text-small {
+            font-size: 14px;
+        }
+
+        body.text-small .dialogue-text {
+            font-size: 14px;
+        }
+
+        body.text-small .dialogue-character {
+            font-size: 12px;
+        }
+
+        body.text-normal {
+            font-size: 16px;
+        }
+
+        body.text-normal .dialogue-text {
+            font-size: 16px;
+        }
+
+        body.text-normal .dialogue-character {
+            font-size: 14px;
+        }
+
+        body.text-large {
+            font-size: 18px;
+        }
+
+        body.text-large .dialogue-text {
+            font-size: 18px;
+        }
+
+        body.text-large .dialogue-character {
+            font-size: 16px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        /* Read Tab */
+        .scene-block {
+            background-color: transparent;
+            border-radius: 8px;
+            padding: 0 16px 16px 16px;
+            margin-bottom: 16px;
+        }
+
+        .dialogue {
+            margin-bottom: 12px;
+            line-height: 1.6;
+            background-color: var(--bg-secondary);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        .dialogue-character {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .dialogue-text {
+            color: var(--text-secondary);
+        }
+
+        .dialogue.highlight {
+            background-color: var(--highlight-bg);
+            border: 2px solid var(--highlight-border);
+        }
+
+        /* Learn Tab */
+        .learn-controls {
+            background-color: var(--bg-secondary);
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -2px 4px var(--shadow-dark);
+            flex-shrink: 0;
+        }
+
+        .learn-scene-header {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            box-shadow: 0 2px 4px var(--shadow-dark);
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            margin-bottom: 12px;
+        }
+
+        .learn-scene-header:active {
+            background-color: #2980b9;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-back {
+            background-color: #3498db;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-back:active {
+            background-color: #2980b9;
+        }
+
+        .btn-next {
+            background-color: #3498db;
+            color: white;
+            flex: 2;
+        }
+
+        .btn-next:active {
+            background-color: #2980b9;
+        }
+
+        .btn-back:disabled,
+        .btn-next:disabled {
+            background-color: var(--border-light);
+            color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .learn-content-area {
+            background-color: transparent;
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .dialogue.my-character {
+            background-color: var(--highlight-bg);
+            border: 2px solid var(--highlight-border);
+        }
+
+        /* Navigation Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--modal-overlay);
+            z-index: 1000;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--bg-secondary);
+            width: 90%;
+            max-width: 400px;
+            max-height: 70vh;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            background-color: var(--bg-header);
+            color: white;
+            padding: 16px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .modal-body {
+            overflow-y: auto;
+            max-height: calc(70vh - 60px);
+        }
+
+        .nav-item {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .nav-item:active {
+            background-color: var(--border-light);
+        }
+
+        .nav-item.current {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .nav-item.current {
+                background-color: #1e3a4a;
+            }
+        }
+
+        .nav-act {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .nav-scene {
+            color: var(--text-light);
+            padding-left: 20px;
+        }
+
+        .arrow-icon {
+            float: right;
+            color: #95a5a6;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Raw play text
+        const rawPlayText = ``;
+    </script>
+
+    <div class="header">
+        <h1 id="play-title"></h1>
+        <button class="fullscreen-btn" id="fullscreen-btn" title="Plein écran">⛶</button>
+    </div>
+
+    <div class="tabs">
+        <button class="tab" data-tab="read">Lire</button>
+        <button class="tab" data-tab="learn">Apprendre</button>
+        <button class="tab" data-tab="settings">Paramètres</button>
+    </div>
+
+    <div class="content">
+        <!-- Read Tab -->
+        <div class="tab-content" id="read-tab">
+            <div id="read-content"></div>
+        </div>
+
+        <!-- Learn Tab -->
+        <div class="tab-content" id="learn-tab">
+            <div class="learn-scene-header" onclick="openNavigation('learn')">
+                <span id="learn-current-scene">Acte 1, Scène 1</span>
+                <span id="line-counter" style="margin-left: auto; margin-right: 8px;">0 / 0</span>
+                <span class="arrow-icon">▼</span>
+            </div>
+            <div class="learn-content-area" id="learn-content"></div>
+            <div class="learn-controls">
+                <div class="button-group">
+                    <button class="btn-back" onclick="restartScene()">⏮ Début</button>
+                    <button class="btn-next" onclick="nextLine()">Suivant ▶</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings-tab">
+            <div class="settings-content">
+                <div class="settings-group">
+                    <label class="settings-label" for="character-select">Mon personnage</label>
+                    <select id="character-select">
+                        <option value="">-- Choisissez votre personnage --</option>
+                    </select>
+                </div>
+                <div class="settings-group">
+                    <label class="settings-label">Taille du texte</label>
+                    <div class="text-size-buttons">
+                        <button class="text-size-btn" data-size="small">Petit</button>
+                        <button class="text-size-btn active" data-size="normal">Normal</button>
+                        <button class="text-size-btn" data-size="large">Grand</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Modal -->
+    <div class="modal" id="navigation-modal" onclick="closeNavigation(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">Navigation</div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        // Parse the play text
+        function parsePlayText(text) {
+            const lines = text.split('\n');
+            const playData = {
+                title: '',
+                acts: []
+            };
+
+            let currentAct = null;
+            let currentScene = null;
+
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line) return;
+
+                // Title (# Title)
+                if (line.startsWith('#') && !line.startsWith('##')) {
+                    playData.title = line.substring(1).trim();
+                }
+                // Act (## Act X)
+                else if (line.startsWith('##') && !line.startsWith('###')) {
+                    currentAct = {
+                        title: line.substring(2).trim(),
+                        scenes: []
+                    };
+                    playData.acts.push(currentAct);
+                    currentScene = null;
+                }
+                // Scene (### Scene X)
+                else if (line.startsWith('###')) {
+                    if (currentAct) {
+                        currentScene = {
+                            title: line.substring(3).trim(),
+                            dialogues: []
+                        };
+                        currentAct.scenes.push(currentScene);
+                    }
+                }
+                // Dialogue (Character : Text)
+                else if (line.includes(':')) {
+                    const colonIndex = line.indexOf(':');
+                    const character = line.substring(0, colonIndex).trim();
+                    const text = line.substring(colonIndex + 1).trim();
+                    
+                    if (currentScene && character && text) {
+                        currentScene.dialogues.push({
+                            character: character,
+                            text: text
+                        });
+                    }
+                }
+            });
+
+            return playData;
+        }
+
+        // Parse the play data
+        const playData = parsePlayText(rawPlayText);
+
+        // Update page title
+        document.title = playData.title || 'Pièce de théâtre';
+
+        // State management
+        let currentTab = 'read';
+        let selectedCharacter = '';
+        let learnState = {
+            actIndex: 0,
+            sceneIndex: 0,
+            lineIndex: 0
+        };
+        let readState = {
+            actIndex: 0,
+            sceneIndex: 0
+        };
+
+        // Storage management functions (localStorage works with file://)
+        function setStorage(name, value) {
+            try {
+                localStorage.setItem(name, value);
+            } catch (e) {
+                console.error('Error saving to localStorage:', e);
+            }
+        }
+
+        function getStorage(name) {
+            try {
+                return localStorage.getItem(name);
+            } catch (e) {
+                console.error('Error reading from localStorage:', e);
+                return null;
+            }
+        }
+
+        // Extract unique characters
+        function getCharacters() {
+            const characters = new Set();
+            playData.acts.forEach(act => {
+                act.scenes.forEach(scene => {
+                    scene.dialogues.forEach(dialogue => {
+                        characters.add(dialogue.character);
+                    });
+                });
+            });
+            return Array.from(characters).sort();
+        }
+
+        // Generate a consistent color for each character
+        const characterColors = {};
+        
+        // Color palettes for light and dark modes
+        const colorPalettesLight = [
+            '#c0392b', // dark red
+            '#2980b9', // dark blue
+            '#27ae60', // dark green
+            '#d68910', // dark orange
+            '#8e44ad', // dark purple
+            '#16a085', // dark turquoise
+            '#d35400', // dark carrot
+            '#2c3e50', // very dark blue
+            '#117a65', // very dark green
+            '#922b21', // very dark red
+            '#6c3483', // dark wisteria
+            '#1e8449', // dark nephritis
+        ];
+
+        const colorPalettesDark = [
+            '#ff6b6b', // bright red
+            '#74b9ff', // bright blue
+            '#55efc4', // bright green
+            '#ffd93d', // bright yellow
+            '#dda0dd', // bright plum
+            '#6bcf7f', // bright mint
+            '#ffa07a', // bright salmon
+            '#87ceeb', // sky blue
+            '#98d8c8', // light teal
+            '#ff9999', // light coral
+            '#c39bd3', // light purple
+            '#90ee90', // light green
+        ];
+
+        function isDarkMode() {
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+
+        function getCharacterColor(character) {
+            if (!characterColors[character]) {
+                const colorPalette = isDarkMode() ? colorPalettesDark : colorPalettesLight;
+                const characters = Object.keys(characterColors);
+                const colorIndex = characters.length % colorPalette.length;
+                characterColors[character] = colorPalette[colorIndex];
+            }
+            return characterColors[character];
+        }
+
+        // Listen for theme changes and update colors
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                // Reset character colors to apply new palette
+                Object.keys(characterColors).forEach(key => delete characterColors[key]);
+                
+                // Re-render current tab
+                if (currentTab === 'read') {
+                    renderReadTab();
+                } else if (currentTab === 'learn') {
+                    renderLearnTab();
+                }
+            });
+        }
+
+        // Update page title with character if selected
+        function updateTitle() {
+            const baseTitle = playData.title;
+            const displayTitle = selectedCharacter ? `${baseTitle} - ${selectedCharacter}` : baseTitle;
+            document.getElementById('play-title').textContent = displayTitle;
+        }
+
+        // Initialize the app
+        function init() {
+            // Load settings first
+            loadSettings();
+            
+            // Setup UI
+            populateCharacterSelect();
+            updateTitle();
+            setupTabs();
+            
+            // Restore saved tab or default to 'read'
+            const savedTab = getStorage('currentTab') || 'read';
+            switchTab(savedTab);
+        }
+
+        // Populate character dropdown
+        function populateCharacterSelect() {
+            const select = document.getElementById('character-select');
+            const characters = getCharacters();
+            characters.forEach(char => {
+                const option = document.createElement('option');
+                option.value = char;
+                option.textContent = char;
+                select.appendChild(option);
+            });
+
+            select.addEventListener('change', (e) => {
+                selectedCharacter = e.target.value;
+                saveSettings();
+                updateTitle();
+                
+                // Re-render current tab
+                if (currentTab === 'read') {
+                    renderReadTab();
+                } else if (currentTab === 'learn') {
+                    renderLearnTab();
+                }
+            });
+            
+            // Text size buttons
+            document.querySelectorAll('.text-size-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const size = this.dataset.size;
+                    applyTextSize(size);
+                    setStorage('textSize', size);
+                });
+            });
+
+            // Fullscreen button
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            if (fullscreenBtn) {
+                fullscreenBtn.addEventListener('click', toggleFullscreen);
+            }
+        }
+
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
+                // Enter fullscreen
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                } else if (elem.mozRequestFullScreen) {
+                    elem.mozRequestFullScreen();
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                }
+            } else {
+                // Exit fullscreen
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        // Setup tab navigation
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+        }
+
+        // Switch between tabs
+        function switchTab(tabName) {
+            currentTab = tabName;
+            setStorage('currentTab', tabName);
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-tab') === tabName) {
+                    tab.classList.add('active');
+                }
+            });
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+
+            // Render specific tab content if needed
+            if (tabName === 'learn') {
+                renderLearnTab();
+            } else if (tabName === 'read') {
+                renderReadTab();
+            }
+        }
+
+        // Render Read Tab
+        function renderReadTab() {
+            const container = document.getElementById('read-content');
+            container.innerHTML = '';
+
+            playData.acts.forEach((act, actIndex) => {
+                act.scenes.forEach((scene, sceneIndex) => {
+                    const sceneTitle = document.createElement('div');
+                    sceneTitle.className = 'learn-scene-header';
+                    
+                    const titleSpan = document.createElement('span');
+                    titleSpan.textContent = `${act.title}, ${scene.title}`;
+                    
+                    const arrowSpan = document.createElement('span');
+                    arrowSpan.className = 'arrow-icon';
+                    arrowSpan.textContent = '▼';
+                    
+                    sceneTitle.appendChild(titleSpan);
+                    sceneTitle.appendChild(arrowSpan);
+                    sceneTitle.onclick = () => {
+                        readState.actIndex = actIndex;
+                        readState.sceneIndex = sceneIndex;
+                        setStorage('readState', readState);
+                        openNavigation('read');
+                    };
+                    
+                    container.appendChild(sceneTitle);
+
+                    const sceneBlock = document.createElement('div');
+                    sceneBlock.className = 'scene-block';
+
+                    scene.dialogues.forEach(dialogue => {
+                        const dialogueDiv = document.createElement('div');
+                        dialogueDiv.className = 'dialogue';
+                        
+                        if (selectedCharacter && dialogue.character === selectedCharacter) {
+                            dialogueDiv.classList.add('highlight');
+                        }
+
+                        const charSpan = document.createElement('span');
+                        charSpan.className = 'dialogue-character';
+                        charSpan.textContent = dialogue.character;
+                        charSpan.style.color = getCharacterColor(dialogue.character);
+
+                        const textSpan = document.createElement('span');
+                        textSpan.className = 'dialogue-text';
+                        textSpan.textContent = dialogue.text;
+
+                        dialogueDiv.appendChild(charSpan);
+                        dialogueDiv.appendChild(textSpan);
+                        sceneBlock.appendChild(dialogueDiv);
+                    });
+
+                    container.appendChild(sceneBlock);
+                });
+            });
+            
+            // Validate readState indices
+            if (readState.actIndex >= playData.acts.length) {
+                readState.actIndex = 0;
+            }
+            if (readState.sceneIndex >= playData.acts[readState.actIndex].scenes.length) {
+                readState.sceneIndex = 0;
+            }
+            
+            // Scroll to the saved scene position
+            setTimeout(() => {
+                const sceneBlocks = document.querySelectorAll('#read-content .scene-block');
+                let totalSceneIndex = 0;
+                for (let i = 0; i < readState.actIndex; i++) {
+                    totalSceneIndex += playData.acts[i].scenes.length;
+                }
+                totalSceneIndex += readState.sceneIndex;
+                
+                if (sceneBlocks[totalSceneIndex]) {
+                    sceneBlocks[totalSceneIndex].scrollIntoView({ behavior: 'auto', block: 'start' });
+                }
+            }, 0);
+        }
+
+        // Render Learn Tab
+        function renderLearnTab(clearContent = true) {
+            const content = document.getElementById('learn-content');
+            if (clearContent) {
+                content.innerHTML = '';
+            }
+
+            // Check if no character is selected
+            if (!selectedCharacter) {
+                content.innerHTML = '<div style="padding: 40px 20px; text-align: center;"><p style="color: var(--text-secondary); font-size: 18px; margin-bottom: 16px;">Aucun personnage sélectionné</p><p style="color: var(--text-muted); font-size: 14px;">Veuillez sélectionner un personnage dans l\'onglet Paramètres pour commencer l\'apprentissage.</p></div>';
+                document.getElementById('line-counter').textContent = '0 / 0';
+                const nextButton = document.querySelector('.btn-next');
+                const backButton = document.querySelector('.btn-back');
+                if (nextButton) nextButton.disabled = true;
+                if (backButton) backButton.disabled = true;
+                return;
+            }
+
+            // Validate learnState indices
+            if (learnState.actIndex >= playData.acts.length) {
+                learnState.actIndex = 0;
+            }
+            if (learnState.sceneIndex >= playData.acts[learnState.actIndex].scenes.length) {
+                learnState.sceneIndex = 0;
+            }
+
+            // Get current scene
+            const act = playData.acts[learnState.actIndex];
+            const scene = act.scenes[learnState.sceneIndex];
+
+            // Update scene header
+            document.getElementById('learn-current-scene').textContent = 
+                `${act.title}, ${scene.title}`;
+
+            const lines = scene.dialogues;
+
+            if (lines.length === 0) {
+                content.innerHTML = '<p style="color: #95a5a6; text-align: center;">Aucune réplique dans cette scène.</p>';
+                document.getElementById('line-counter').textContent = '0 / 0';
+                return;
+            }
+
+            // Find character's lines and their indices
+            const characterLines = [];
+            lines.forEach((dialogue, index) => {
+                if (dialogue.character === selectedCharacter) {
+                    characterLines.push(index);
+                }
+            });
+
+            if (characterLines.length === 0) {
+                content.innerHTML = '<p style="color: #95a5a6; text-align: center;">Aucune réplique pour ce personnage dans cette scène.</p>';
+                document.getElementById('line-counter').textContent = '0 / 0';
+                return;
+            }
+
+            // Update counter based on character's lines
+            document.getElementById('line-counter').textContent = 
+                `${learnState.lineIndex} / ${characterLines.length}`;
+
+            // When clearContent is true (initial load or restart), show all dialogues up to current state
+            // When clearContent is false (appending), show only the new dialogues
+            let startIndex, endIndex;
+            
+            if (clearContent) {
+                // Show all dialogues from start up to current lineIndex
+                startIndex = 0;
+                if (learnState.lineIndex === 0) {
+                    endIndex = characterLines[0];
+                } else {
+                    const currentCharLineIndex = Math.min(learnState.lineIndex - 1, characterLines.length - 1);
+                    endIndex = learnState.lineIndex < characterLines.length 
+                        ? characterLines[learnState.lineIndex] 
+                        : lines.length;
+                }
+            } else {
+                // Append mode: show only new dialogues
+                if (learnState.lineIndex === 0) {
+                    startIndex = 0;
+                    endIndex = characterLines[0];
+                } else {
+                    const currentCharLineIndex = Math.min(learnState.lineIndex - 1, characterLines.length - 1);
+                    startIndex = characterLines[currentCharLineIndex];
+                    endIndex = learnState.lineIndex < characterLines.length 
+                        ? characterLines[learnState.lineIndex] 
+                        : lines.length;
+                }
+            }
+
+            // Display the dialogues in the range
+            for (let i = startIndex; i < endIndex; i++) {
+                const dialogue = lines[i];
+                const dialogueDiv = document.createElement('div');
+                dialogueDiv.className = 'dialogue';
+                
+                // Highlight selected character's lines
+                if (dialogue.character === selectedCharacter) {
+                    dialogueDiv.classList.add('my-character');
+                }
+
+                const charSpan = document.createElement('span');
+                charSpan.className = 'dialogue-character';
+                charSpan.textContent = dialogue.character;
+                charSpan.style.color = getCharacterColor(dialogue.character);
+
+                const textSpan = document.createElement('span');
+                textSpan.className = 'dialogue-text';
+                textSpan.textContent = dialogue.text;
+
+                dialogueDiv.appendChild(charSpan);
+                dialogueDiv.appendChild(textSpan);
+                content.appendChild(dialogueDiv);
+            }
+            
+            // Update button state
+            const nextButton = document.querySelector('.btn-next');
+            const backButton = document.querySelector('.btn-back');
+            if (nextButton) {
+                nextButton.disabled = learnState.lineIndex >= characterLines.length;
+            }
+            if (backButton) {
+                backButton.disabled = learnState.lineIndex === 0;
+            }
+        }
+
+        // Next line in Learn mode
+        function nextLine() {
+            const act = playData.acts[learnState.actIndex];
+            const scene = act.scenes[learnState.sceneIndex];
+            const lines = scene.dialogues;
+
+            // If no character selected, advance one line at a time
+            if (!selectedCharacter) {
+                if (learnState.lineIndex < lines.length - 1) {
+                    learnState.lineIndex++;
+                    saveSettings();
+                    renderLearnTab();
+                }
+                return;
+            }
+
+            // Find character's lines
+            const characterLines = [];
+            lines.forEach((dialogue, index) => {
+                if (dialogue.character === selectedCharacter) {
+                    characterLines.push(index);
+                }
+            });
+
+            // Advance to next step
+            if (learnState.lineIndex < characterLines.length) {
+                const oldLineIndex = learnState.lineIndex;
+                learnState.lineIndex++;
+                saveSettings();
+                renderLearnTab(false); // Don't clear content, just append
+                
+                // Scroll to the first newly added dialogue
+                setTimeout(() => {
+                    const content = document.getElementById('learn-content');
+                    const newDialogues = content.querySelectorAll('.dialogue');
+                    
+                    // Calculate the index of the first new dialogue
+                    let firstNewIndex = 0;
+                    if (oldLineIndex === 0) {
+                        // On first click, scroll to the character's first line
+                        firstNewIndex = characterLines[0];
+                    } else {
+                        const prevCharLineIndex = oldLineIndex - 1;
+                        const prevEndIndex = oldLineIndex < characterLines.length 
+                            ? characterLines[oldLineIndex] 
+                            : lines.length;
+                        firstNewIndex = prevEndIndex;
+                    }
+                    
+                    if (newDialogues[firstNewIndex]) {
+                        newDialogues[firstNewIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 50);
+            }
+        }
+
+        // Restart scene in Learn mode
+        function restartScene() {
+            learnState.lineIndex = 0;
+            saveSettings();
+            renderLearnTab(true); // Clear content and restart
+        }
+
+        // Open navigation modal
+        function openNavigation(source) {
+            const modal = document.getElementById('navigation-modal');
+            const modalBody = document.getElementById('modal-body');
+            modalBody.innerHTML = '';
+
+            playData.acts.forEach((act, actIndex) => {
+                const actItem = document.createElement('div');
+                actItem.className = 'nav-item nav-act';
+                actItem.textContent = act.title;
+                actItem.onclick = () => navigateToScene(actIndex, 0, source);
+                modalBody.appendChild(actItem);
+
+                act.scenes.forEach((scene, sceneIndex) => {
+                    const sceneItem = document.createElement('div');
+                    sceneItem.className = 'nav-item nav-scene';
+                    sceneItem.textContent = scene.title;
+                    sceneItem.onclick = () => navigateToScene(actIndex, sceneIndex, source);
+
+                    if (source === 'learn' && actIndex === learnState.actIndex && sceneIndex === learnState.sceneIndex) {
+                        sceneItem.classList.add('current');
+                    }
+
+                    modalBody.appendChild(sceneItem);
+                });
+            });
+
+            modal.classList.add('active');
+        }
+
+        // Close navigation modal
+        function closeNavigation(event) {
+            if (event.target.id === 'navigation-modal') {
+                document.getElementById('navigation-modal').classList.remove('active');
+            }
+        }
+
+        // Navigate to a specific scene
+        function navigateToScene(actIndex, sceneIndex, source) {
+            if (source === 'learn') {
+                learnState.actIndex = actIndex;
+                learnState.sceneIndex = sceneIndex;
+                learnState.lineIndex = 0;
+                saveSettings();
+                renderLearnTab();
+            } else if (source === 'read') {
+                readState.actIndex = actIndex;
+                readState.sceneIndex = sceneIndex;
+                saveSettings();
+                
+                // Scroll to the scene block
+                const sceneBlocks = document.querySelectorAll('#read-content .scene-block');
+                let totalSceneIndex = 0;
+                for (let i = 0; i < actIndex; i++) {
+                    totalSceneIndex += playData.acts[i].scenes.length;
+                }
+                totalSceneIndex += sceneIndex;
+                
+                if (sceneBlocks[totalSceneIndex]) {
+                    sceneBlocks[totalSceneIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
+            closeNavigation({ target: { id: 'navigation-modal' } });
+        }
+
+        // Save settings to localStorage
+        function saveSettings() {
+            setStorage('selectedCharacter', selectedCharacter);
+            setStorage('readState', JSON.stringify(readState));
+            setStorage('learnState', JSON.stringify(learnState));
+        }
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const savedCharacter = getStorage('selectedCharacter');
+            if (savedCharacter) {
+                selectedCharacter = savedCharacter;
+                const select = document.getElementById('character-select');
+                if (select) {
+                    select.value = savedCharacter;
+                }
+            }
+
+            const savedReadState = getStorage('readState');
+            if (savedReadState) {
+                try {
+                    readState = JSON.parse(savedReadState);
+                } catch (e) {
+                    console.error('Error parsing readState:', e);
+                }
+            }
+
+            const savedLearnState = getStorage('learnState');
+            if (savedLearnState) {
+                try {
+                    learnState = JSON.parse(savedLearnState);
+                } catch (e) {
+                    console.error('Error parsing learnState:', e);
+                }
+            }
+            
+            // Load and apply text size
+            const textSize = getStorage('textSize') || 'normal';
+            applyTextSize(textSize);
+        }
+        
+        // Apply text size to body
+        function applyTextSize(size) {
+            document.body.classList.remove('text-small', 'text-normal', 'text-large');
+            document.body.classList.add(`text-${size}`);
+            
+            // Update button states
+            document.querySelectorAll('.text-size-btn').forEach(btn => {
+                if (btn.dataset.size === size) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // Initialize the app when DOM is ready
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

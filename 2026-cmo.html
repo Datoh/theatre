@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pièce de théâtre</title>
+    <style>
+        :root {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: white;
+            --bg-header: #34495e;
+            --text-primary: #333;
+            --text-secondary: #555;
+            --text-muted: #666;
+            --text-light: #7f8c8d;
+            --border-color: #ddd;
+            --border-light: #ecf0f1;
+            --highlight-bg: #d6ebf7;
+            --highlight-border: #3498db;
+            --shadow-light: rgba(0,0,0,0.05);
+            --shadow-medium: rgba(0,0,0,0.08);
+            --shadow-dark: rgba(0,0,0,0.1);
+            --modal-overlay: rgba(0,0,0,0.5);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: #0d0d0d;
+                --bg-secondary: #3d3d3d;
+                --bg-header: #0d0d0d;
+                --text-primary: #ffffff;
+                --text-secondary: #f5f5f5;
+                --text-muted: #e0e0e0;
+                --text-light: #cccccc;
+                --border-color: #555555;
+                --border-light: #4a4a4a;
+                --highlight-bg: #2a5d8a;
+                --highlight-border: #a8daff;
+                --shadow-light: rgba(0,0,0,0.3);
+                --shadow-medium: rgba(0,0,0,0.4);
+                --shadow-dark: rgba(0,0,0,0.5);
+                --modal-overlay: rgba(0,0,0,0.7);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh; /* Dynamic viewport height for mobile */
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--bg-header);
+            color: white;
+            padding: 12px 16px;
+            text-align: center;
+            box-shadow: 0 2px 4px var(--shadow-dark);
+            z-index: 100;
+            order: 1;
+            flex-shrink: 0;
+            min-height: 50px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .fullscreen-btn {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+        }
+
+        .fullscreen-btn:hover {
+            opacity: 0.7;
+        }
+
+        .fullscreen-btn:active {
+            opacity: 0.5;
+        }
+
+        /* Tab Navigation */
+        .tabs {
+            display: flex;
+            background-color: #d5d5d5;
+            border-top: 2px solid var(--border-color);
+            box-shadow: 0 -4px 8px var(--shadow-light);
+            order: 3;
+            z-index: 999;
+            flex-shrink: 0;
+            min-height: 60px;
+            height: 60px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 16px 0;
+            text-align: center;
+            background-color: #e8e8e8;
+            border: none;
+            color: #555;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tab.active {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .tabs {
+                background-color: #2c3e50;
+            }
+            
+            .tab {
+                background-color: #3d3d3d;
+                color: #95a5a6;
+            }
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background-color: var(--bg-primary);
+            -webkit-overflow-scrolling: touch;
+            order: 2;
+            min-height: 0;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 16px;
+            animation: fadeIn 0.3s;
+        }
+
+        #read-tab,
+        #learn-tab {
+            padding: 0;
+        }
+        
+        #learn-tab.active {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Settings Tab */
+        .settings-content {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px var(--shadow-dark);
+        }
+
+        .settings-group {
+            margin-bottom: 24px;
+        }
+
+        .settings-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .settings-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .text-size-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .text-size-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .text-size-btn:hover {
+            border-color: #3498db;
+        }
+
+        .text-size-btn.active {
+            background-color: #3498db;
+            border-color: #3498db;
+            color: white;
+        }
+
+        /* Text size variations */
+        body.text-small {
+            font-size: 14px;
+        }
+
+        body.text-small .dialogue-text {
+            font-size: 14px;
+        }
+
+        body.text-small .dialogue-character {
+            font-size: 12px;
+        }
+
+        body.text-normal {
+            font-size: 16px;
+        }
+
+        body.text-normal .dialogue-text {
+            font-size: 16px;
+        }
+
+        body.text-normal .dialogue-character {
+            font-size: 14px;
+        }
+
+        body.text-large {
+            font-size: 18px;
+        }
+
+        body.text-large .dialogue-text {
+            font-size: 18px;
+        }
+
+        body.text-large .dialogue-character {
+            font-size: 16px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        /* Read Tab */
+        .scene-block {
+            background-color: transparent;
+            border-radius: 8px;
+            padding: 0 16px 16px 16px;
+            margin-bottom: 16px;
+        }
+
+        .dialogue {
+            margin-bottom: 12px;
+            line-height: 1.6;
+            background-color: var(--bg-secondary);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        .dialogue-character {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .dialogue-text {
+            color: var(--text-secondary);
+        }
+
+        .dialogue.highlight {
+            background-color: var(--highlight-bg);
+            border: 2px solid var(--highlight-border);
+        }
+
+        /* Learn Tab */
+        .learn-controls {
+            background-color: var(--bg-secondary);
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -2px 4px var(--shadow-dark);
+            flex-shrink: 0;
+        }
+
+        .learn-scene-header {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            box-shadow: 0 2px 4px var(--shadow-dark);
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            margin-bottom: 12px;
+        }
+
+        .learn-scene-header:active {
+            background-color: #2980b9;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-back {
+            background-color: #3498db;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-back:active {
+            background-color: #2980b9;
+        }
+
+        .btn-next {
+            background-color: #3498db;
+            color: white;
+            flex: 2;
+        }
+
+        .btn-next:active {
+            background-color: #2980b9;
+        }
+
+        .btn-back:disabled,
+        .btn-next:disabled {
+            background-color: var(--border-light);
+            color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .learn-content-area {
+            background-color: transparent;
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .dialogue.my-character {
+            background-color: var(--highlight-bg);
+            border: 2px solid var(--highlight-border);
+        }
+
+        /* Navigation Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--modal-overlay);
+            z-index: 1000;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--bg-secondary);
+            width: 90%;
+            max-width: 400px;
+            max-height: 70vh;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            background-color: var(--bg-header);
+            color: white;
+            padding: 16px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .modal-body {
+            overflow-y: auto;
+            max-height: calc(70vh - 60px);
+        }
+
+        .nav-item {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .nav-item:active {
+            background-color: var(--border-light);
+        }
+
+        .nav-item.current {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .nav-item.current {
+                background-color: #1e3a4a;
+            }
+        }
+
+        .nav-act {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .nav-scene {
+            color: var(--text-light);
+            padding-left: 20px;
+        }
+
+        .arrow-icon {
+            float: right;
+            color: #95a5a6;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Raw play text
+        const rawPlayText = `#Coach me oui !!!
+##Acte 1
+###Scène 1
+Matou  : (Au lever de rideau, la scène est plongée dans la pénombre. Seul un projecteur éclaire l'horloge, côté cour, il est 6 heures du matin. On est chez Bruno et Nicole, appartement cosy. Un canapé. Côté cour l'entrée, côté jardin la chambre. Nicole et Bruno sont du côté jardin dans leur lit mais on ne les voit pas, on les entend juste. Depuis les coulisses, on entend une voix masculine de type « tutoriel audio » ou « message vocal » diffusée en fond. C'est Mathis, le coach : nouveau programme pré-enregistré, ton ultra-dynamique, gourou et disjoncté.) (voix enregistrée) On se réveille avec Matou, heu je voulais dire Mathis votre coach de feu de Dieu !!! (Torture pendant 1 minute. Le mari râle et appuie sur l'appli.)
+Matou  : (voix enregistrée) Je vous vois, je vous vois, vous m'avez arrêté mais je suis toujours là à votre service.
+Bruno  : (hurlant depuis les coulisses, sa voix ensommeillée et furieuse) Ta gueule !
+Nicole : (elle se réveille, elle ne comprend pas pourquoi son mari râle) Oh ! Mais qu'est-ce qui se passe, pourquoi tu cries comme ça ?
+Bruno  : Pourquoi je crie ? Pourquoi je crie ? Tu me demandes grrr ! Parce que ça fait une semaine que ton abruti de coach me saoule tous les matins, surtout à 6h du matin. Je n'ai pas de TGV à prendre, je ne me lève pas pour faire ma prière, je ne travaille pas non plus entre 6 et 8h du matin ! Alors oui moi à 6h je dors encore, merde. (Et il râle de nouveau, il grogne...)
+Nicole : Quoi ? (À moitié endormie encore, elle se lève et va dans la salle de bain.)
+Bruno  : Rien, et voilà que tu es sourde ma pauvre. (On entend la voix jeune et dynamique du coach qui baragouine des choses.) Mais retenez-moi je vais le tuer ! Putain au secours !
+Nicole : Tu râles tout le temps, tu deviens pénible. (De la salle de bain. Elle arrive sur scène en peignoir.) Oh ! Mince je vais être en retard pour le cours. (Elle parle toute seule car son mari reste couché.)
+Bruno  : (il murmure) Tu as un rendez-vous hyper tôt ce matin ? Ma parole tu es devenue folle ???
+Nicole : Non mais je veux être prête, c'est à 10h mais il y a du boulot à mon âge. (Elle monologue seule face public.) Je prie pour qu'on soit tous les deux aujourd'hui, pourvu... J'aimerais l'avoir pour moi toute seule. Oui je sais il est un peu jeune pour moi mais et alors ? Après tout on n'a qu'une vie ? Non ?
+Bruno  : (Le mari ronchon finit par se lever au radar et traverse la pièce pour disparaître dans la cuisine, la porte à côté de l'entrée.) Un bon café maintenant que je suis réveillé.
+Nicole : Comment je vais m'habiller ? Mince j'ai encore grossi. Je ne comprends pas, je ne mange plus de sucre, je mange plus de légumes et de fruits et j'ai l'impression de gonfler comme une montgolfière mais sans voler ! Pourtant son programme garanti « Pleine vitalité » est supposé faire mincir. OK minceur, corps de déesse (elle se regarde) là c'est pas gagné ! OK voyons le côté positif : vitalité ça peut aller. Minceur heu ? À la loupe alors ou au microscope. Chéri tu ne trouves pas que j'ai minci ?
+Bruno  : Quoi encore ?
+Nicole : Voilà, rien. (Ça fait bien longtemps que je n'existe plus à ses yeux.) L'avantage c'est qu'il ne voit pas mes défauts mais il voit bien les qualités de certaines autres.
+Bruno  : (toujours dans la cuisine, ronchonnant) De quoi tu parles ?
+Nicole : Rien ? Rien ? Bonne journée. (Elle met une tenue un peu trop sexy, voire un peu ridicule. Le mari a fini de boire son café et revient sur scène.)
+Bruno  : Ah ! Mon Dieu c'est quoi cette tenue ?
+Nicole : (vexée) Tu n'y connais rien !
+Bruno  : Si tu veux ressembler à une pouf c'est réussi ! Ou encore mieux au lampadaire dans le sketch de... tu sais ? (Et il se met à rire !) « Le lampadaire c'est moi ».
+Nicole : Merci beaucoup ! C'est fou comme je me sens encouragée avec toi.
+Bruno  : Oh ! Mais tu es très bien comme ça. Pourquoi tu t'obstines à vouloir rester jeune ?
+Nicole : (en colère) Goujat ! Pauvre con !
+Bruno  : Non ! Mais attends ce n'est pas ce que j'ai voulu dire. Pourquoi tu veux te muscler alors que tu es très bien comme ça ? Encore une lubie comme tout le monde. (Il rit.) Tu n'es pas une athlète de haut niveau. Même eux ils prennent un jour leur retraite.
+Nicole : Décidément, tu ne comprends rien !
+Bruno  : Non mais si tu remets l'appli pour 6h du mat, je demande le divorce ou je fais chambre à part.
+Nicole : Pour ce que ça change ? Tu as raison.
+Bruno  : Je suis fatigué moi ! Je vais me reposer dans le bureau, il y a un bon canapé ! Et j'ai des dossiers en retard ! Bon allez à ce soir ? (Le bureau se trouve à côté de la chambre, mais il a également son bureau en dehors avec un bon canapé.)
+Nicole : Mais oui bien sûr. Fuis-moi je te suis, suis-moi je te fuis, mais quelle connerie ! Si je tenais l'abruti qui a dit que de fuir son homme ça le faisait revenir. Je lui ferais bouffer sa tablette, son iPhone, son Android, sa Nintendo d'attardé de cerveau masculin. Car c'est un homme qui a pondu ça ! Moi j'essaye avec le mien c'est la Bérézina, nada, rien... Depuis que j'ai choisi ce coach sur ce site je me sens toute bizarre, il faut dire qu'il est très beau ce jeune homme et je suis attirée par lui, oui je sais c'est idiot vu qu'on ne s'est jamais rencontrés, mais je me sens toute chose. Oh ! Là ! Là ! Je parle ! Je parle, ça c'est tout moi ça... Je veux arriver en avance. Pourvu qu'on soit tous les deux. Oui mais si lui n'est pas là... Mais que je suis bête, il sera forcément là puisque c'est chez lui le cours. Nicole il faut que tu te ressaisisses voyons !
+Bruno  : (Il revient sur ses pas, il a oublié quelque chose. Il entend qu'elle parle toute seule.) Hein, avec qui tu parles ? Bon, pas avec moi apparemment ???
+Nicole : Moi ? Personne voyons, je parlais de Françoise qui va venir, tu sais, mon amie.
+Bruno  : Bon ! Bon ! J'y vais ! (il lance) Tu voudrais pas ranger ? Car là c'est l'horreur ! (Il parle en râlant... Ils ne s'écoutent plus l'un et l'autre... Monologue de chacun dans son coin.)
+Nicole : Oui ! Oui. « Bonne journée ma chérie, tu vas bien ce matin ? Alors, heureuse ? » Ce sont des phrases que je n'entends plus. J'ai l'impression de faire partie des meubles. Et encore les meubles on leur donne un petit coup pour les nettoyer de temps en temps... Mais qu'est-ce que je raconte moi ??? C'est ce jeune Matou. Allez je file me préparer, je suis folle mais j'assume.
+###Scène 2
+Matou  : (Pour des raisons financières, notre jeune Matou donne ses cours chez lui en attendant de trouver une salle. Nicole arrive et elle n'est pas contente car il y a une jeune femme qui est déjà avec Matou.) Bonjour, je me présente : Mathis, mais pour les intimes c'est Matou, pour vous coacher mes belles ! Si vous êtes sages ! Mais ça vous le savez déjà car vous avez eu le plaisir de m'entendre tous les matins de bon matin !
+Lili   : Matou, comment vous faites pour être aussi joyeux ? Avec tout ce qui se passe... (Elle commence à renifler.)
+Matou  : Non ! Non, pas de ça avec moi, j'ai horreur des gens qui pleurnichent. C'est dans la tête tout ça. On prend une grande respiration et on expire.
+Lili   : (suffoque)
+Matou  : Mais non, on ne bloque pas, on inspire et on expire.
+Lili   : (s'accroche à lui) Je n'y arrive pas...
+Matou  : Mais si ! Mais si, ça sera cher !
+Lili   : Quoi ?
+Matou  : Heu ! Ce sera dur pour vous mais on y arrivera.
+Lili   : C'est que j'ai déjà 25 ans. (Et elle repleure.)
+Matou  : C'est très bien ça d'avoir 25 ans. Vous gagnez combien ?
+Lili   : Hein ?
+Matou  : Pardon, vous faites quoi de beau dans la vie Lili ?
+Lili   : Je fais des études pour devenir infirmière mais je ne veux pas continuer...
+Matou  : Tu m'étonnes ! Eh bien oui je comprends. (Elle a raison, elle déprimerait les malades.)
+Lili   : Bon alors qu'est-ce que vous allez faire pour moi docteur ?
+Matou  : Non, pas de transfert tout de suite, je ne suis pas docteur, mais on va essayer de remodeler tout ça ! (Il la regarde pour voir les différentes possibilités susceptibles de lui convenir.) C'est pas gagné... mais on va y arriver, allez on s'accroche...
+Lili   : En plus je suis grosse.
+Matou  : Vous les femmes vous avez toujours quelque chose. (Et heureusement pour moi !!!)
+Lili   : (avec Nicole) Hein ???
+Nicole : (avec Lili) Hein ???
+Matou  : Je suis là pour vous aider ! (Et il se tourne vers Nicole. Elle regarde le coach qui l'a bien ignorée pendant qu'il parlait à Lili. Avec un large sourire :) Comment ça va, vous ? (Il cherche son nom...)
+Nicole : (vexée) Nicole !!!! Mal, pas bien du tout ! Que me préconisez-vous aujourd'hui ? Je suis prête à mettre le paquet...
+Matou  : Formidable !
+Lili   : Quel sera le programme ?
+Matou  : Quel programme ? Voyons, vous n'avez pas vu mon DVD, application Bluetooth connectée 24h/24 pour avancer dans votre vie ?
+Nicole : (les deux femmes se regardent dubitatives, en chœur avec Lili) Non !
+Lili   : (en chœur avec Nicole) Non !
+Matou  : Bon, je vois manifestement que vous ne lisez pas vos messages. Bon je vous explique en deux mots car je n'ai pas que ça à faire non plus... 1ère semaine vous écoutez tous les soirs pour vous (en désignant Nicole) et pour vous (en désignant Lili) la totale : matin, midi et soir et même en pleine nuit si vous n'arrivez pas à dormir. C'est connecté directement sur votre portable et il y a un rappel, si ! C'est génial non ?
+Nicole : Et ça parle de quoi ?
+Lili   : Oui ça parle de quoi votre truc là ? Pour l'avenir, votre bien-être ? (Elles le regardent, perplexes.)
+Matou  : Ce sont des mantras hyper puissants qui vont changer votre vie. Ça rééquilibre le corps et le mental. Je vous ai concocté des programmes sur mesure.
+Lili   : Sans me connaître ?
+Matou  : Mais yes ! Oui c'est parce que je suis le meilleur. Toi tu as besoin de prendre confiance en toi, non ? Je ne me trompe pas ?
+Lili   : Oui, comment vous le savez ?
+Matou  : (jouant le modeste) Je suis trop fort. Tu n'es pas adaptée pour cette vie et c'est là que j'interviens. Tiens-toi droite. (Lili lève le doigt comme à l'école.) Chut, on ne dit plus rien, on intériorise ce que je viens de dire. Voilà, très bien !
+Lili   : (muette, droite comme un piquet, terrifiée)
+Matou  : Mais on respire Lili. (Il va vers Nicole qui le dévore des yeux.) Vous ce sera : on muscle les bras, les jambes, (il la scrute de haut en bas) il y a du boulot.
+Nicole : (en aparté) C'est agréable !!! Montrez-moi ! (Elle l'attrape par le bras. Elle lui montre trop son désir, mettant en avant sa poitrine généreuse, comme s'ils allaient danser un tango... Fantasme.)
+Matou  : Non mais ce n'est pas si grave que cela, vous Nicole les applications devraient suffire pour le début.
+Nicole : (déçue) Mon mari va me tuer !
+Matou  : Oui bon, si vous vous tenez tranquille on peut éventuellement se voir 2 fois par semaine ! Voilà, je vous propose de venir toutes les deux, vous vous soutiendrez, vous aimez ça vous l'entraide, les femmes. Le temps que je trouve d'autres clientes...
+Lili   : Oui je suis d'accord.
+Nicole : Non, pas moi, on n'a pas le même programme.
+Matou  : Alors oui et non ! Mais moi ça m'arrange, vous êtes 2, parlez entre vous, faites connaissance l'une et l'autre. (Il regarde sa montre connectée.) J'ai un autre cours, on fait un briefing semaine pro, next girls ! Happy weekend ! (Et il s'en va ! Et il revient.) Ah j'oubliais, on va chez qui ? On va chez qui ? C'est qui la veinarde ? (Et il désigne Nicole !) Merci, really best ! Bravo ! You give your address ??? (Sans lui donner le choix. Les deux femmes se retrouvent toutes seules, un peu déconcertées.)
+Nicole : Vous le connaissez depuis longtemps ? En plus je suis nulle en anglais.
+Lili   : C'est pas grave, il a dit donnez-moi votre adresse, logique, sinon pas de cours. Non, moi c'est la première fois, c'est une copine qui m'a dit : en plus de ton psy tu devrais prendre un coach COMPLET. Au début je ne voulais pas, question budget ! C'est cher vous comprenez ? Mais ma grand-mère a cassé tout de suite son compte épargne pour moi. « Ma chérie si c'est pour ton bien, Mamie est là ! Surtout si c'est pour ne plus t'entendre pleurer ou gémir, alors ALLÉLUIA je te donne tout. » Alors voilà je suis là !
+Nicole : (acquiesçant) Je vois, je comprends. Mais j'aimerais que la semaine prochaine vous me laissiez seule avec Matou.
+Lili   : Ah ! Ben non pourquoi ? J'ai payé d'avance...
+Nicole : Je vous rembourserai...
+Lili   : Mais ce n'est pas ça le problème, moi je veux m'en sortir.
+Nicole : Eh bien augmentez vos séances de psy. Vous, vous avez encore de l'avenir devant vous... Moi un peu moins.
+Lili   : Il ne va pas vouloir, en plus il me crie dessus. La dernière fois j'étais en panique, je venais de rater la veine d'un cobaye pour mon examen d'infirmière et je pleurais ! Je l'ai appelé, il ne répondait pas. Il a décroché au bout de la 20ème fois et m'a hurlé dessus. Pour un psy il n'est pas très patient vous ne trouvez pas ?
+Nicole : (qui a décroché) Je le comprends ce psy !
+Lili   : Quoi ?
+Nicole : Allons bon, changez de psy, c'est pas ça qui manque !
+Lili   : J'ai pris un coach pour diminuer mon psy alors si...
+Nicole : Bon OK vous venez, mais en retard, c'est possible ça, c'est dans vos cordes ?
+Lili   : Quoi, avec une corde ?
+Nicole : Mais non, vous ne connaissez pas l'expression « dans vos cordes » ?
+Lili   : ???
+Nicole : Ah ! Oui quand même !
+Lili   : Ça me fait du bien de vous parler. Personne ne veut plus me parler, ils disent que je suis trop négative. Pourtant je suis les actualités, on est en guerre, on devrait être gentils entre nous.
+Nicole : Non Lili on n'est pas en guerre et heureusement, ce n'est pas chez nous.
+Lili   : Et ces putains de virus de merde ? Alors hein ? Ils sont partout, on ne peut plus prendre les gens dans les bras. Ils circulent toujours ! La dernière fois j'ai voulu embrasser un copain, il m'a foutu son coude dans l'œil ! J'ai eu un bleu pendant deux semaines. Sans compter les coups de poing, j'en ai plein les bras... Tout le monde me regarde mais je ne suis pas une femme battue je dis... Moi ma mère ça fait 4 ans que je ne l'ai pas prise dans les bras, mais ça ne change rien elle n'aime pas ça. Et elle ne m'aime pas. Et puis ça fait plus de 4 ans que je n'ai pas... plus... matché avec un mec... C'est vrai, pour sortir avec quelqu'un il faut montrer ses dernières analyses, son bilan de santé, son test sida et maintenant son test de covid. Sans parler de « et combien tu gagnes » et « tu vis où, dans une chambre de bonne ? » Pas un grand standing. Et surtout pas oublier de mettre des capotes car je ne prends pas la pilule, et on ne s'embrasse plus...
+Nicole : Oui ! C'est effectivement très triste et moi-même je suis mariée mademoiselle, et bien comme vous je n'ai pas vu le loup depuis longtemps !
+Lili   : Vous viviez avec un loup ?
+Nicole : Mais non, c'est pénible cette génération qui ne comprend plus les métaphores. Les subtilités de la langue...
+Lili   : Ah ! Mais je ne suis pas une cruche !
+Nicole : Mais non ! On utilise cette image pour dire que les relations sexuelles étaient rares, voire inexistantes pour certaines femmes.
+Lili   : Vous faisiez l'amour avec des loups dans votre temps ?
+Nicole : Mais non, mais non, c'est une image. Et puis un peu de respect, je ne viens pas des cavernes...
+Lili   : Pauvres loups, ça ne m'étonne pas qu'ils disparaissent !
+Nicole : Bon laissons tomber... Je vous propose de venir la semaine prochaine, soit mardi soir, en retard, bien en retard.
+Lili   : Vous voulez CONCLURE AVEC !
+Nicole : Mais non voyons ! Mais si !
+Lili   : OK ! N'oubliez pas de nous transmettre votre adresse ! Sinon pas de... Allez, à la semaine prochaine.
+Nicole : Ah ! Oui merci !
+###Scène 3
+Nicole : (Retour à la maison. Bruno est tranquille dans le salon, il lit des papiers pour son travail, un verre de vin rouge, une musique de fond jazzy. Nicole arrive. Il est 21h. Elle enlève son manteau et dit en le voyant :) Ah ! Tu es encore là ?
+Bruno  : (plongé dans ses dossiers) Tant qu'à faire je me suis mis à mon aise, j'avais l'appartement pour moi tout seul. Hum ! (Il lève la tête et la regarde d'un air moqueur.) Tu n'as pas dû beaucoup bouger à ton cours, tu ne transpires même pas, Véronique !
+Nicole : Commence pas ! Et pourquoi tu me parles de Véronique ? Qui est Véronique ? Une qui transpire, elle ?
+Bruno  : (rigole) Véronique et Dalida ?
+Nicole : Très drôle, merci, sauf que c'est Davina.
+Bruno  : Oui en fait je m'en fiche, moi tout ce que je me rappelle c'est la douche. (Un air de désir l'envahit, souvenir.) Elles avaient transpiré, elles, pour notre plus grand bonheur.
+Nicole : Obsédé ! Avec elle tu voudrais bien ? Moi je ne te fais plus envie. C'est ça, aux oubliettes passé 50 ans ! Merde ! (Elle part en claquant la porte dans la salle de bain.)
+Bruno  : Hé ! Ma pauvre vieille tu n'as plus d'humour ! Pourtant tu aimais ça rire !
+Nicole : (on l'entend de la salle de bain) Pauvre con !
+Bruno  : (Il fait semblant de ne rien entendre, soupire, boit son verre en entier d'un trait et se ressert en hésitant. Ironique :) À ta santé et à la mienne surtout !
+Nicole : (réapparaît en tenue décontractée) Je suppose que Monsieur n'a pas mangé ?
+Bruno  : Madame suppose très mal, Monsieur est allé au restaurant seul comme un grand ! (Je me suis régalé et j'ai même pris un digestif.)
+Nicole : Alors d'accord, tu t'éclates au restaurant sans moi ? Je te fais honte ou quoi ? Ça y est, on en est réduits à sortir chacun de notre côté sans plus rien à faire ensemble ? Mais qu'est-ce qu'on fait ensemble ?
+Bruno  : Allons, voilà que tu te formalises ! J'ai bien le droit de manger alors que tu n'es pas là ? Non vraiment tu deviens irritable avec l'âge !
+Nicole : ARRÊTE AVEC MON ÂGE, c'est insupportable ! Vous les mecs quand vous vieillissez on vous trouve du charme. Nous on nous fait bien comprendre que...
+Bruno  : Ben ça ma pauvre, on ne peut pas rajeunir, c'est pas nouveau. C'est pour ça, reste tranquille, cool ! Prends une camomille et va te coucher car moi je dois finir mon dossier. Je n'ai pas envie de retourner au bureau à cette heure. Moi je suis bien.
+Nicole : TU es bien ? TU ES BIEN ? TU ES BIEN ?
+Bruno  : (Il ne bouge pas mais prend un peu peur, il voit Nicole arriver sur lui, énervée.) Jusqu'à ce que tu arrives oui, mais là ? Tu me fous un doute.
+Nicole : Monsieur est bien ? Parfait ! Et moi je compte pour qui ? Mon boulot il me fait c... Ma famille, ils vont bien mais ils m'énervent ! Même la tienne !
+Bruno  : Calme-toi ! Décidément ton gourou n'a pas su canaliser ta colère ! Tu devrais changer ! Pourquoi tu ne ferais pas de la boxe ?
+Nicole : Mer... DE !!! Et puis arrête avec ce tic de te toucher le nez, c'est dégoûtant ! Prends un mouchoir !
+Bruno  : Ah ! (Ne se rendant compte de rien.) Dis, tu deviens pointilleuse avec l'...
+Nicole : Stop ! Si tu dis encore le mot ÂGE je te jure que je réduis tes dossiers en confettis.
+Bruno  : (prenant sous son aile ledit dossier) Ah ben non, Madame Lindamerk, la pauvre, j'ai déjà du mal à conclure avec elle ! (Elle est si belle.)
+Nicole : Quoi ?
+Bruno  : Je disais elle est tellement laide ! En plus si je n'arrive pas à me la faire !
+Nicole : Pardon ?
+Bruno  : Non je disais si je n'arrive pas à me faire... à suivre le dossier, le dossier ! (Gêné.) Il faut consulter un ornithologue d'urgence ma douce !
+Nicole : C'est toi qui yoyotes mon pauvre ! Un ORNITHOLOGUE POUR LES OREILLES ? Pourquoi pas un sexologue pour ta vue ? Ornithologue, n'importe quoi ! Sais-tu ce que ça veut dire au moins ?
+Bruno  : Je te demande pardon, j'ai confondu, ça peut arriver ! La belle que je suis... heu zut je veux dire la belle affaire que je suis est ornithodingue ? (Il bafouille quand il parle d'elle... Elle me rend dingue, reprends-toi !)
+Nicole : Oui ça c'est sûr, tu en fais un drôle d'oiseau toi ! Je vois, je vois !
+Bruno  : (il rêve de Madame Lindamerk) Nous nous voyions oui, nous nous voyions absolument pour que je puisse me rapprocher encore et encore...
+Nicole : ???
+Bruno  : ... de son problème ? De son problème. Uniquement de son problème. De quoi d'ailleurs ?
+Nicole : Eh ! Ça doit être compliqué pour que tu ne trouves pas tes mots, toi !
+Bruno  : Très compliqué oui, trop compliqué ! (Non, elle m'a souri ! Il se parle à lui-même.) Elle a un sourire, une joie de vivre !
+Nicole : Tu parles tout seul maintenant ?
+Bruno  : Tout le monde le fait dans certaines circonstances. (Là je ne pense qu'à elle.) Toi aussi tu le fais, nous le faisons tous. (Elle le fait en rêvant de moi peut-être ?) C'est un dossier brûlant ! Tu ne comprendrais pas !
+Nicole : Brûlant ???
+Bruno  : Oui brûlant, chaud... Tu m'embrouilles, ce sont des termes de boulot ! (Oh que oui elle est chaude comme la braise ! Non c'est moi ! Allons, on se reprend !) Je boirais bien un autre verre ! Tu peux m'apporter une autre bouteille ?
+Nicole : Tu as raison, picole en plus ! TOUT SEUL !
+Bruno  : Oui Stella ! Avec plaisir !
+Nicole : Quoi ? Stella ?
+Bruno  : Quoi Stella, quoi Stella, tu m'agaces avec tes questions ! Stella, c'est Stella Lindamerk, la femme qui me rend fou ! Si fou ! Fou de travail sur son dossier !
+Nicole : Oui je vois ça, tu n'es pas clair mon petit bonhomme...
+Bruno  : Ne m'appelle pas mon petit bonhomme... D'abord je ne suis pas petit, je suis dans la moyenne.
+Nicole : Toi aussi on ne peut plus rien te dire, tu deviens aigri !
+Bruno  : C'est toi qui dis ça ? Moi, doux comme un agneau, j'étais tranquille, j'étais peinard, comme dirait Renaud, et toi tu viens m'agresser avec tes questions sur le retour d'âge !
+Nicole : (vient sur lui) Tu sais ce qu'il te dit mon âge ? Un VERRE d'eau dans la figure !
+Bruno  : Ah ! Tu as mouillé Stella !
+Nicole : Grrrr, bonne nuit ! (Et elle part dans la chambre !)
+Bruno  : (Il reste seul avec son dossier humide. Monologue face public.) Oui je vois bien que vous me jugez, si ! On devrait divorcer. Mais même si je fantasme sur Stella, oh Stella mon rayon de soleil ! Nicole aussi était mon rayon de soleil ! On n'efface pas 30 ans de vie commune comme ça, non ? Le feu s'est éteint certes, mais peut-être qu'il reste des braises. Oui enfin moi j'ai envie d'essayer quand même de me faire Stella. Le dossier ? Non ? Je suis un homme ! Et puis c'est de sa faute, il ne se passe plus rien depuis quelque temps, alors qui a tort, qui a raison, je vous le demande ?
+###Scène 4
+Matou  : (Nicole s'est mise sur son 31, bien décidée à le faire craquer, ou à le croquer, son Matou. Matou arrive essoufflé car il a tourné en rond pendant 1h, le GPS a déconné.) Je suis en retard, toutes mes excuses, j'ai tourné, tourné, d'ailleurs j'en ai le tournis, je refaisais le chemin inverse, bref j'ai dû me décider à demander pour la première fois mon chemin à un humain en chair et en os, hourra ! La personne était open ! Et me voilà, ouf ! Bien sûr en retard, du coup je ne vous compte pas la demi-heure, cadeau. Waouh ! C'est joli chez vous ! Et Lili, elle est où ? C'est si grand, elle s'est perdue en allant faire popo ?
+Nicole : Non, elle est comme vous, en retard. Voulez-vous boire quelque chose ?
+Matou  : Non merci, pas de ça pendant le service ! Par contre si vous avez des smoothies, du jus de coco, du jus de betterave, des raisins secs, des noix, des noisettes, des fruits secs, je ne dis pas non. Sinon de l'eau...
+Nicole : (surprise) OK, je vais voir ce que j'ai !
+Matou  : Bon, avez-vous écouté votre message de cette semaine ?
+Nicole : (qui se rapproche de lui) Non, c'est quoi ? Dites-le-moi à l'oreille.
+Matou  : Pourquoi à l'oreille ? C'est pas sérieux, vous n'avez rien fait ?
+Nicole : On peut faire l'impasse sur le connecté. Moi je veux du live, du direct...
+Matou  : Très bonne idée, oui on fait un live briefing en vidéo, c'est très bien ça, ça me va tout à fait !
+Nicole : Non, moi je ne veux pas !
+Matou  : Mais si, vous allez adorer et promis, si vous êtes sage, vous...
+Nicole : (plus collante) Oui QUOI ???
+Matou  : On se verra plus...
+Nicole : Oh oui !
+Matou  : Avec Lili, je veux dire avec Lili.
+Nicole : (déçue) Ah ! Oui avec Lili ! Pas avec moi, d'accord, avec Lili.
+Matou  : (essayant d'y mettre les formes mais assez maladroitement) En plus avec tous les travaux dans Paris et les virus toujours présents, ce serait plus raisonnable, non ? Désormais on se verra plus par vidéo. (Je suis idiot de ne pas y avoir pensé avant !)
+Nicole : Oui mais là on est en live, si tu veux filmer pas de problème. Nous pouvons déjà faire un point sur certaines parties de mon corps. (Elle se rapproche et lui met sa poitrine devant.)
+Matou  : (au public) C'est ma veine ! Une nympho !
+Nicole : Vous savez, j'étais encore désirable il y a quelques années. Aujourd'hui je suis mariée depuis plus de 25 ans mais mon mari ne me regarde plus, je n'existe plus. (Espérant un peu de soutien.)
+Matou  : Oui mais moi je ne peux pas vous faire remonter le temps et je ne fais pas de miracle ! Je ne sais pas quoi vous dire ! À part augmenter vos mantras sur l'appli sur la confiance. Et booster votre body...
+Nicole : Mais je me fous de vos applis machin truc et bidule chose ! J'ai souhaité en m'inscrivant à vos cours que vous me trouviez un peu de SEX-APPEAL. Un peu de chaleur humaine.
+Matou  : Ah ! Mais oui ! Mais non ! Je ne suis pas ce genre d'homme...
+Nicole : Quoi, je vous paye en plus si vous voulez ?
+Matou  : Oui, je veux dire non, ce n'est pas possible !
+Nicole : Vous êtes marié ?
+Matou  : Non pas du tout, je suis trop jeune pour me coupler.
+Nicole : Je ne sais pas, moi je me suis mariée à 25 ans.
+Matou  : Comme ma mère. Bon, je ne suis pas psy, ce n'est pas dans mes cordes vocales.
+Nicole : Non c'est le moins qu'on puisse dire. (Elle fait la tête.) Et on ne dit pas « mes cordes vocales » mais « j'ai plusieurs cordes à mon arc ».
+Matou  : Oui ben c'est pareil !
+Nicole : Vous avez raison, je n'ai jamais rien compris à cette expression, surtout qu'il n'y a qu'une corde à un arc.
+Matou  : ???
+Nicole : Ce n'est pas important. Voilà, c'est vrai, vous pourriez être mon fils. J'ai l'impression de ne pas avoir eu la vie que je voulais. La vie va vite, très vite ! Vous savez.
+Matou  : Ce que je vois moi, c'est que nous n'avons rien fait et que Lili n'est toujours pas arrivée. On perd du temps.
+Nicole : C'est agréable, je vous fais perdre votre temps. Je suis si insignifiante que ça, c'est clair ! Ça a le mérite d'être précis. (En aparté : je me suis emballée, j'ai honte.)
+Matou  : Non je ne dirais pas cela, mais je ne suis pas, comment vous dites, un Gigi, je suis juste coach !
+Nicole : Ah ça non c'est pas Gigi, imbécile, c'est gigolo. Ça c'est vrai, vous ne savez pas écouter.
+Matou  : Un peu quand même... Tout le monde a ses problèmes, tenez moi, il me faut trouver d'autres clientes.
+Nicole : Si vous étiez plus à l'écoute vous auriez plus de clients. (Sur un ton plus autoritaire.) Votre cours n'est même pas structuré et on ne fait rien à part entendre votre voix sur des applis et des messages incompréhensibles. Vous me rendez folle, moi et mon mari aussi, surtout à 6h. Qui se lève à 6h du mat ? Vous ne voulez pas que nous devenions moines bouddhistes, et du coup on jeûnerait et on ne dormirait plus ? Non merci, ni lui ni moi on n'a envie de tout ça. Moi j'ai besoin de corps à corps. (Et elle le regarde comme un gros gâteau à dévorer.)
+Matou  : Prenez un amant, c'est très bien un amant, mais pas moi. Il y a des sites pour ça, vous savez ? Voulez-vous des noms ?
+Nicole : Non ! Marre de vos sites à la con... Vous n'êtes pas que beau et superficiel tout de même ?
+Matou  : Vous me trouvez beau ?
+Nicole : Il n'y a pas que le physique, il faut s'entretenir de l'intérieur aussi.
+Matou  : Je mange sainement. C'est mon job ! Et merci, de ce côté-là je n'ai jamais eu de réclamations avec ce corps que le Dieu de l'amour m'a donné, et je ne fais pas la guerre.
+Nicole : (Elle se met à rire !)
+Matou  : Ah ! J'ai réussi à vous faire rire, ça vous va bien le rire. J'aime rire, les gens sont tristes... Avec mon appli... (Regard noir de Nicole.) Pardon, je veux dire rire me rend heureux. Je peux le rajouter à mes cordes ? Ma corde ?
+Nicole : Oui certainement.
+Matou  : Lili ne viendra plus !
+Nicole : Oui, cette brave Lili ! (Elle m'a écoutée mais ça n'a servi à rien !)
+Matou  : On a bien parlé, j'avais oublié ce que ça fait de parler vrai avec quelqu'un.
+Nicole : Ravie de vous l'entendre dire, si j'ai pu aider déjà pour ça ! À l'heure de votre monde ultra-connecté, les gens ne prennent plus le temps de se parler vraiment et c'est triste à mourir. On donne l'image que tout va bien ! On réduit au minimum nos pensées, alors ça donne des hiéroglyphes, oui c'est amusant ! Mais...
+Matou  : Oui je comprends, ma mère pense pareil ! Mais il faut rester dans le move !
+Nicole : Il faut vivre, quoi ? À quoi bon ? Mon mari ne m'aime plus. Moi, ben, je ne sais plus non plus... Et puis se séparer à notre âge c'est risqué !
+Matou  : Vous ne l'aimez plus du tout ? Vraiment ?
+Nicole : Si, oui, peut-être ? Je ne sais plus... On ne se voit plus, on ne fait plus rien ensemble. On ne baise plus ensemble... On ne se touche plus quoi. Je pense qu'il a une maîtresse, j'en suis sûre. Vous les hommes... enfin vous, vous êtes trop jeune pour comprendre...
+Matou  : (un peu mal à l'aise) Oui mais au fond je suis sûr que vous l'aimez encore ? Sinon vous n'en parleriez même pas ? Non ? Ne perdez pas l'espoir de vous... comment je pourrais dire... de vous retrouver.
+Nicole : Matou, vous devenez de plus en plus sensé, vous faites des progrès, bravo !
+Matou  : Je ne suis pas que beau et superficiel ! J'ai un cœur aussi. Allez, on va se rebooster le moral !
+Nicole : Boire un spritz, yes ! J'en veux !
+Matou  : Non, non et non, pas d'alcool. Un corps sain et un cerveau au top !
+Nicole : Pas drôle ! Pourquoi faut-il se priver des bonnes choses alors qu'elles existent ! Moi je crois que quand on est heureuse, vraiment bien, on s'en fout !
+Matou  : Je ne sais pas, je ne me suis pas posé la question du tout ! Je n'ai jamais été en couple, ni à deux, ni à trois, ni avec un mec...
+Nicole : C'est vrai que vous avez le choix ! Nous on a eu les années 70, bon je n'ai pas connu, sauf ma mère ! Ça devait bien s'éclater car vu comme je suis accro aux fringues de cette époque, et le délire des drogues douces ! Impression d'être tombée dedans comme Obélix et la potion magique...
+Matou  : Qui ?
+Nicole : Obélix et Astérix ???
+Matou  : Oui je vois, avec Depardieu et Clavier le petit !
+Nicole : Oui c'est ça !
+Matou  : Sur ce je vais partir. Prenez soin de vous et tout va aller. Et au fait, on va aller où la prochaine fois, chez Lili ? Vous avez son adresse ?
+Nicole : Ne vous inquiétez pas, si elle ne peut pas on revient chez moi.
+Matou  : Merci beaucoup, trop sympa ! Au revoir !
+Nicole : Allez filez ! À bientôt !
+###Scène 5
+Lili   : (Le jour suivant, Nicole laisse les deux jeunes faire connaissance. La séance se passe de nouveau chez Nicole. Lili arrive.) Bonjour Matou, comment ça va ? Désolée, désolée de ne pas être venue mardi, mon chat est mort.
+Matou  : C'est pas grave, on peut commencer ?
+Lili   : Si tu le dis ! Mais quand même je l'aimais bien.
+Matou  : Veux-tu en parler ? J'ai une nouvelle corde !
+Lili   : Quoi ? Une corde ? Moi ça fait longtemps que je n'ai plus sauté à la corde, et puis je tombais systématiquement, j'avais un déséquilibre a dit le doc. Plus tard on m'a diagnostiqué dyslec... Quelque chose comme ça. Et que j'avais un problème de retard de croissance. Bref, je ne suis pas finie a dit ma mère.
+Matou  : D'accord. Perso je ne vois rien.
+Lili   : Non ça y est, je suis guérie, la médecine a du bon. Mais j'ai encore des complexes. On m'appelle Jane Birkin car je suis plate. C'est pas juste, elle on a dit que c'était un sex-symbol et moi... (Elle se met à renifler...) Mais là j'ai triché avec les nouveaux soutiens-gorge. (Elle se déshabille.)
+Matou  : OK ! OK ! Non, sans façon. Vous n'allez pas vous y mettre vous aussi.
+Lili   : Tu peux me tutoyer, je suis plus jeune que toi, pas ta mémé. Avec tout ce que je vis j'ai l'impression de ne pas savoir où est ma place. Et toi ?
+Matou  : Pas forcément, je ne me pose pas cette question si tu veux savoir.
+Lili   : Avec le covid je n'ai vécu que dans le virtuel, c'était pas facile. (Matou commence à l'écouter et à la regarder un peu plus. Il y a quelque chose qui le touche chez cette fille. Il ne sait pas encore quoi.)
+Matou  : On redresse tout ça ! Je peux te toucher ? T'inquiète, je suis vacciné.
+Lili   : Moi non ! Mais j'ai fait le test avant de venir !
+Matou  : Bon ben tout va bien alors. (Il continue à lui donner des conseils.) Il faut parler plus fort, on ne comprend pas toujours ce que tu dis car tu vas vite et...
+Lili   : Je parle trop, c'est ça ?
+Matou  : Je vais t'aider à reprendre confiance en toi. (Lili le regarde comme le messie.) Je vais être ton coach du cœur... heu ? Du corps je voulais dire, DU CORPS !
+Lili   : Oui ça me plaît ! Les deux sonnent bien !
+Matou  : Tu as déjà entendu parler des lentilles pour les yeux ?
+Lili   : Des lentilles pour les yeux ??? Ben non, c'est quoi ça encore ?
+Matou  : Je voulais dire des verres de contact.
+Lili   : Ah oui ! Mais non ! PAS POSSIBLE pour moi, je les perdrais tout le temps à cause de mon cerveau qui de temps en temps bugue ! Je n'ai pas Alzheimer, NON, mais j'ai un manque de concentration !
+Matou  : OK mais là je ne vois pas le rapport avec les lentilles, les verres !
+Lili   : AUCUN, oui, mais mes yeux ne voudraient pas, enfin mon cerveau non plus ! J'aurais peur de les casser, qu'ils éclatent dans mes yeux. BEURK !
+Matou  : Ils ne sont pas dangereux tu sais !
+Lili   : Non, je préfère attendre de me faire opérer, le doc des yeux il a dit ! (Elle a un chewing-gum.)
+Matou  : Ce n'est pas très bon de ruminer comme les vaches.
+Lili   : Mais je suis si grosse que ça ? Mais c'est la catastrophe !
+Matou  : Mais non Lili, je parle du chewing-gum, ce n'est pas bon, on avale de l'air et ce n'est pas bon pour les exercices, après ça coupe le souffle. Non, a priori ta silhouette n'est pas mal mais tu te caches avec ces horribles joggings trop larges pour toi. Je ne veux pas te vexer, tu as pris les affaires les plus pourries de ton armoire ?
+Lili   : Tout le monde ne peut pas avoir la bourse à Rothschild pour s'habiller.
+Matou  : Pardon, je ne voulais pas te vexer. Mais si tu faisais un effort tu serais vraiment bien ! Et c'est quoi ce bonnet ? Ici il fait bon ! Je t'assure, tu peux l'enlever ? On est tous les deux ! Non ? De quoi tu as peur ?
+Lili   : De moi ? Je n'existe pour personne.
+Matou  : Toi aussi, allons bon ! C'est quoi ton problème ? Sache qu'avec moi il n'y a que des solutions. Bien entendu je ne garantis pas tout. Moi je peux te redonner confiance en ton corps si on arrive à faire des choses, car là nous ne faisons que parler. Ce n'est pas un reproche, c'est tout nouveau pour moi...
+Lili   : Oh là ! Là, c'est tout moi ça, je parle, je parle, je parle ! Mais je n'ai pas assez parlé à ma séance de psy, c'est pour ça. Mon psy est arrivé lui aussi en retard, du coup on n'a fait QUE 15 minutes ! C'est pas assez ! Moi j'ai trop de choses dans ma tête.
+Matou  : Voilà ! Voilà ! Lili on avance, je le sens ! J'ai une amie qui relooke, elle va t'aider ! Elle est géniale tu vas voir, et franchement tu peux trouver des fringues très bien pour un moindre prix. Car là j'aurais tendance à croire que tu es une toxico en manque. Excuse-moi mais tu es TOUTE blanche. Tu me fais un peu peur d'ailleurs.
+Lili   : Je suis une grosse vache blanche qui fait peur ? (Elle pleure !)
+Matou  : Mais non, je n'ai pas dit ça, tu vois tu comprends tout de travers, c'est un peu pénible.
+Lili   : C'est mon cerveau, il me joue des tours ! (Elle renifle.) Il n'a pas de filtres...
+Matou  : (lui tend un kleenex) Tiens !
+Lili   : Merci, tu es gentil toi.
+Matou  : Je ne sais pas, mais je n'aime pas les gens malheureux. Et toi tu n'es pas heureuse, c'est clair !
+Lili   : Waouh, tu es aussi fort que mon psy !
+Matou  : Je vais peut-être songer à me reconvertir, ça gagne bien psy, non ?
+Lili   : Je pense bien, toutes les semaines je lâche 100 euros.
+Matou  : Ah oui, ça le fait grave ! Oui mais le truc des cerveaux, moi ! Je n'y connais rien... Tu veux du thé au jasmin ? Ça va te réchauffer.
+Lili   : Oui je veux bien, merci ! (Matou sort son thermos de son sac. Il lui tend une tasse et il verse le thé.)
+Lili   : Hum c'est trop bon ! Tu as raison, ça réchauffe ! Encore ? Tu as du miel ?
+Matou  : Non Lili, je n'ai pas de miel, je le bois nature.
+Lili   : Ma grand-mère aime le miel, elle dit que c'est divin et que ça donne du baume au cœur. Moi je crois que ça ne marche pas avec tout le monde. J'en prends souvent et la vie est toujours aussi triste...
+Matou  : Bon, à défaut de bouger nos corps, ce qui est pourtant très bon pour la santé, je crois que je vais devoir t'écouter comme ton psy. Comme un coach à l'écoute, QUOI ! À moins que tu veuilles vraiment faire des mouvements et me parler en même temps ?
+Lili   : Oui si tu veux. (Et elle saute sur le canapé et recommence à parler.) Moi j'aimerais bien un appart comme ça, pas toi ? Être en couple, avoir des enfants...
+Matou  : Il ne faut pas aller aussi vite, tu as encore largement le temps !
+Lili   : Oui mais dans ma tête je voudrais tout, tout de suite... Le bonheur quoi ! C'est quoi le bonheur pour toi ? À part être là à la bonne heure, LOL !
+Matou  : ????
+Lili   : Le bonheur c'est ne plus se poser de questions, dire merde à qui on veut...
+Matou  : C'est une façon réduite de voir les choses... Moi... (Elle le coupe.)
+Lili   : Bonheur c'est beau comme mot, non ? Puis ça sonne bien ! C'est doux, on dirait le son des cloches, la douceur du soleil sur la peau, les oiseaux qui chantent. ALORS QUE quand tu es adulte c'est moche ! Il faut payer ton loyer, déjà il te faut chercher pour te loger. Il faut travailler, et dans quoi ? « PAS GRAVE », a dit ma mère, « on manque d'infirmières alors fonce ! » « Oui mais maman je suis nulle en maths. » « On s'en fout pour faire des piqûres ! » « Bien maman, seulement je n'aime pas la vue du sang. » « ÇA VA TE DURCIR le caractère. » Tu parles, je tremble de tuer quelqu'un, résultat je ne fais plus que les pansements. « Tu apprends », dit ma mère. Bien sûr maman. Mais je ne suis pas faite pour ça... je le vois bien. Tout le monde dans ma famille pense que je suis une bonne à rien... (Et elle pleure !)
+Matou  : Allez, ça va mieux ?
+Lili   : Même ma fichue pompe à chaleur se fout de moi !
+Matou  : Hein ?
+Lili   : (se lâche) Elle ne tient aucun compte des programmations des températures demandées. Moi je voulais 25 degrés, c'est l'idéal non ? Surtout quand on est frileuse comme moi. Vive le progrès. Si j'avais de l'argent j'irais vivre à Miami, il fait toujours beau là-bas, non ? Bref ! J'ai encore appelé le technicien pour qu'il passe car j'ai trop chaud ! Tout est électronique et sophistiqué et comme je suis nulle je suis dépassée. Je ne suis pas ingénieure à la NASA avec Thomas Pasquier !
+Matou  : Avec qui ?
+Lili   : Thomas, qui va dans l'univers !
+Matou  : OK.
+Lili   : C'est ma grand-mère qui a voulu me faire changer pour une pompe. Résultat, oui, ça me pompe l'air, c'est drôle non ? Et le technicien, pas gratuit ! En plus même lui il a l'air d'être largué ! Ça rassure pas quand même. NON ?
+Matou  : C'est à moi que tu parles ?
+Lili   : Quelle question, il n'y a personne d'autre avec nous ! T'es bizarre toi !
+Matou  : Non tu trouves ? J'écoute, je ne sais pas en quelle qualité d'écoute je suis, moi aussi je suis perdu.
+Lili   : Tu es perdu ? Va voir un psy, ça ne te fera pas de mal !
+Matou  : Ah ! Non, ça devient pire qu'aux States, tout le monde a un psy !!!!
+Lili   : Tu sais, le mien est pas si mal en fait, tu veux son numéro ?
+Matou  : Mais non merci, je n'ai pas besoin de psy, moi je vais très bien...
+Lili   : Alors je suis folle ?
+Matou  : Mais oui, mais non ! Je ne suis pas psy... (Il perd patience.) JE SUIS COACH sportif !
+Lili   : JE LE SAIS, PAS BESOIN DE CRIER ! Mais un coach ça parle aussi, non ?
+Matou  : Je ne sais plus du tout !
+Lili   : Ah ! Voilà, tout le monde va mal !
+Matou  : Merci de me déprimer, j'en avais grandement besoin.
+Lili   : Pas de problème, bon ben salut ! Et entre amis je ne te paye pas, si t'as besoin de parler tu sais que je suis là...
+Matou  : Quoi ?
+Lili   : On ne va pas payer un ami qui vous écoute. Entre amis ça ne se fait pas... (Elle saute du canapé.) Bisous !
+Matou  : Non mais Lili, on n'est pas amis ! Je suis ton coach enfin !
+Lili   : Je mangerais bien quelque chose. Tu n'as pas faim ? Tu n'as pas une de tes barres de céréales hyper protéinées qui sont dégueulasses mais qui donnent de l'énergie ? Et puis non, dans sa cuisine il doit bien y avoir des trucs. Je vais voir... (Elle va dans la cuisine, laissant Matou interrogatif.)
+Matou  : J'en ai juste pour moi, sorry.
+Lili   : (de la cuisine) Tu veux des frites ? J'ai une envie de frites soudainement ! Je ne suis pas enceinte, ben non, sinon je le saurais ! Aucun mec depuis... (elle compte sur ses doigts) je ne compte plus. Et toi ?
+Matou  : Moi quoi ?
+Lili   : Les filles, tu dois en avoir, non ?
+Matou  : Pas plus que ça... Mais ça devient trop intime toutes tes questions !
+Lili   : Je sais, je ne te plais pas c'est ça ? Je suis moche, j'ai pas de poitrine, je porte des lunettes, je m'habille comme un sac et en plus je n'ai même pas de conversation intéressante.
+Matou  : Je ne veux pas te blesser mais tu es un peu beaucoup chiante à rabâcher toujours la même chose. C'est évident que si tu le penses aussi fort, ouh ouh, tout le monde va le voir ! Dans ton quartier et même Thomas Pasquier ! Les pensées sont comme des graines : si tu plantes en te disant que ça ne sert à rien, ben ta plante elle va crever. Ben je pense que les humains c'est pareil ! Plus tu leur dis des douceurs et de jolies choses, plus tu auras de chances d'avoir une bonne estime de toi-même. C'est toi qui comptes Lili, pas les autres...
+Lili   : Oui mais personne ne m'aime, je suis toujours larguée et ils ne veulent plus me voir, même pour boire un verre ou rester amis. Qu'est-ce que j'ai fait ? Ah ! Un ex m'a demandé si j'habitais toujours au même endroit, tu parles, c'était juste au cas où il aurait besoin d'un pied-à-terre à Paris ! Enfoiré ! Et il voulait me... (elle fait le geste) en plus. C'est quoi cette nouvelle conception du sex friend ? Moi je ne peux pas si je n'aime pas, et toi ? En plus le mec il me dit : « T'inquiète Lili, je ne voulais pas te violer, mais comme tu es seule et que je suis seul, ben on n'a qu'à baiser ensemble ou juste se faire un câlin, tu me fais du bien, je te fais du bien... Voilà ! Cool ! »
+Matou  : Mouais, oui mais les hommes c'est pas pareil. On compartimente le sexe et les sentiments ! C'est mécanique ! Quand j'ai envie, ben ça se voit et je le sens. Je peux te dire aussi que ça peut être très désagréable s'il ne se passe rien du tout ! Car il ne faut pas croire qu'on peut tout gérer. Mais oh là ! Là ! Ça va loin la conversation entre nous. En fait le gros souci ambiant c'est le manque de sexe. Mais le manque d'amour aussi... On a quoi, 10 ans d'écart, Nicole pourrait être notre mère, mais on cherche tous la même chose : aimer, être aimé.
+Lili   : Oui c'est ça, mais quoi faire ? Tu as une solution ?
+Matou  : Confiance, reprendre confiance, comme quand on est enfant, on s'en fout, on vit...
+Lili   : Oui mais là je t'arrête tout de suite ! Je vais faire réchauffer les frites, trop la dalle.
+Matou  : Avec de la mayonnaise alors, merci, moi aussi trop faim. Je ne me dépense pas, mais qu'est-ce que je cogite dans ma tête, et du coup perte d'énergie ! LE GRAND MAL DU SIÈCLE : LE MANQUE D'ESTIME DE SOI !
+Lili   : (Elle apporte les bonnes frites maison que Nicole avait mises de côté pour son mari.) Miam ça sent bon ! J'ai pas trouvé de mayo mais de la moutarde à l'ancienne, ça te va ?
+Matou  : OK, pas de souci !
+Lili   : On est bien là chez Nicole, on parle bien, merci de m'écouter... Toi et Nicole vous êtes super ! Tu sais je te vois maintenant comme un grand frère ! Donc un grand frère on lui dit tout ! Non ? J'ai toujours rêvé d'en avoir un, et toi ? (Elle repart dans ses monologues.) Paraît-il que j'en ai un, bon c'est pas le même père, mais on s'en fiche non ? Mais il n'est pas gentil on m'a dit, il ne pourra rien t'apporter de bon. Comment je peux savoir puisque je ne le connais pas... C'est compliqué les histoires de famille. NON ? Tu as ça toi ?
+Matou  : Non pas du tout, mais grâce à toi je viens de me rendre compte que ma famille est cool, voire très cool ! Merci !
+Lili   : De rien... Tu veux mes frites ? J'en ai trop !
+Matou  : Une petite entorse après tout ! C'est bon en plus. Tiens, curieux, pas de nouvelles de Nicole. (Chacune leur tour !) Bon, ça fait déjà 1h15, il faut que je te quitte. Pense bien à ce que je t'ai dit surtout ! The best friend of you, that's you ! Et on essaye de reprendre un peu le programme sinon...
+Lili   : Bye bye ! Bisous ! Je vais y aller ! (Un peu troublée. Elle ne veut pas partir.)
+Matou  : OK, en forme Lili ! Bye ! Bye !
+Lili   : Tu permets, je finis mes frites, pas toi ? À la semaine prochaine !`;
+    </script>
+
+    <div class="header">
+        <h1 id="play-title"></h1>
+        <button class="fullscreen-btn" id="fullscreen-btn" title="Plein écran">⛶</button>
+    </div>
+
+    <div class="tabs">
+        <button class="tab" data-tab="read">Lire</button>
+        <button class="tab" data-tab="learn">Apprendre</button>
+        <button class="tab" data-tab="settings">Paramètres</button>
+    </div>
+
+    <div class="content">
+        <!-- Read Tab -->
+        <div class="tab-content" id="read-tab">
+            <div id="read-content"></div>
+        </div>
+
+        <!-- Learn Tab -->
+        <div class="tab-content" id="learn-tab">
+            <div class="learn-scene-header" onclick="openNavigation('learn')">
+                <span id="learn-current-scene">Acte 1, Scène 1</span>
+                <span id="line-counter" style="margin-left: auto; margin-right: 8px;">0 / 0</span>
+                <span class="arrow-icon">▼</span>
+            </div>
+            <div class="learn-content-area" id="learn-content"></div>
+            <div class="learn-controls">
+                <div class="button-group">
+                    <button class="btn-back" onclick="restartScene()">⏮ Début</button>
+                    <button class="btn-next" onclick="nextLine()">Suivant ▶</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings-tab">
+            <div class="settings-content">
+                <div class="settings-group">
+                    <label class="settings-label" for="character-select">Mon personnage</label>
+                    <select id="character-select">
+                        <option value="">-- Choisissez votre personnage --</option>
+                    </select>
+                </div>
+                <div class="settings-group">
+                    <label class="settings-label">Taille du texte</label>
+                    <div class="text-size-buttons">
+                        <button class="text-size-btn" data-size="small">Petit</button>
+                        <button class="text-size-btn active" data-size="normal">Normal</button>
+                        <button class="text-size-btn" data-size="large">Grand</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Modal -->
+    <div class="modal" id="navigation-modal" onclick="closeNavigation(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">Navigation</div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        // Parse the play text
+        function parsePlayText(text) {
+            const lines = text.split('\n');
+            const playData = {
+                title: '',
+                acts: []
+            };
+
+            let currentAct = null;
+            let currentScene = null;
+
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line) return;
+
+                // Title (# Title)
+                if (line.startsWith('#') && !line.startsWith('##')) {
+                    playData.title = line.substring(1).trim();
+                }
+                // Act (## Act X)
+                else if (line.startsWith('##') && !line.startsWith('###')) {
+                    currentAct = {
+                        title: line.substring(2).trim(),
+                        scenes: []
+                    };
+                    playData.acts.push(currentAct);
+                    currentScene = null;
+                }
+                // Scene (### Scene X)
+                else if (line.startsWith('###')) {
+                    if (currentAct) {
+                        currentScene = {
+                            title: line.substring(3).trim(),
+                            dialogues: []
+                        };
+                        currentAct.scenes.push(currentScene);
+                    }
+                }
+                // Dialogue (Character : Text)
+                else if (line.includes(':')) {
+                    const colonIndex = line.indexOf(':');
+                    const character = line.substring(0, colonIndex).trim();
+                    const text = line.substring(colonIndex + 1).trim();
+                    
+                    if (currentScene && character && text) {
+                        currentScene.dialogues.push({
+                            character: character,
+                            text: text
+                        });
+                    }
+                }
+            });
+
+            return playData;
+        }
+
+        // Parse the play data
+        const playData = parsePlayText(rawPlayText);
+
+        // Update page title
+        document.title = playData.title || 'Pièce de théâtre';
+
+        // State management
+        let currentTab = 'read';
+        let selectedCharacter = '';
+        let learnState = {
+            actIndex: 0,
+            sceneIndex: 0,
+            lineIndex: 0
+        };
+        let readState = {
+            actIndex: 0,
+            sceneIndex: 0
+        };
+
+        // Storage management functions (localStorage works with file://)
+        function setStorage(name, value) {
+            try {
+                localStorage.setItem(name, value);
+            } catch (e) {
+                console.error('Error saving to localStorage:', e);
+            }
+        }
+
+        function getStorage(name) {
+            try {
+                return localStorage.getItem(name);
+            } catch (e) {
+                console.error('Error reading from localStorage:', e);
+                return null;
+            }
+        }
+
+        // Extract unique characters
+        function getCharacters() {
+            const characters = new Set();
+            playData.acts.forEach(act => {
+                act.scenes.forEach(scene => {
+                    scene.dialogues.forEach(dialogue => {
+                        characters.add(dialogue.character);
+                    });
+                });
+            });
+            return Array.from(characters).sort();
+        }
+
+        // Generate a consistent color for each character
+        const characterColors = {};
+        
+        // Color palettes for light and dark modes
+        const colorPalettesLight = [
+            '#c0392b', // dark red
+            '#2980b9', // dark blue
+            '#27ae60', // dark green
+            '#d68910', // dark orange
+            '#8e44ad', // dark purple
+            '#16a085', // dark turquoise
+            '#d35400', // dark carrot
+            '#2c3e50', // very dark blue
+            '#117a65', // very dark green
+            '#922b21', // very dark red
+            '#6c3483', // dark wisteria
+            '#1e8449', // dark nephritis
+        ];
+
+        const colorPalettesDark = [
+            '#ff6b6b', // bright red
+            '#74b9ff', // bright blue
+            '#55efc4', // bright green
+            '#ffd93d', // bright yellow
+            '#dda0dd', // bright plum
+            '#6bcf7f', // bright mint
+            '#ffa07a', // bright salmon
+            '#87ceeb', // sky blue
+            '#98d8c8', // light teal
+            '#ff9999', // light coral
+            '#c39bd3', // light purple
+            '#90ee90', // light green
+        ];
+
+        function isDarkMode() {
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+
+        function getCharacterColor(character) {
+            if (!characterColors[character]) {
+                const colorPalette = isDarkMode() ? colorPalettesDark : colorPalettesLight;
+                const characters = Object.keys(characterColors);
+                const colorIndex = characters.length % colorPalette.length;
+                characterColors[character] = colorPalette[colorIndex];
+            }
+            return characterColors[character];
+        }
+
+        // Listen for theme changes and update colors
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                // Reset character colors to apply new palette
+                Object.keys(characterColors).forEach(key => delete characterColors[key]);
+                
+                // Re-render current tab
+                if (currentTab === 'read') {
+                    renderReadTab();
+                } else if (currentTab === 'learn') {
+                    renderLearnTab();
+                }
+            });
+        }
+
+        // Update page title with character if selected
+        function updateTitle() {
+            const baseTitle = playData.title;
+            const displayTitle = selectedCharacter ? `${baseTitle} - ${selectedCharacter}` : baseTitle;
+            document.getElementById('play-title').textContent = displayTitle;
+        }
+
+        // Initialize the app
+        function init() {
+            // Load settings first
+            loadSettings();
+            
+            // Setup UI
+            populateCharacterSelect();
+            updateTitle();
+            setupTabs();
+            
+            // Restore saved tab or default to 'read'
+            const savedTab = getStorage('currentTab') || 'read';
+            switchTab(savedTab);
+        }
+
+        // Populate character dropdown
+        function populateCharacterSelect() {
+            const select = document.getElementById('character-select');
+            const characters = getCharacters();
+            characters.forEach(char => {
+                const option = document.createElement('option');
+                option.value = char;
+                option.textContent = char;
+                select.appendChild(option);
+            });
+
+            select.addEventListener('change', (e) => {
+                selectedCharacter = e.target.value;
+                saveSettings();
+                updateTitle();
+                
+                // Re-render current tab
+                if (currentTab === 'read') {
+                    renderReadTab();
+                } else if (currentTab === 'learn') {
+                    renderLearnTab();
+                }
+            });
+            
+            // Text size buttons
+            document.querySelectorAll('.text-size-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const size = this.dataset.size;
+                    applyTextSize(size);
+                    setStorage('textSize', size);
+                });
+            });
+
+            // Fullscreen button
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            if (fullscreenBtn) {
+                fullscreenBtn.addEventListener('click', toggleFullscreen);
+            }
+        }
+
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
+                // Enter fullscreen
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                } else if (elem.mozRequestFullScreen) {
+                    elem.mozRequestFullScreen();
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                }
+            } else {
+                // Exit fullscreen
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        // Setup tab navigation
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+        }
+
+        // Switch between tabs
+        function switchTab(tabName) {
+            currentTab = tabName;
+            setStorage('currentTab', tabName);
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-tab') === tabName) {
+                    tab.classList.add('active');
+                }
+            });
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+
+            // Render specific tab content if needed
+            if (tabName === 'learn') {
+                renderLearnTab();
+            } else if (tabName === 'read') {
+                renderReadTab();
+            }
+        }
+
+        // Render Read Tab
+        function renderReadTab() {
+            const container = document.getElementById('read-content');
+            container.innerHTML = '';
+
+            playData.acts.forEach((act, actIndex) => {
+                act.scenes.forEach((scene, sceneIndex) => {
+                    const sceneTitle = document.createElement('div');
+                    sceneTitle.className = 'learn-scene-header';
+                    
+                    const titleSpan = document.createElement('span');
+                    titleSpan.textContent = `${act.title}, ${scene.title}`;
+                    
+                    const arrowSpan = document.createElement('span');
+                    arrowSpan.className = 'arrow-icon';
+                    arrowSpan.textContent = '▼';
+                    
+                    sceneTitle.appendChild(titleSpan);
+                    sceneTitle.appendChild(arrowSpan);
+                    sceneTitle.onclick = () => {
+                        readState.actIndex = actIndex;
+                        readState.sceneIndex = sceneIndex;
+                        setStorage('readState', readState);
+                        openNavigation('read');
+                    };
+                    
+                    container.appendChild(sceneTitle);
+
+                    const sceneBlock = document.createElement('div');
+                    sceneBlock.className = 'scene-block';
+
+                    scene.dialogues.forEach(dialogue => {
+                        const dialogueDiv = document.createElement('div');
+                        dialogueDiv.className = 'dialogue';
+                        
+                        if (selectedCharacter && dialogue.character === selectedCharacter) {
+                            dialogueDiv.classList.add('highlight');
+                        }
+
+                        const charSpan = document.createElement('span');
+                        charSpan.className = 'dialogue-character';
+                        charSpan.textContent = dialogue.character;
+                        charSpan.style.color = getCharacterColor(dialogue.character);
+
+                        const textSpan = document.createElement('span');
+                        textSpan.className = 'dialogue-text';
+                        textSpan.textContent = dialogue.text;
+
+                        dialogueDiv.appendChild(charSpan);
+                        dialogueDiv.appendChild(textSpan);
+                        sceneBlock.appendChild(dialogueDiv);
+                    });
+
+                    container.appendChild(sceneBlock);
+                });
+            });
+            
+            // Validate readState indices
+            if (readState.actIndex >= playData.acts.length) {
+                readState.actIndex = 0;
+            }
+            if (readState.sceneIndex >= playData.acts[readState.actIndex].scenes.length) {
+                readState.sceneIndex = 0;
+            }
+            
+            // Scroll to the saved scene position
+            setTimeout(() => {
+                const sceneBlocks = document.querySelectorAll('#read-content .scene-block');
+                let totalSceneIndex = 0;
+                for (let i = 0; i < readState.actIndex; i++) {
+                    totalSceneIndex += playData.acts[i].scenes.length;
+                }
+                totalSceneIndex += readState.sceneIndex;
+                
+                if (sceneBlocks[totalSceneIndex]) {
+                    sceneBlocks[totalSceneIndex].scrollIntoView({ behavior: 'auto', block: 'start' });
+                }
+            }, 0);
+        }
+
+        // Render Learn Tab
+        function renderLearnTab(clearContent = true) {
+            const content = document.getElementById('learn-content');
+            if (clearContent) {
+                content.innerHTML = '';
+            }
+
+            // Check if no character is selected
+            if (!selectedCharacter) {
+                content.innerHTML = '<div style="padding: 40px 20px; text-align: center;"><p style="color: var(--text-secondary); font-size: 18px; margin-bottom: 16px;">Aucun personnage sélectionné</p><p style="color: var(--text-muted); font-size: 14px;">Veuillez sélectionner un personnage dans l\'onglet Paramètres pour commencer l\'apprentissage.</p></div>';
+                document.getElementById('line-counter').textContent = '0 / 0';
+                const nextButton = document.querySelector('.btn-next');
+                const backButton = document.querySelector('.btn-back');
+                if (nextButton) nextButton.disabled = true;
+                if (backButton) backButton.disabled = true;
+                return;
+            }
+
+            // Validate learnState indices
+            if (learnState.actIndex >= playData.acts.length) {
+                learnState.actIndex = 0;
+            }
+            if (learnState.sceneIndex >= playData.acts[learnState.actIndex].scenes.length) {
+                learnState.sceneIndex = 0;
+            }
+
+            // Get current scene
+            const act = playData.acts[learnState.actIndex];
+            const scene = act.scenes[learnState.sceneIndex];
+
+            // Update scene header
+            document.getElementById('learn-current-scene').textContent = 
+                `${act.title}, ${scene.title}`;
+
+            const lines = scene.dialogues;
+
+            if (lines.length === 0) {
+                content.innerHTML = '<p style="color: #95a5a6; text-align: center;">Aucune réplique dans cette scène.</p>';
+                document.getElementById('line-counter').textContent = '0 / 0';
+                return;
+            }
+
+            // Find character's lines and their indices
+            const characterLines = [];
+            lines.forEach((dialogue, index) => {
+                if (dialogue.character === selectedCharacter) {
+                    characterLines.push(index);
+                }
+            });
+
+            if (characterLines.length === 0) {
+                content.innerHTML = '<p style="color: #95a5a6; text-align: center;">Aucune réplique pour ce personnage dans cette scène.</p>';
+                document.getElementById('line-counter').textContent = '0 / 0';
+                return;
+            }
+
+            // Update counter based on character's lines
+            document.getElementById('line-counter').textContent = 
+                `${learnState.lineIndex} / ${characterLines.length}`;
+
+            // When clearContent is true (initial load or restart), show all dialogues up to current state
+            // When clearContent is false (appending), show only the new dialogues
+            let startIndex, endIndex;
+            
+            if (clearContent) {
+                // Show all dialogues from start up to current lineIndex
+                startIndex = 0;
+                if (learnState.lineIndex === 0) {
+                    endIndex = characterLines[0];
+                } else {
+                    const currentCharLineIndex = Math.min(learnState.lineIndex - 1, characterLines.length - 1);
+                    endIndex = learnState.lineIndex < characterLines.length 
+                        ? characterLines[learnState.lineIndex] 
+                        : lines.length;
+                }
+            } else {
+                // Append mode: show only new dialogues
+                if (learnState.lineIndex === 0) {
+                    startIndex = 0;
+                    endIndex = characterLines[0];
+                } else {
+                    const currentCharLineIndex = Math.min(learnState.lineIndex - 1, characterLines.length - 1);
+                    startIndex = characterLines[currentCharLineIndex];
+                    endIndex = learnState.lineIndex < characterLines.length 
+                        ? characterLines[learnState.lineIndex] 
+                        : lines.length;
+                }
+            }
+
+            // Display the dialogues in the range
+            for (let i = startIndex; i < endIndex; i++) {
+                const dialogue = lines[i];
+                const dialogueDiv = document.createElement('div');
+                dialogueDiv.className = 'dialogue';
+                
+                // Highlight selected character's lines
+                if (dialogue.character === selectedCharacter) {
+                    dialogueDiv.classList.add('my-character');
+                }
+
+                const charSpan = document.createElement('span');
+                charSpan.className = 'dialogue-character';
+                charSpan.textContent = dialogue.character;
+                charSpan.style.color = getCharacterColor(dialogue.character);
+
+                const textSpan = document.createElement('span');
+                textSpan.className = 'dialogue-text';
+                textSpan.textContent = dialogue.text;
+
+                dialogueDiv.appendChild(charSpan);
+                dialogueDiv.appendChild(textSpan);
+                content.appendChild(dialogueDiv);
+            }
+            
+            // Update button state
+            const nextButton = document.querySelector('.btn-next');
+            const backButton = document.querySelector('.btn-back');
+            if (nextButton) {
+                nextButton.disabled = learnState.lineIndex >= characterLines.length;
+            }
+            if (backButton) {
+                backButton.disabled = learnState.lineIndex === 0;
+            }
+        }
+
+        // Next line in Learn mode
+        function nextLine() {
+            const act = playData.acts[learnState.actIndex];
+            const scene = act.scenes[learnState.sceneIndex];
+            const lines = scene.dialogues;
+
+            // If no character selected, advance one line at a time
+            if (!selectedCharacter) {
+                if (learnState.lineIndex < lines.length - 1) {
+                    learnState.lineIndex++;
+                    saveSettings();
+                    renderLearnTab();
+                }
+                return;
+            }
+
+            // Find character's lines
+            const characterLines = [];
+            lines.forEach((dialogue, index) => {
+                if (dialogue.character === selectedCharacter) {
+                    characterLines.push(index);
+                }
+            });
+
+            // Advance to next step
+            if (learnState.lineIndex < characterLines.length) {
+                const oldLineIndex = learnState.lineIndex;
+                learnState.lineIndex++;
+                saveSettings();
+                renderLearnTab(false); // Don't clear content, just append
+                
+                // Scroll to the first newly added dialogue
+                setTimeout(() => {
+                    const content = document.getElementById('learn-content');
+                    const newDialogues = content.querySelectorAll('.dialogue');
+                    
+                    // Calculate the index of the first new dialogue
+                    let firstNewIndex = 0;
+                    if (oldLineIndex === 0) {
+                        // On first click, scroll to the character's first line
+                        firstNewIndex = characterLines[0];
+                    } else {
+                        const prevCharLineIndex = oldLineIndex - 1;
+                        const prevEndIndex = oldLineIndex < characterLines.length 
+                            ? characterLines[oldLineIndex] 
+                            : lines.length;
+                        firstNewIndex = prevEndIndex;
+                    }
+                    
+                    if (newDialogues[firstNewIndex]) {
+                        newDialogues[firstNewIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 50);
+            }
+        }
+
+        // Restart scene in Learn mode
+        function restartScene() {
+            learnState.lineIndex = 0;
+            saveSettings();
+            renderLearnTab(true); // Clear content and restart
+        }
+
+        // Open navigation modal
+        function openNavigation(source) {
+            const modal = document.getElementById('navigation-modal');
+            const modalBody = document.getElementById('modal-body');
+            modalBody.innerHTML = '';
+
+            playData.acts.forEach((act, actIndex) => {
+                const actItem = document.createElement('div');
+                actItem.className = 'nav-item nav-act';
+                actItem.textContent = act.title;
+                actItem.onclick = () => navigateToScene(actIndex, 0, source);
+                modalBody.appendChild(actItem);
+
+                act.scenes.forEach((scene, sceneIndex) => {
+                    const sceneItem = document.createElement('div');
+                    sceneItem.className = 'nav-item nav-scene';
+                    sceneItem.textContent = scene.title;
+                    sceneItem.onclick = () => navigateToScene(actIndex, sceneIndex, source);
+
+                    if (source === 'learn' && actIndex === learnState.actIndex && sceneIndex === learnState.sceneIndex) {
+                        sceneItem.classList.add('current');
+                    }
+
+                    modalBody.appendChild(sceneItem);
+                });
+            });
+
+            modal.classList.add('active');
+        }
+
+        // Close navigation modal
+        function closeNavigation(event) {
+            if (event.target.id === 'navigation-modal') {
+                document.getElementById('navigation-modal').classList.remove('active');
+            }
+        }
+
+        // Navigate to a specific scene
+        function navigateToScene(actIndex, sceneIndex, source) {
+            if (source === 'learn') {
+                learnState.actIndex = actIndex;
+                learnState.sceneIndex = sceneIndex;
+                learnState.lineIndex = 0;
+                saveSettings();
+                renderLearnTab();
+            } else if (source === 'read') {
+                readState.actIndex = actIndex;
+                readState.sceneIndex = sceneIndex;
+                saveSettings();
+                
+                // Scroll to the scene block
+                const sceneBlocks = document.querySelectorAll('#read-content .scene-block');
+                let totalSceneIndex = 0;
+                for (let i = 0; i < actIndex; i++) {
+                    totalSceneIndex += playData.acts[i].scenes.length;
+                }
+                totalSceneIndex += sceneIndex;
+                
+                if (sceneBlocks[totalSceneIndex]) {
+                    sceneBlocks[totalSceneIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
+            closeNavigation({ target: { id: 'navigation-modal' } });
+        }
+
+        // Save settings to localStorage
+        function saveSettings() {
+            setStorage('selectedCharacter', selectedCharacter);
+            setStorage('readState', JSON.stringify(readState));
+            setStorage('learnState', JSON.stringify(learnState));
+        }
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const savedCharacter = getStorage('selectedCharacter');
+            if (savedCharacter) {
+                selectedCharacter = savedCharacter;
+                const select = document.getElementById('character-select');
+                if (select) {
+                    select.value = savedCharacter;
+                }
+            }
+
+            const savedReadState = getStorage('readState');
+            if (savedReadState) {
+                try {
+                    readState = JSON.parse(savedReadState);
+                } catch (e) {
+                    console.error('Error parsing readState:', e);
+                }
+            }
+
+            const savedLearnState = getStorage('learnState');
+            if (savedLearnState) {
+                try {
+                    learnState = JSON.parse(savedLearnState);
+                } catch (e) {
+                    console.error('Error parsing learnState:', e);
+                }
+            }
+            
+            // Load and apply text size
+            const textSize = getStorage('textSize') || 'normal';
+            applyTextSize(textSize);
+        }
+        
+        // Apply text size to body
+        function applyTextSize(size) {
+            document.body.classList.remove('text-small', 'text-normal', 'text-large');
+            document.body.classList.add(`text-${size}`);
+            
+            // Update button states
+            document.querySelectorAll('.text-size-btn').forEach(btn => {
+                if (btn.dataset.size === size) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // Initialize the app when DOM is ready
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

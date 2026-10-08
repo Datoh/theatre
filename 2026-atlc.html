@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pièce de théâtre</title>
+    <style>
+        :root {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: white;
+            --bg-header: #34495e;
+            --text-primary: #333;
+            --text-secondary: #555;
+            --text-muted: #666;
+            --text-light: #7f8c8d;
+            --border-color: #ddd;
+            --border-light: #ecf0f1;
+            --highlight-bg: #d6ebf7;
+            --highlight-border: #3498db;
+            --shadow-light: rgba(0,0,0,0.05);
+            --shadow-medium: rgba(0,0,0,0.08);
+            --shadow-dark: rgba(0,0,0,0.1);
+            --modal-overlay: rgba(0,0,0,0.5);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: #0d0d0d;
+                --bg-secondary: #3d3d3d;
+                --bg-header: #0d0d0d;
+                --text-primary: #ffffff;
+                --text-secondary: #f5f5f5;
+                --text-muted: #e0e0e0;
+                --text-light: #cccccc;
+                --border-color: #555555;
+                --border-light: #4a4a4a;
+                --highlight-bg: #2a5d8a;
+                --highlight-border: #a8daff;
+                --shadow-light: rgba(0,0,0,0.3);
+                --shadow-medium: rgba(0,0,0,0.4);
+                --shadow-dark: rgba(0,0,0,0.5);
+                --modal-overlay: rgba(0,0,0,0.7);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh; /* Dynamic viewport height for mobile */
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--bg-header);
+            color: white;
+            padding: 12px 16px;
+            text-align: center;
+            box-shadow: 0 2px 4px var(--shadow-dark);
+            z-index: 100;
+            order: 1;
+            flex-shrink: 0;
+            min-height: 50px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .fullscreen-btn {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+        }
+
+        .fullscreen-btn:hover {
+            opacity: 0.7;
+        }
+
+        .fullscreen-btn:active {
+            opacity: 0.5;
+        }
+
+        /* Tab Navigation */
+        .tabs {
+            display: flex;
+            background-color: #d5d5d5;
+            border-top: 2px solid var(--border-color);
+            box-shadow: 0 -4px 8px var(--shadow-light);
+            order: 3;
+            z-index: 999;
+            flex-shrink: 0;
+            min-height: 60px;
+            height: 60px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 16px 0;
+            text-align: center;
+            background-color: #e8e8e8;
+            border: none;
+            color: #555;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tab.active {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .tabs {
+                background-color: #2c3e50;
+            }
+            
+            .tab {
+                background-color: #3d3d3d;
+                color: #95a5a6;
+            }
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background-color: var(--bg-primary);
+            -webkit-overflow-scrolling: touch;
+            order: 2;
+            min-height: 0;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 16px;
+            animation: fadeIn 0.3s;
+        }
+
+        #read-tab,
+        #learn-tab {
+            padding: 0;
+        }
+        
+        #learn-tab.active {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Settings Tab */
+        .settings-content {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px var(--shadow-dark);
+        }
+
+        .settings-group {
+            margin-bottom: 24px;
+        }
+
+        .settings-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .settings-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .text-size-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .text-size-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .text-size-btn:hover {
+            border-color: #3498db;
+        }
+
+        .text-size-btn.active {
+            background-color: #3498db;
+            border-color: #3498db;
+            color: white;
+        }
+
+        /* Text size variations */
+        body.text-small {
+            font-size: 14px;
+        }
+
+        body.text-small .dialogue-text {
+            font-size: 14px;
+        }
+
+        body.text-small .dialogue-character {
+            font-size: 12px;
+        }
+
+        body.text-normal {
+            font-size: 16px;
+        }
+
+        body.text-normal .dialogue-text {
+            font-size: 16px;
+        }
+
+        body.text-normal .dialogue-character {
+            font-size: 14px;
+        }
+
+        body.text-large {
+            font-size: 18px;
+        }
+
+        body.text-large .dialogue-text {
+            font-size: 18px;
+        }
+
+        body.text-large .dialogue-character {
+            font-size: 16px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        /* Read Tab */
+        .scene-block {
+            background-color: transparent;
+            border-radius: 8px;
+            padding: 0 16px 16px 16px;
+            margin-bottom: 16px;
+        }
+
+        .dialogue {
+            margin-bottom: 12px;
+            line-height: 1.6;
+            background-color: var(--bg-secondary);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        .dialogue-character {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .dialogue-text {
+            color: var(--text-secondary);
+        }
+
+        .dialogue.highlight {
+            background-color: var(--highlight-bg);
+            border: 2px solid var(--highlight-border);
+        }
+
+        /* Learn Tab */
+        .learn-controls {
+            background-color: var(--bg-secondary);
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -2px 4px var(--shadow-dark);
+            flex-shrink: 0;
+        }
+
+        .learn-scene-header {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            box-shadow: 0 2px 4px var(--shadow-dark);
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            margin-bottom: 12px;
+        }
+
+        .learn-scene-header:active {
+            background-color: #2980b9;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-back {
+            background-color: #3498db;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-back:active {
+            background-color: #2980b9;
+        }
+
+        .btn-next {
+            background-color: #3498db;
+            color: white;
+            flex: 2;
+        }
+
+        .btn-next:active {
+            background-color: #2980b9;
+        }
+
+        .btn-back:disabled,
+        .btn-next:disabled {
+            background-color: var(--border-light);
+            color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .learn-content-area {
+            background-color: transparent;
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .dialogue.my-character {
+            background-color: var(--highlight-bg);
+            border: 2px solid var(--highlight-border);
+        }
+
+        /* Navigation Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--modal-overlay);
+            z-index: 1000;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--bg-secondary);
+            width: 90%;
+            max-width: 400px;
+            max-height: 70vh;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            background-color: var(--bg-header);
+            color: white;
+            padding: 16px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .modal-body {
+            overflow-y: auto;
+            max-height: calc(70vh - 60px);
+        }
+
+        .nav-item {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .nav-item:active {
+            background-color: var(--border-light);
+        }
+
+        .nav-item.current {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .nav-item.current {
+                background-color: #1e3a4a;
+            }
+        }
+
+        .nav-act {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .nav-scene {
+            color: var(--text-light);
+            padding-left: 20px;
+        }
+
+        .arrow-icon {
+            float: right;
+            color: #95a5a6;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Raw play text
+        const rawPlayText = `#À tous les coups !
+##Acte 1
+###Scène 1
+Catherine : (Le logement de Catherine est insalubre. Les murs jaunis sont tachés d'humidité, le papier peint se détache par endroits et laisse apparaître le plâtre fissuré. Un seau est posé dans un coin de la pièce. Le mobilier est rare, usé et dépareillé : une table abîmée, quelques chaises bancales, un vieux fauteuil. Un petit meuble avec un tiroir supporte une lampe fatiguée, dont la lumière vacillera régulièrement, s'allumant et s'éteignant pour signaler les fréquentes pannes de courant. Une porte s'ouvre sur un couloir desservant la chambre, la cuisine et le balcon extérieur. Catherine est assise dans le fauteuil affaissé. Elle porte des vêtements sombres et sans éclat, ils sont propres mais fatigués. Une couverture usée repose sur ses genoux. D'une main, Catherine tient un stylo avec lequel elle note les mots qu'elle inscrit dans une grille de mots croisés. Elle porte par moments à ses lèvres une tasse de tisane. La lampe clignote par instants, plongeant brièvement la scène dans la pénombre.) Voyons... En 10 lettres : désastre, événement destructeur. Facile : cataclysme. En 11 lettres : situation tragique, soudaine. Catastrophe ? Oui, ça doit être ça. Catastrophe. En 11 lettres : (familier), embêtement, dérangement. (étonnée, elle regarde le public) Emmerdement ? C'est ça ? (Catherine regarde l'heure à son collier-montre. Elle a du mal à la lire car le cadran est inversé.)
+Catherine : Muriel ne devrait pas tarder... Mon Dieu, je n'aurais jamais dû accepter qu'elle vienne... C'est de ma faute, je ne sais pas dire non. (On entend une sonnette qui fonctionne mal. La porte s'ouvre et Muriel entre. Très dynamique et enjouée, elle tient une valise et une pochette d'ordinateur portable. Elle porte un manteau abîmé et vieillot. Catherine se lève pour l'accueillir.)
+Muriel    : (enthousiaste) Salut ! C'est moi ! Muriel ! (Muriel se précipite vers Catherine et lui fait la bise avec entrain. Catherine est un peu déconcertée par tant de familiarité.)
+Muriel    : Ah ça fait plaisir ! Tu vas bien ? C'est quand même un sacré coup de bol d'être tombée sur toi sur Internet ! Il est génial ce site « Les années collèges » ! On s'inscrit et hop ! on retrouve des anciennes copines ! (Pendant la conversation, Muriel pose sa valise, enlève son manteau et le jette sur le fauteuil.)
+Catherine : (pas très enthousiaste) Oui, c'est formidable.
+Muriel    : C'était quand la dernière fois qu'on s'est vues, déjà ?
+Catherine : C'était au collège justement.
+Muriel    : Dis donc, t'as pas changé.
+Catherine : Bah si quand même, depuis le temps.
+Muriel    : En tout cas, t'es toujours aussi sympa. T'étais vraiment une bonne copine. Et tu sais quoi ? Je peux te le dire maintenant : au collège, t'étais « ma » meilleure copine. Si, si, c'est vrai. Et toi, tu me reconnais ?
+Catherine : Non pas du tout. Et comme je te l'ai dit sur Internet, je ne me souviens pas qu'on était amies toutes les deux.
+Muriel    : Mais enfin ! On était toujours fourrées ensemble ! Muriel et Caroline ! Les inséparables !
+Catherine : Catherine, pas Caroline.
+Muriel    : C'est ça ! Muriel et Catherine ! Qu'est-ce qu'on a pu se marrer, hein ?
+Catherine : Je me rappelle surtout que je passais mon temps avec Françoise.
+Muriel    : Françoise ? La petite toute maigre, toute pâle, toute moche et qui chialait tout le temps ?
+Catherine : Elle était très malheureuse, la pauvre. On avait un point commun : j'avais été placée dans une famille d'accueil et elle aussi dans une autre.
+Muriel    : En tout cas, moi, elle me foutait le bourdon. Qu'est-ce qu'elle est devenue ?
+Catherine : On l'a retrouvée, il y a cinq ans.
+Muriel    : On l'a retrouvée ? Pourquoi elle s'était perdue ? Remarque ça m'étonne pas, elle était pas fute-fute la Françoise, hein ?
+Catherine : On l'a retrouvée pendue à une corde. (Catherine fait rapidement son signe de croix.)
+Muriel    : Ah ouais ?... Bon à part ça, qu'est-ce que tu deviens ?
+Catherine : Comme je t'ai dit sur Internet, je suis célibataire-caissière.
+Muriel    : Eh bien tant mieux ! Dis-moi, ça caille chez toi, non ?
+Catherine : Le chauffage est compris dans le loyer alors le propriétaire qui est très économe a bloqué le thermostat des radiateurs.
+Muriel    : Ouais, c'est un radin quoi. C'est pas grave, tu me fileras un pull.
+Catherine : Comme je t'ai dit, je veux bien t'accueillir chez moi un ou deux jours pour te dépanner mais pas plus. On est bien d'accord ?
+Muriel    : Mais oui, t'inquiète. (Muriel jette un regard circulaire et découvre l'appartement peu à son goût.)
+Muriel    : C'est toi qu'a choisi la déco ?
+Catherine : Non, c'est un meublé et le propriétaire ne veut pas que je l'aménage à mon goût.
+Muriel    : (en regardant un mur) Il se décolle un peu ton papier peint, non ?
+Catherine : C'est à cause de l'humidité. J'ai des taches de moisissures sur tous les plafonds. Le pire c'est dans la salle de bains : la peinture s'écaille et en plus les carreaux de faïence n'arrêtent pas de tomber. Ce n'est vraiment pas pratique quand je prends une douche...
+Muriel    : Tu m'étonnes... (en montrant le seau posé dans un coin de la pièce) Et le seau, là, je suppose que c'est pour des fuites au plafond ?
+Catherine : Oui mais les fuites c'est seulement quand il pleut.
+Muriel    : Génial... Et à part ça, il n'y a pas d'autres problèmes ?
+Catherine : Non ça va. À part des fissures dans les murs, les portes qui se ferment mal, le parquet qui gondole dans la chambre, les robinets qui coincent et les radiateurs qui fuient.
+Muriel    : Et sans parler de cette odeur. Ça sent quoi exactement ? Le moisi, les poubelles ou les égouts ?
+Catherine : Les trois.
+Muriel    : Et tu as signalé tous ces problèmes à ton propriétaire ?
+Catherine : Oui mais il ne veut pas faire de travaux. Il possède tout l'immeuble : deux étages, huit appartements. Il est très riche mais ne veut rien dépenser.
+Muriel    : Eh bien, il a l'air super sympa ton proprio... Et tu payes cher pour ce logement pourri ?
+Catherine : Oui malheureusement, mais je n'ai rien trouvé d'autre.
+Muriel    : Ton proprio est un marchand de sommeil, quoi...
+Catherine : Je sais bien mais j'ai eu beaucoup de mal à trouver cet appartement. Je travaille à temps partiel, j'ai un petit salaire et je n'avais pas trop le choix. Au fait, monsieur Lavache ne doit pas savoir que je t'héberge.
+Muriel    : Monsieur Lavache ? Qui c'est ça ?
+Catherine : C'est mon propriétaire. Quand j'ai signé le bail, il a mis ses conditions : ne pas fumer, ne pas mettre de musique, ne pas cuisiner de poisson à cause des odeurs et surtout : aucun animal et aucun humain ne sont autorisés à venir ici.
+Muriel    : Aucun humain ? Comment ça ?
+Catherine : Je n'ai droit à aucune visite. Il veut le calme absolu.
+Muriel    : Charmant Lavache.
+Catherine : Son appartement est au même étage, au fond du couloir à droite. Tu devras rester très discrète.
+Muriel    : T'inquiète, de toute façon je ne ferai pas de bruit, j'ai juste besoin de mon ordi pour mon business.
+Catherine : Tu comptes travailler ici, chez moi ?!
+Muriel    : Je ne t'en ai pas parlé ?
+Catherine : Non.
+Muriel    : Tu es sûre ?
+Catherine : Certaine.
+Muriel    : Ah oui ? Là, tu m'étonnes. Je vais bosser ici car comme je t'ai dit au niveau logement, en ce moment, c'est un peu compliqué pour moi.
+Catherine : Tu as été mise à la porte ?
+Muriel    : De mon ancien boulot, oui, il y a deux ans. Et de mon appartement, il y a huit jours mais je t'ai trouvée ! C'est du bol hein ?
+Catherine : Muriel, on a dit seulement un ou deux jours.
+Muriel    : Mais oui, t'inquiète. Bon, je t'explique mon taf : je viens de créer un site, il s'appelle : « Coaching énergie positive, développement personnel, santé et bien-être pour tous ». Je sais le titre est un peu long, il faut que j'en trouve un autre plus pêchu. Je vais te montrer. (Pendant la conversation, Muriel sort son ordinateur portable de sa pochette et l'allume. Elle branche ensuite à une prise de courant une rallonge électrique reliée à son ordinateur.)
+Muriel    : Je peux le brancher là ?
+Catherine : Non celle-ci ne marche pas, essaye l'autre plutôt. Mais pourquoi as-tu créé un site ? Je ne comprends pas.
+Muriel    : Je vais coacher les gens en ligne. Je le branche, j'ai presque plus de batterie.
+Catherine : Coacher les gens ? Mais dans quel but ?
+Muriel    : Pour qu'ils retrouvent leur énergie positive et leur santé.
+Catherine : (perplexe) Tu t'y connais en médecine, toi ? Tu as fait des études ?
+Muriel    : Oui Madame, j'ai suivi une formation... Une formation de trois heures sur Internet.
+Catherine : Trois heures ? Mais... Et ton activité est légale ?
+Muriel    : Ce n'est pas interdit. Bon, tu veux voir comment je bosse avec mes clients ?
+Catherine : Tu ne peux pas recevoir tes clients chez moi. Je ne veux pas d'histoire avec mon propriétaire.
+Muriel    : Tout se fait sur Internet, je ne reçois personne, t'inquiète. Lavache peut dormir sur ses deux oreilles. Ça y est, je suis connectée. Regarde, la page d'accueil de mon site est sympa, non ?
+Catherine : (pas convaincue) Peut-être, je ne sais pas.
+Muriel    : Je dois juste attendre qu'un futur client se connecte.
+Catherine : Et tu en as beaucoup des clients ?
+Muriel    : Je t'ai dit que je viens juste de monter ma boîte. Le premier client va venir, il faut juste être patiente. C'est comme la pêche, tu mets de l'appât, tu attends en surveillant ta ligne et dès que ça mord à l'hameçon, hop ! tu attrapes le poisson et t'empoches le pognon !
+Catherine : Je ne connais rien à la pêche.
+Muriel    : Moi non plus, mon truc c'est le coaching. Tu veux que je te forme ?
+Catherine : Moi ? Mais je ne saurais jamais.
+Muriel    : Il faut juste avoir un peu de baratin. Tiens, par exemple, comment tu te sens en ce moment ? T'as la pêche ?
+Catherine : Je t'ai dit que je n'ai aucune expérience dans le domaine de la pêche.
+Muriel    : T'es en forme ou t'es plutôt crevée ?
+Catherine : À vrai dire, je suis un peu fatiguée.
+Muriel    : Tant mieux. Si une cliente est comme toi, complètement naze et déprimée, tu lui dis : fatigue, stress, pensées négatives, il est temps madame de purifier vos vibrations impures.
+Catherine : Purifier mes vibrations impures ?
+Muriel    : Voilà, c'est ça.
+Catherine : Mais qu'est-ce que ça veut dire ?
+Muriel    : T'occupe. Après, il faut lui parler du secret.
+Catherine : Le secret ?
+Muriel    : Ouais, à tous les coups ça marche. Madame, je vais vous dévoiler un secret que seules les stars et les milliardaires connaissent.
+Catherine : Ah oui ?
+Muriel    : Vous devrez absolument garder ce secret pour vous.
+Catherine : D'accord.
+Muriel    : Vous me le promettez ?
+Catherine : Je vous le promets.
+Muriel    : Sur la tête de vos mômes ?
+Catherine : Je suis célibataire, je n'ai pas d'enfant.
+Muriel    : Tant mieux. Voilà mon secret : votre corps n'est jamais séparé de l'Univers, il suffit juste de le réaligner.
+Catherine : Ah bon ? Et je fais comment pour le réaligner ?
+Muriel    : En purifiant vos vibrations impures ! T'as pigé le truc ?
+Catherine : Non, je n'ai absolument rien compris. C'est du charabia pour moi.
+Muriel    : Caroline ?
+Catherine : Non, moi c'est Catherine.
+Muriel    : Catherine, un conseil d'amie : le coaching c'est pas ton truc, laisse tomber.
+Catherine : Je suis entièrement d'accord. Je préfère être caissière.
+Muriel    : Oh ! Y'en a un qui vient de se connecter !
+Catherine : Où ça ? (Muriel et Catherine regardent l'écran.)
+Muriel    : Là ! Attends ! Il est en train d'écrire un message !
+Catherine : Qu'est-ce que tu vas faire ?
+Muriel    : Il faut que je le choppe ! (enthousiaste) « Bonjour » ! Il a écrit bonjour !
+Catherine : Ah oui ?
+Muriel    : (en tapant sur son clavier) Je réponds : bonjour, que puis-je faire pour vous ?
+Catherine : Ah oui, c'est bien ça.
+Muriel    : Il pose une question ! (lit la réponse de Camille) Il paraît que je manque de confiance en moi. Pouvez-vous m'aider ?
+Muriel    : Et comment ! Je le tiens celui-là ! (en tapant sur son clavier) Oui je peux vous aider à retrouver votre confiance. Vous êtes au bon endroit. Je m'appelle Muriel, et vous ?
+Catherine : Pourquoi tu lui demandes son prénom ?
+Muriel    : Technique d'approche, laisse tomber. (lit la réponse de Camille) Je suis un homme et je m'appelle Camille. (en tapant sur son clavier) Enchantée de faire votre connaissance Camille.
+Catherine : Et comment vas-tu faire pour l'aider ? Ça se trouve il a des problèmes psychologiques cet homme. Ce serait peut-être mieux qu'il consulte un médecin ou un psychiatre, non ?
+Muriel    : Dis, t'as pas un truc à faire ailleurs ? Il faut que je bosse là.
+Catherine : Ah oui, pardon. Je vais dans la cuisine ?
+Muriel    : Ouais, c'est ça. Qu'est-ce que tu buvais là ?
+Catherine : Une infusion camomille-verveine, ça te ferait plaisir ?
+Muriel    : Sûrement pas, je te laisse ta pisse-mémé. Donne-moi un café plutôt. Fort et chaud le café, on se caille les miches ici ! Tiens, ramène-moi aussi un pull, on se croirait en Sibérie chez toi.
+Catherine : D'accord, à tout de suite, je te laisse travailler tranquillement. (Catherine sort pour aller dans sa cuisine.)
+Muriel    : (en tapant sur son clavier) Camille, acceptez-vous de mettre en marche votre caméra et votre micro ? Ce sera plus facile. (lit la réponse de Camille) Si vous voulez, oui.
+Muriel    : Cool. (en tapant sur son clavier) J'allume ma caméra et je suis à vous. (Muriel manipule avec difficulté son ordinateur.)
+Muriel    : Merde ! j'y arrive pas ! C'est quoi cette daube ? Saloperie d'informatique ! (À partir de ce moment, on entendra la voix de Camille, sono.)
+Camille   : (sa voix) Je vous entends Muriel. Vous avez des problèmes informatiques ?
+Muriel    : Ah ? Vous... Ça marche chez vous ?
+Camille   : (sa voix) Je vous entends mais je ne vous vois pas. Votre caméra doit être en panne.
+Muriel    : Ah ça y est ça marche ! Moi, je vous vois ! (elle récite, pas très naturel) Bonjour Camille. Acceptez-vous que je devienne votre coach privé ? Grâce à mon don et grâce à ma technique révolutionnaire et très puissante vous deviendrez un autre homme. Votre charisme sera exceptionnel !
+Camille   : (sa voix) C'est gentil mais je n'en demande pas tant.
+Muriel    : Et pourquoi pas ? (elle récite, pas très naturel) Votre potentiel est déjà là, il attend simplement l'autorisation de s'exprimer. Santé, joie, abondance, dans l'ordre que vous voulez, je vous promets que vous ne regretterez pas de m'avoir rencontrée.
+Camille   : (sa voix) D'accord, je veux bien essayer.
+Muriel    : Avant de commencer, avez-vous votre code promo énergétique ? Vous le trouverez en haut à droite sur votre écran.
+Camille   : (sa voix) 3615.
+Muriel    : 3615 ?! Félicitations Camille ! Vous bénéficiez d'une promo de 5 % sur la séance ! On commence ?
+Camille   : (sa voix) Oui, si vous voulez. (Soudain la lampe qui était allumée s'éteint.)
+Muriel    : Merde ! L'écran s'est éteint ! Caroline ! Y'a plus de jus ! (Catherine entre.)
+Catherine : Moi, c'est Catherine.
+Muriel    : Y'a plus de courant ! C'est quoi cette connerie ?!
+Catherine : La cafetière ne fonctionne plus. On a une panne d'électricité je crois. Ça doit venir de l'immeuble, ça arrive assez souvent.
+Muriel    : Débrouille-toi ! Remets le courant ! Je vais perdre mon client !
+Catherine : Mais ce n'est pas de ma faute, je ne sais pas comment faire, je... (La lampe se rallume.)
+Muriel    : Ah c'est revenu !
+Catherine : Je retourne à la cuisine ?
+Muriel    : Voilà. Et mon pull, t'as oublié ?
+Catherine : Tu ne préfères pas plutôt un plaid, ce serait plus chaud ?
+Muriel    : Si tu veux, on se les gèle ici.
+Camille   : (sa voix) Vous avez froid ?
+Muriel    : Ah ! Vous étiez là ?
+Camille   : (sa voix) Oui, je vous entendais très bien mais je ne vous vois toujours pas. Vous n'êtes pas seule ?
+Muriel    : Euh, je parlais à... mon assistante en informatique. (Catherine s'approche de l'écran pour voir Camille.)
+Catherine : Bonjour monsieur.
+Muriel    : Dégage ! Tu vas le faire fuir !
+Camille   : (sa voix) Non, elle peut rester, ça ne me dérange pas.
+Muriel    : Euh, excusez-moi, nous avons eu un petit incident technique indépendant de notre volonté. (Muriel fait un signe de la main à Catherine pour qu'elle sorte. Catherine sort.)
+Camille   : (sa voix) Je dois payer par carte bancaire maintenant ?
+Muriel    : Oui, s'il vous plaît Camille. (La lampe s'éteint à nouveau.)
+Muriel    : Mais c'est pas vrai ! Ça recommence ! Caro, Carotrine ! Catherine !!! (Catherine revient avec un plaid usé et troué qu'elle tend à Muriel.)
+Muriel    : Ça recommence ! Fais quelque chose ! Ne reste pas plantée là !
+Catherine : Mais je ne suis pas électricienne, je suis caissière... (La lampe se rallume. Muriel prend le plaid qu'elle place sur ses épaules.)
+Muriel    : C'est revenu ! T'as mon café ?
+Camille   : (sa voix) Vous voulez un café ?
+Muriel    : Ah ! Euh, non ce n'est pas à vous que je parle Camille. J'étais avec Catherine... mon assistante en informatique.
+Catherine : (chuchote) Je vais faire le café... (s'approche de l'écran et lui chuchote) Au revoir monsieur.
+Camille   : (sa voix) Au revoir madame. (Catherine sort.)
+Muriel    : Café ? Euh, Camille ? Vous êtes là ? Je ne vous vois plus.
+Camille   : (sa voix) Oui, je vous entends toujours.
+Muriel    : Camille, avez-vous eu le temps d'effectuer votre règlement ?
+Camille   : (sa voix) Non, ça ne fonctionne pas. (La lampe s'éteint.)
+Muriel    : Mais c'est pas vrai ! (La lampe se rallume.)
+Muriel    : Camille ? (silence) ... Merde ! Il est parti cet imbécile !
+Camille   : (sa voix) Non, je suis toujours là.
+Muriel    : Ah ! Euh, pouvez-vous réessayer avec votre carte bancaire ?
+Camille   : (sa voix) D'accord, je recommence. (La lampe s'éteint.)
+Muriel    : Aaaaah ! Mais c'est pas possible ! (La lampe se rallume.)
+Muriel    : Camille ? (La lampe s'éteint.)
+Muriel    : Aaaaah ! C'est quoi cette dinguerie ?! (La lampe se rallume.)
+Camille   : (sa voix) Je crois que je vais arrêter, votre système de paiement ne marche pas.
+Muriel    : Non ! Attendez ! J'appelle mon assistante ! C'est rien du tout ! Restez ! (La lampe s'éteint.)
+Muriel    : Aaaaaah ! (La lampe se rallume.)
+Muriel    : Camille, vous êtes où ?
+Camille   : (sa voix) Je suis là, chez moi.
+Muriel    : Il faut qu'on se rencontre, ce sera plus simple. Vous habitez Paris ?
+Camille   : (sa voix) Oui dans le 18ème, pourquoi ?
+Muriel    : Super ! Moi aussi ! J'habite au 32 rue Thénardier, premier étage, porte 3.
+Camille   : (sa voix) Vous voulez que je vienne chez vous ?
+Muriel    : Oui ce sera plus efficace. Soyez rassuré, je ne vous abandonne pas Camille, j'ai besoin de votre pogn... de votre potentiel. Je veux vous aider.
+Camille   : (sa voix) Très bien, j'arrive. 32 rue Thénardier, premier étage, porte 3. À tout de suite.
+Muriel    : Je le tiens ! Je vais avoir mon premier client !
+Camille   : (sa voix) Je suis votre premier client ?
+Muriel    : Ah ! Non, pas du tout ! Le premier millier ! J'ai beaucoup d'expérience. À tout de suite Camille.
+Camille   : (sa voix) Je coupe et j'arrive. (La lampe s'éteint. Catherine revient.)
+Catherine : Je crois qu'on a un petit problème avec la cafetière, elle ne fait pas le café.
+Muriel    : Ouais, y'a plus de jus... Il m'a crevée ! Je vais prendre l'air deux minutes. Comment on fait pour aller sur ton balcon ? (Muriel se lève et laisse le plaid.)
+Catherine : (en indiquant la porte qui mène aux autres pièces) Tu dois passer par la chambre, deuxième porte à droite.
+Muriel    : C'est quand même vraiment mal foutu chez toi.
+Catherine : Fais attention de ne pas t'appuyer sur la rambarde du balcon, elle est rouillée et ne tient presque plus.
+Muriel    : Super... Et trouve une solution pour cette panne, ça commence à devenir pénible. (Muriel prend son manteau et sort.)
+Catherine : Mon Dieu, que je suis faible... Je ne sais jamais dire non... (La porte s'ouvre : Monsieur Lavache entre, tenant une bouteille Thermos et ce qui semble être un tricot. Son attitude est antipathique et odieuse. Pendant la conversation, Catherine paraît mal à l'aise, craignant l'arrivée de Muriel.)
+Lavache   : Qu'est-ce que c'est que ce cirque ?!
+Catherine : Ah ? Bonjour Monsieur Lavache, comment allez-vous ?
+Lavache   : Ça n'arrête pas de couper chez moi ! Ça s'allume ! Ça s'éteint ! Ça clignote ! On se croirait à Las Vegas ! Vous avez du courant ici ?
+Catherine : Non, je n'ai plus d'électricité. Vous savez d'où vient la panne ?
+Lavache   : Est-ce que je sais moi ? (En montrant son front) C'est pas marqué EDF ici !
+Catherine : Ça arrive quand même souvent. Peut-être que l'installation électrique est trop ancienne, non ?
+Lavache   : Trop ancienne ? Mais qu'est-ce que vous allez imaginer ! Ça vient d'EDF ! Ah ! ils vont m'entendre ! Pour le prix qu'on paye !
+Catherine : Oui c'est certain. Je vous aurais bien offert un café mais sans électricité la cafetière ne...
+Lavache   : (en montrant sa Thermos) Pas la peine, j'ai ma Thermos. Détox maison, ça réchauffe et ça donne du tonus. Tenez, je vous ai apporté un bonnet pour lutter contre le froid. (Monsieur Lavache lui tend un bonnet tricoté, difforme et hideux, bariolé de couleurs criardes. Plusieurs pompons pendouillent grotesquement.)
+Catherine : Ah oui ? Que c'est gentil. (Catherine découvre la laideur du bonnet.)
+Catherine : Je... Monsieur Lavache, il ne fallait pas.
+Lavache   : Mettez-le donc pour voir. (Catherine se résigne à mettre ce bonnet affreux sur sa tête.)
+Lavache   : Il vous va bien. Il est fait pour vous : vous avez une grosse tête. Je l'ai trouvé dans le local à poubelles.
+Catherine : Merci, c'est vraiment gentil. En plus, il est très chaud.
+Lavache   : Eh bien gardez-le sur la tête. Ça fera 30 euros.
+Catherine : 30 euros ?
+Lavache   : La laine c'est cher et en plus, là, on voit que c'est du fait main, c'est de l'artisanat. C'est pas comme les cochonneries qu'on trouve en grandes surfaces.
+Catherine : Oui c'est certain...
+Lavache   : Il vous plaît au moins ?
+Catherine : Oui, il est très joli, très discret.
+Lavache   : C'est de la qualité, c'est du haut de gamme. Je me demande si je devrais pas vous le faire à 50 euros. Allez ! Je vous fais une fleur ! Vous payerez le bonnet 40 euros avec votre prochain loyer.
+Catherine : Je, merci... Bon, eh bien au revoir Monsieur Lavache et j'espère que le courant va revenir.
+Lavache   : Vous êtes pressée ?
+Catherine : Ah non, pas du tout.
+Lavache   : Dites, j'ai cru entendre une personne parler fort tout à l'heure. Ça venait pas d'ici au moins ?
+Catherine : Ah non, pas du tout.
+Lavache   : Vous n'avez pas reçu quelqu'un ?
+Catherine : Ah non, pas du tout.
+Lavache   : Vous connaissez les règles, hein ! Je ne veux voir personne ici ! Attention hein !
+Catherine : Oui bien sûr. Au revoir Monsieur Lavache, merci d'être passé me voir. Et si vous avez besoin de quelque chose, n'hésitez pas à revenir.
+Lavache   : C'est ça. En tout cas, si EDF remet pas le courant dans cinq minutes, je leur colle un procès carabiné ! Ah ils vont apprendre à me connaître !
+Catherine : Vous avez raison. Bonne journée Monsieur Lavache. (Monsieur Lavache ouvre la porte et s'apprête à sortir. Muriel entre sans le voir. Pendant la conversation, Muriel enlèvera son manteau et le mettra sur une chaise.)
+Muriel    : Dis donc, ça caille moins dehors qu'ici ! (choquée en voyant Catherine avec son bonnet) Ah !! Tu m'as foutu la trouille ! Qu'est-ce que t'as sur la tête ?! La vache !!!
+Lavache   : Monsieur Lavache !!! Pas de familiarité s'il vous plaît !!! Attention hein !
+Catherine : Je... Muriel, je te présente Monsieur Lavache, mon propriétaire...
+Muriel    : Bonjour M'sieur. Pas chaud, hein ?
+Lavache   : (à Catherine) J'avais été très clair avec vous ! Aucune visite n'est permise ! Vous ne devez accueillir personne ! Personne ! Attention hein ! Attention !
+Catherine : Je suis désolée, Muriel est une ancienne collégienne en difficulté qui a besoin d'aide et...
+Lavache   : J'avais dit : personne ! Et encore moins les clodos ! J'ai déjà eu de très mauvaises expériences avec des locataires qui ne savaient pas se tenir ! Je vous ai choisie pour plusieurs raisons : vous êtes une femme célibataire, non fumeuse, sans enfant, sans animal. Vous êtes banale, effacée, insignifiante et vous n'avez aucune relation sociale : ni famille, ni amis !
+Catherine : J'ai quand même une cousine qui est très gentille...
+Muriel    : Et elle a une amie : moi.
+Lavache   : (à Muriel) Vous êtes son amie ?
+Muriel    : Ouais et je suis aussi coach en énergie positive, développement personnel, santé et bien-être pour tous.
+Lavache   : Pardon ?
+Muriel    : Je vous explique rapidement : j'aide mes patients à aller mieux.
+Lavache   : Vous êtes médecin ?
+Muriel    : Pas du tout. Les médecins, faut les oublier : c'est pour se faire du pognon, qu'ils vous soignent. Si vous voulez, je vous offre une séance de coaching. Voulez-vous que je vous aide à vous brancher à votre énergie cosmique ?
+Lavache   : Pas question. Pour être en forme j'ai beaucoup mieux : (en montrant sa Thermos) Cinq verres par jour de Détox maison. Avec ça je ne suis jamais malade.
+Catherine : Ah oui ?
+Lavache   : Tenez, c'est mon jour de bonté. Donnez-moi deux verres.
+Catherine : Oui, bien sûr Monsieur Lavache. (Catherine prend deux verres dans le meuble et les pose sur la table.)
+Muriel    : C'est fait à base de plantes ?
+Lavache   : Oui mais pas question que je vous donne mon secret. (Monsieur Lavache remplit les deux verres avec sa boisson.)
+Muriel    : Je comprends. Chaque fruit, chaque légume est un portail cosmique déguisé en aliment.
+Lavache   : Ça je peux pas vous dire. Ce que je sais, c'est que ça marche. Buvez ! (Catherine et Muriel avalent la boisson. Elle est infecte : Muriel ouvre grand les yeux, grimace, porte la main à sa bouche, puis recule et se cogne volontairement deux fois la tête contre un mur. Catherine, elle, lève les yeux au ciel, se tord de douleur, se tient le ventre, laisse tomber le bonnet qui lui couvre désormais les yeux et après, on entend ses sanglots.)
+Muriel    : (voix enrouée) Aaaaah... La vache !
+Lavache   : Monsieur Lavache ! Pas de familiarité ! Attention hein ! C'est bon, n'est-ce pas ?
+Muriel    : (voix enrouée) C'est... C'est surprenant en tout cas...
+Lavache   : Allez ! Vous allez bien en reprendre un autre.
+Muriel    : (voix enrouée) Ça ira merci. Dis donc, je ne sens plus ma langue. (Catherine arrête de pleurer. Elle relève son bonnet et essuie ses larmes.)
+Catherine : Désolée, je n'ai pas pu m'empêcher de pleurer. (à Muriel) J'ai les orteils qui tremblent dans mes chaussures, pas toi ?
+Muriel    : Non, moi ça me pique les yeux et je vois tout rouge.
+Catherine : J'ai aussi comme l'impression que mes cheveux poussent à l'intérieur de ma tête : je les entends.
+Muriel    : Ah oui, moi aussi... C'est pas dangereux au moins votre boisson ?
+Lavache   : Mais non, ça soigne je vous dis ! Allez ! Un autre verre !
+Catherine : Non, merci, c'est gentil mais sans façon. Votre boisson est savoureuse, très délicate, très douce, mais si je bois un autre verre, je crains de mourir sur-le-champ. (Catherine enlève le bonnet et le pose sur la table.)
+Lavache   : Bon comme vous voulez. En tout cas, je vous rappelle que je ne veux voir plus personne entrer ici ! C'est clair ?
+Catherine : C'est promis Monsieur Lavache, vous pouvez compter sur moi. (Florence entre, une boîte contenant un gâteau d'anniversaire dans une main et un paquet cadeau dans l'autre. Elle porte des vêtements aux couleurs vives.)
+Florence  : Joyeux anniversaire ! Joyeeeuuuuuuuuux anniiiiiiiiiiversaire Catherine ! Joyeeeuuuuuuuuux anniiiiiiiiiiversaire !
+Lavache   : Qu'est-ce que c'est que ça ?
+Catherine : Euh, c'est Florence, ma cousine.
+Lavache   : Vous vous foutez de moi ?!
+Catherine : Si je vous assure, Florence est bien ma cousine.
+Lavache   : J'ai dit aucune visite et vous invitez du monde pour votre anniversaire ! Là, vous jouez avec le feu ! Attention hein ! Attention ! Ça va mal finir !
+Catherine : Mais je vous jure que ce n'est pas mon anniversaire.
+Lavache   : Et c'est ça quoi ? Un œuf de Pâques ?
+Florence  : Nan ! C'est un gâteau d'anniversaire ! Et là, c'est un cadeau d'anniversaire ! Joyeeeuuuuuuuuux anniiiiiiiiiiversaire Catherine ! (Catherine pose le gâteau et le paquet cadeau sur le fauteuil.)
+Catherine : Il faut que je vous explique. Florence est un peu... Elle est un peu « spéciale » depuis que son mari l'a quittée...
+Muriel    : Comment ça spéciale ?
+Catherine : Il l'a quittée le jour de son anniversaire et, depuis, elle est très perturbée. Elle a aussi de gros troubles de la mémoire. Apparemment, c'est le choc psychologique qui a provoqué ça...
+Lavache   : Elle est folle-dingue ?
+Florence  : Ah bon ? Qui ça ?
+Catherine : Je... Merci Florence, c'est très gentil mais tu sais, ce n'est pas mon anniversaire aujourd'hui.
+Florence  : Je sais bien, t'es née le jour de Noël, le 18 mars.
+Catherine : Non plus, non.
+Florence  : Ah oui, c'est le jour de l'an que t'es née : le 14 juillet. C'est super compliqué les jours, hein ? Par exemple, une petite question : après-demain c'est déjà passé ?
+Muriel    : Non, c'est hier qu'est déjà passé et avant demain, c'est aujourd'hui.
+Florence  : Ah bon ? On a beau dire, c'est bien foutu les semaines.
+Catherine : Bon... En tout cas merci Florence pour le gâteau, c'est très gentil.
+Florence  : Quel gâteau ?
+Lavache   : J'y vais, les tarés c'est vraiment pas mon truc... Je vous laisse ma Thermos, si vous voulez vous resservir plus tard.
+Catherine : C'est gentil, au revoir Monsieur Lavache.
+Florence  : Elle est où la vache ? Il y a des chèvres aussi ? Et des poules ?
+Lavache   : Attention hein ! Attention ! (à Catherine) Et si vous ne virez pas la cinglée d'ici, je vous fous à la porte !
+Florence  : Elle est où la cinglée ? Avec la vache et les poules ?
+Muriel    : Vous inquiétez pas, on va la virer !
+Lavache   : (à Muriel) Et vous, venez donc avec moi. Il faut trouver d'où vient la panne. Je ne sais pas s'il y a un rapport mais quand j'ai arrosé mes plantes dans la salle de bain, ça a commencé à clignoter...
+Muriel    : OK, pas de problème. Et vous savez quoi Monsieur Lavache ? Il faut toujours s'aider entre voisins... C'est important d'avoir un bon voisinage. Tenez, si vous voulez, je vous offre une séance de coaching. Quel jour on met ?
+Lavache   : Arrêtez de me passer de la pommade et trouvez donc la panne !
+Catherine : Je vous accompagne. Florence je peux te laisser seule deux minutes ?
+Florence  : Bah oui, pourquoi ?
+Catherine : Pour rien, à tout de suite.
+Lavache   : (En sortant, à Catherine) Dites, c'est toute votre famille qu'est siphonnée ou y'a qu'elle ?
+Catherine : Florence est ma seule famille... mais vous savez, elle est très gentille.
+Lavache   : C'est ça, c'est ça, à d'autres... (Catherine, Muriel et monsieur Lavache sont sortis, laissant la bouteille Thermos sur la table. Seule, Florence semble désorientée. Elle fait le tour de la pièce du regard, comme pour retrouver ses repères.)
+Florence  : C'est joli ici... Je ne sais pas où je suis mais c'est très joli... Par contre qu'est-ce que ça schlingue... (Florence voit le paquet cadeau posé sur le fauteuil.)
+Florence  : Oooooooooh ! Un paquet cadeau ! Waouuuuh ! Je sais ! C'est pour mon anniversaire ! (Camille, vêtu d'une veste et d'un jean, entre dans l'appartement.)
+Camille   : Bonjour. J'ai sonné mais je crois que votre sonnette ne fonctionne pas...
+Florence  : D'accord.
+Camille   : Je suis Camille, je viens pour la séance de coaching.
+Florence  : D'accord.
+Camille   : Je n'étais pas très chaud à l'idée de vous contacter. À vrai dire, on m'a poussé.
+Florence  : D'accord.
+Camille   : Ce sont mes collègues. Ils disent tous que je manque un peu de confiance en moi quand je fais des visites chez les gens.
+Florence  : D'accord.
+Camille   : Euh... Vous voulez que je paye maintenant, juste avant la séance ?
+Florence  : Pas la peine, c'est gratuit.
+Camille   : Gratuit ? Eh bien c'est très aimable de votre part... Finalement je préfère vous voir en vrai, l'informatique je n'aime pas trop.
+Florence  : L'informatique, c'est pas bien.
+Camille   : Excusez-moi, est-ce qu'il y a des travaux de canalisations dans l'immeuble ?
+Florence  : Ah bon ?
+Camille   : Je sens une odeur assez forte.
+Florence  : Oui je sais, ça fouette.
+Camille   : Ah... Et ça vient de quoi ?
+Florence  : Je sais pas.
+Camille   : Euh... Pour la séance de coaching, je commence par quoi ?
+Florence  : Déshabillez-vous.
+Camille   : Pardon ?
+Florence  : Nan, je déconne. Asseyez-vous là. (Camille s'assoit sur le fauteuil où sont posés le cadeau et le gâteau. Il écrase le gâteau en s'asseyant.)
+Camille   : Oh mince !
+Florence  : Il a écrasé le gâteau cette andouille !
+Camille   : Je suis vraiment désolé ! Excusez-moi.
+Florence  : C'est mon gâteau d'anniversaire !
+Camille   : Je ne l'avais pas vu. Je suis sincèrement désolé.
+Florence  : De quoi ? Pourquoi vous êtes désolé ?
+Camille   : Mais... je viens d'écraser involontairement votre gâteau...
+Florence  : Ah bon ? Quel gâteau ?
+Camille   : Je... Je vais le mettre sur la table. Je mets le paquet cadeau aussi. (Camille pose sur la table la boîte du gâteau et le paquet cadeau.)
+Florence  : Il y a un paquet cadeau ?
+Camille   : Oui. Il n'est pas à vous ?
+Florence  : Je sais pas. Donnez-le-moi. (Camille donne le paquet à Florence qui l'ouvre. Camille s'assoit dans le fauteuil.)
+Camille   : Je... C'est la première fois que l'on va me coacher.
+Florence  : (en découvrant la petite cuiller oxydée à l'intérieur du paquet) Whaou ! Une petite cuiller toute rouillée !
+Camille   : Ah oui ? Tiens donc...
+Florence  : C'est naze comme cadeau... Qui c'est le débile qui m'a offert ça ?
+Camille   : Je ne sais pas... Vous voulez que je vous parle un peu de moi avant de commencer ? (Florence pose la petite cuiller sur la table. Elle voit le bonnet qui y est posé.)
+Florence  : Oui, super idée.
+Camille   : Commençons par le début. J'ai eu une enfance assez difficile.
+Florence  : Ah bon ? On se gèle ici ! J'ai le bout du nez tout froid !
+Camille   : Euh, oui, il ne fait pas très chaud... (Florence enfonce sur sa tête le bonnet hideux, puis s'assoit sur une chaise, face à Camille. Ce bonnet le déstabilise.)
+Florence  : Continuez, je vous écoute.
+Camille   : Je... Je vous disais que j'ai eu une enfance difficile...
+Florence  : D'accord.
+Camille   : Et après j'ai... Euh, vous êtes obligée de garder ce bonnet ? Je crois qu'il me déconcentre.
+Florence  : Ah bon ? Vous voulez le mettre ?
+Camille   : Non, non... Je ne sais plus ce que je disais.
+Florence  : Moi non plus.
+Camille   : En tout cas une chose est sûre, quand ma femme m'a quitté il y a deux ans, ça m'a mis un sacré coup.
+Florence  : Pareil ! Pareil ! Mon mari est parti ! Il m'a abandonnée comme une vieille chaussette ! Vous portez des chaussettes de quelle couleur ?
+Camille   : (il doute) Je... Vous croyez vraiment que vous pouvez m'aider à retrouver ma confiance ?
+Florence  : Oui, pas de problème.
+Camille   : Et qu'est-ce que je dois faire pour avoir plus de charisme ?
+Florence  : Mettez ce bonnet.
+Camille   : Mais... Ah si, je comprends. En portant quelque chose de ridicule, on apprend à se détacher du regard des autres, c'est bien ça ? (Florence enlève le bonnet, le tend à Camille qui le met.)
+Florence  : Vous avez une drôle de tête. On vous a déjà dit que vous n'êtes pas beau ?
+Camille   : Je... Je comprends. Vous essayez de m'humilier pour que j'apprenne à prendre du recul, c'est ça ?
+Florence  : Nan, je le pense vraiment, t'es moche. Ça m'étonne pas que t'as pas confiance ! T'as vu ta tronche ?!
+Camille   : Mais...
+Florence  : Quand on a une tête comme la tienne on se laisse pas bouffer par les autres ! On fonce ! On cogne ! Allez ! Réagis bon sang ! Lève-toi et gueule un bon coup ! Allez ! Pousse un cri de guerre !
+Camille   : Mais non ! Je n'ose pas ! (Florence cramponne Camille par les épaules et le secoue énergiquement.)
+Florence  : Il ose pas ? Il ose pas ?! Mais quel poltron ! Tu vas te bouger, oui ! Poule mouillée ! T'es qu'un lâche ! Un minable !
+Camille   : Mais enfin !
+Florence  : Une mauviette ! Un froussard ! T'es naze ! T'es moche ! T'es bête ! Ça m'étonne pas que ta femme s'est barrée ! (Camille, choqué, reste figé, les yeux grands ouverts. La lampe qui était éteinte s'allume.)
+Florence  : Alors ? Ça va mieux ? T'as retrouvé ta confiance ? (Camille, avec toujours le bonnet sur la tête, se jette soudainement sur Florence en voulant l'étrangler.)
+Camille   : Je vais vous tuer !!! (Florence prend la fuite et se réfugie derrière le fauteuil pour échapper à Camille. Muriel entre au même moment et est stupéfaite par la scène.)
+Florence  : Au secours ! À l'aide ! Appelez la police !
+Muriel    : Mais qu'est-ce qui se passe ici ?!
+Florence  : Y'a un fou échappé de l'asile qui veut m'étrangler !
+Camille   : Pas du tout ! C'est cette coach à la noix qui m'a provoqué !
+Muriel    : Quelle coach ?
+Florence  : Quelle coach ?
+Camille   : (en indiquant Florence) Mais elle ! Elle me dit de venir chez elle pour une séance de coaching et après elle m'insulte ! C'est une psychopathe !
+Muriel    : Houlà... Je crois que vous confondez. La psychopathe c'est moi, et elle c'est la coach.
+Camille   : Quoi ? (Camille enlève le bonnet et le met sur la table.)
+Muriel    : Enfin non, le contraire ! Je suis Muriel et c'est moi qui vous ai demandé de passer. Vous êtes bien Camille ?
+Camille   : Oui c'est moi. Et alors, elle qui c'est ?
+Muriel    : Une psychopathe. La cousine de Catherine.
+Camille   : Catherine votre assistante en informatique ?
+Muriel    : Voilà, c'est ça...
+Florence  : Catherine c'est ma cousine ! Et c'est son anniversaire aujourd'hui !
+Muriel    : Elle est usante, elle... Dis, tu veux pas aller aider ta cousine ? Elle est en train d'enlever la flotte dans la salle de bain de Lavache. (À partir de ce moment, Camille décroche complètement. Il croit que Muriel parle d'une vache, la pense folle et s'en inquiète. Dès lors, il n'a plus confiance en elle.)
+Camille   : La salle de bain de la vache ?
+Muriel    : Oui c'est inondé à cause de ses plantes.
+Camille   : Les plantes de la vache ? (Muriel prend le seau posé dans un coin de la pièce et le donne à Florence.)
+Muriel    : Oui Lavache aime les plantes vertes. (à Florence) Tiens prends ça, ça urge, c'est un vrai déluge. Au fond du couloir à droite. (Florence ravie prend le seau et sort.)
+Florence  : Youpi !!!
+Muriel    : Je sais, c'est insensé Lavache est sans seau.
+Camille   : Oui, oui...
+Muriel    : Lavache a arrosé ses plantes mais cette andouille a oublié de fermer le robinet de sa baignoire. S'il n'y avait plus de jus, c'était à cause de Lavache.
+Camille   : Du jus de plante ?
+Muriel    : Hein ? Mais non, Lavache a fait sauter les plombs. Du coup, tout l'étage a sauté aussi.
+Camille   : Il a sauté aussi, oui...
+Muriel    : J'ai réenclenché le disjoncteur dans le couloir et le courant est revenu. Il y a des fils électriques qui traînent partout. Je ne serais pas étonnée si un jour ça crame. J'ai osé lui dire que l'installation était naze et ça ne lui a pas plu : maintenant Lavache rumine. ... Qu'est-ce que vous avez à me regarder comme ça ? J'ai l'impression que vos neurones ont du mal à suivre quand je parle.
+Camille   : Si si. L'étage a sauté à cause de la vache qui rumine.
+Muriel    : Un vrai caractère de cochon. Lavache ne veut voir personne et parle même de virer Catherine.
+Camille   : Parce que la vache parle en plus ?
+Muriel    : Évidemment, pourquoi ?
+Camille   : D'accord, la vache parle...
+Muriel    : Si Lavache vire Catherine, qu'est-ce qui va se passer d'après vous, hein ?
+Camille   : Elle devra retrouver un job dans l'informatique.
+Muriel    : Hein ? Mais pas du tout. Si Lavache la vire, du coup je devrai partir aussi et ça, c'est la catastrophe car je n'ai pas de logement !
+Camille   : Évidemment...
+Muriel    : Lavache ne veut voir aucun être humain ici.
+Camille   : Oui les réactions des animaux sont parfois surprenantes...
+Muriel    : La vache ! J'ai l'impression que vous êtes comme l'étage, vous avez disjoncté. Vous êtes sûr que ça va ?
+Camille   : Oui, oui, moi ça va très bien... Et vous ? Vous êtes sûre que vous vous sentez bien ?
+Muriel    : Oui pourquoi ? Qu'est-ce que je disais ? Ah oui, il faut faire semblant d'être sympa avec Lavache sinon on va être foutues à la porte !
+Camille   : Oui les animaux sont parfois cruels...
+Muriel    : Là, je n'ai plus aucun doute : ses neurones ont grillé. Je vous explique que Lavache est une peau de vache, vous comprenez ça ?
+Camille   : Bien sûr, c'est parfaitement clair...
+Muriel    : Et si j'osais un jeu de mots pourri, je dirais que c'est de mal en pis.
+Camille   : Mal en pis, oui, oui... Je comprends...
+Muriel    : Bon... Revenons à nos moutons.
+Camille   : Vous savez que les moutons ont plein de qualités ? Ils sont intelligents, sociables et ont une très bonne mémoire.
+Muriel    : Houlà... Son cerveau est comme mon compte bancaire : complètement vide... Camille, et si on commençait par une séance pour vous aider à retrouver la raison. Qu'est-ce que vous en pensez ?
+Camille   : Je crois que ce n'est pas la peine, je vais vous laisser.
+Muriel    : Comment ça vous allez me laisser ? Mais il n'en est pas question, vous souffrez Camille !
+Camille   : Je vous dis que moi ça va.
+Muriel    : Fatigue, stress, pensées négatives, il est temps Camille de purifier vos vibrations impures.
+Camille   : Je comprends mais je vais y aller, là.
+Muriel    : Camille soyez raisonnable. Je vais vous dévoiler un secret que seules les stars et les milliardaires connaissent.
+Camille   : Évidemment, mais ce n'est pas la peine.
+Muriel    : Camille, votre corps n'est jamais séparé de l'Univers, il suffit juste de le réaligner.
+Camille   : Une autre fois peut-être.
+Muriel    : Camille ! La lune, les planètes et les étoiles nous parlent si on sait les écouter !
+Camille   : Je vous en prie, laissez-moi ! Je crois que je vais devenir cinglé si je reste.
+Muriel    : Camille, vous l'ignorez, mais vous l'êtes déjà...
+Camille   : Je veux rentrer chez moi !
+Muriel    : Mais je suis là pour vous aider à vous brancher à votre énergie cosmique !
+Camille   : Je vous dis que je veux rentrer chez moi !
+Muriel    : Et tout ça pour 50 euros. Vous avez du liquide sur vous ?
+Camille   : Ne me parlez plus de liquide, ni de baignoire, ni de vache ! Au secours ! À l'aide ! Appelez la police ! (Catherine entre.)
+Catherine : Mon Dieu ! Mais qu'est-ce qui se passe ici ?!
+Muriel    : C'est mon client qu'est devenu maboule !
+Camille   : Pas du tout ! C'est cette coach à la noix qu'est devenue folle !
+Catherine : Mais arrêtez de vous disputer ! C'est vous Camille ?
+Camille   : Oui ! Et je veux rentrer chez moi !
+Catherine : Muriel ! Tu m'avais dit qu'aucun client ne viendrait ici ! Tu me l'avais juré !
+Muriel    : Eh oh, hein ! Le business c'est le business !
+Catherine : Je suis fichue si mon propriétaire l'apprend ! Complètement fichue ! Oh mon Dieu, qu'est-ce que j'ai fait pour mériter ça ?!
+Muriel    : Ça va s'arranger, t'inquiète. T'as réussi à enlever toute la flotte ?
+Catherine : Non, je n'ai pas terminé. Le frère du propriétaire est arrivé et il n'a pas l'air commode. Ils ont commencé à se disputer, donc je suis partie discrètement. Mais au fait, où est Florence ?
+Muriel    : Elle ne t'a pas rejointe chez Lavache ?
+Camille   : Ça ne va pas recommencer ! Arrêtez avec cette vache ! C'est pénible à la fin !
+Catherine : Qu'est-ce qu'il a ?
+Muriel    : Il est maboule j'te dis.
+Catherine : Mais alors, où est Florence ?
+Muriel    : Où est passée cette imbécile ? Bouge pas, je vais la chercher ! (Muriel sort rapidement.)
+##Acte 2
+###Scène 1
+Catherine : Je suis sincèrement désolée mais vous ne pouvez pas rester plus longtemps ici. Mon propriétaire ne l'accepte pas.
+Camille   : Ne vous inquiétez pas, je pars. Si vous permettez un petit conseil : allez chercher un travail d'assistante en informatique ailleurs, votre collègue n'a pas toute sa raison. Si vous voyez ce que je veux dire... (Jean entre, habillé simplement : un jean et un blouson.)
+Jean      : Je peux ? Vous me remettez ? Je vous ai croisée à l'instant chez mon frère.
+Catherine : Oui bien sûr, je vous ai aperçu.
+Jean      : Il m'a dit que vous habitez là... Je... (il sent les mauvaises odeurs) Y'a un fennec de crevé dans le coin ?
+Catherine : Non, c'est l'odeur habituelle mais on s'y fait très bien à force.
+Jean      : OK. Bon, je viens vous voir car j'ai besoin d'un tout petit coup de main.
+Catherine : Oui ?
+Jean      : La semaine dernière j'ai joué au poker et j'ai injustement perdu la partie. Il avait un carré de rois ! Qu'est-ce que je pouvais faire moi avec ma petite paire ? Hein, je vous le demande ?!
+Catherine : Je ne sais pas. Je ne sais pas jouer aux cartes, je suis caissière.
+Jean      : Il m'a plumé de 2000 euros ! 2000 ! L'escroc !
+Catherine : C'est fâcheux mais qu'est-ce que je peux faire pour vous ?
+Jean      : Je n'avais pas le fric sur moi. Il veut que je le rembourse ! Il m'a même menacé ! Le bandit !
+Camille   : Les jeux d'argent sont interdits, non ?
+Jean      : Ce qui est interdit c'est de menacer les honnêtes gens avec une arme ! L'assassin !
+Camille   : Vous allez le rembourser ?
+Jean      : Je n'ai pas le choix ! Il me donne 24 heures. Je lui ai donné tout ce que j'avais : 32 euros. (à Catherine) Auriez-vous l'amabilité de me prêter 1968 euros ?
+Catherine : Mais... Non, je ne les ai pas. Je suis vraiment désolée.
+Jean      : (à Camille) Et vous ?
+Camille   : Moi ? Ah non, c'est impossible. De toute façon j'allais partir.
+Jean      : 1968 euros ! C'est rien ! C'est un tueur ! Il va me tuer ! Vous pensez que je ne vaux pas 1968 euros ?
+Catherine : Je ne sais pas, je ne me rends pas compte. Avez-vous demandé à votre frère ?
+Jean      : Mon frangin est blindé de fric mais il ne veut rien me filer ! L'ordure ! Allez ! Soyez sympa !
+Catherine : Je n'ai pas cet argent, je suis caissière-célibataire et je n'ai pas d'économies.
+Jean      : Bon... Comme vous voulez... Je vais faire autrement.
+Camille   : Très bien, c'est beaucoup plus raisonnable. Je vous laisse, au revoir. (Jean sort un revolver de la poche de son blouson et menace Camille et Catherine.)
+Jean      : (à Camille) Toi, le radin, bouge pas ! Allez ! On arrête de jouer ! 2000 balles tout de suite sinon je tire dans le tas !
+Catherine : Oh ! Seigneur !
+Jean      : 2000 liquides ! En balles ! Tout de suite ! Merde ! 2000 balles ! En liquide ! Tout de suite ! (Florence entre. Elle tient son seau qu'elle pose sur le sol.)
+Jean      : (à Florence) Toi avance ! Et pas d'entourloupe !
+Florence  : Qu'est-ce qui se passe ?
+Jean      : Je fais une cagnotte et tu tombes bien, tu vas y participer !
+Florence  : Ah bon ? Ouah ! C'est chouette !
+Jean      : 2000 balles divisé par trois ça fait... Ça fait... Quelqu'un a une calculette ?
+Florence  : Ça fait 1000 !
+Jean      : Ça va pas non !
+Florence  : 5000 !
+Jean      : Hein ?
+Florence  : Un milliard !
+Jean      : Toi, t'es encore plus nulle que moi. Débrouillez-vous pour les comptes ! Et plus vite que ça ! Je suis pressé !
+Camille   : Monsieur, vous agissez sous le coup de la colère. Soyez raisonnable, rangez votre arme et laissez-nous tranquilles.
+Jean      : Eh oh, t'as pas bien compris que c'est ma vie qu'est en jeu, là ! Ma vie !
+Camille   : Sans doute, mais je dois y aller, là. (Jean lui colle son arme sur la joue.)
+Jean      : (à Camille, l'arme sur sa joue) Tu veux qu'on me retrouve allongé avec une balle entre les deux oreilles ? Tu veux que j'essaie sur toi pour voir ce que ça fait ?! Hein ?! C'est ça que tu veux ?!
+Camille   : Je... Je ne me sens pas bien... (Camille s'évanouit de peur et s'écroule dans le fauteuil.)
+Florence  : Il est mouru ?
+Jean      : Toi la ferme ! Eh oh ! Réveille-toi !
+Florence  : Oui, c'est l'heure du réveillage !
+Jean      : J'ai dit la ferme !
+Catherine : Doux Jésus ! C'est la catastrophe ! (Catherine prend le pouls de Camille qui est inconscient.)
+Catherine : J'ai l'impression qu'il ne respire plus ! Oh mon Dieu ! Mon Dieu !
+Jean      : Elle est bonne celle-là ! Il va crever et j'ai même pas tiré ! Je veux pas aller en taule pour ça !
+Catherine : On peut peut-être le sauver ! Mon Dieu faites quelque chose !
+Jean      : Toi la bigote, fais-lui le bouche-à-bouche !
+Catherine : Le bouche-à-bouche ? Mais je ne sais pas comment faire, je suis caissière.
+Florence  : Moi je sais ! J'ai mon brevet ! (Florence soulève les bras de Camille et les fait monter et descendre dans un mouvement de pompage.)
+Florence  : Une, deux. Une, deux. Une, deux.
+Jean      : Je ne suis pas médecin mais t'es sûre que c'est comme ça qu'on réanime un mort ?
+Florence  : Une, deux. Une, deux. Une, deux. Je vous dis que j'ai mon brevet. Mon brevet des collèges.
+Jean      : Pousse-toi l'intello ! Allez ! Dégage ! Je vais le faire moi-même ce bouche-à-bouche ! (Machinalement, Jean pose sur le sol son revolver et approche son visage de celui de Camille pour faire un bouche-à-bouche. Camille pousse un cri au moment où Jean allait commencer à poser ses lèvres sur les siennes.)
+Camille   : Pouaaaaaaaaaaa !
+Catherine : Dieu merci, il est sauvé !
+Camille   : Il m'a embrassé ?! Pouaaaah ! (Camille crache. Florence prend le revolver qui était sur le sol, et le pointe sur Jean.)
+Florence  : Haut les mains ! Peau de lapin !
+Jean      : Ah ! Rends-moi ça tout de suite !
+Florence  : Nan ! Je vais vous tuer ! Vous n'êtes pas gentil avec nous !
+Jean      : Donne je te dis !
+Florence  : Nan ! À trois je tire ! Un ! Deux ! (Jean s'approche de la porte rapidement.)
+Jean      : (en fuyant) Ça, vous allez le regretter ! Bandits ! (Jean est sorti. Florence regarde dans le canon du revolver.)
+Florence  : Il est rigolo ce jouet. Il est à qui ?
+Camille   : Oh !!! Donnez-moi ça, c'est dangereux ! (Camille prend le revolver et le met aussitôt dans le tiroir du meuble.)
+Catherine : Mon Dieu, il aurait pu nous tuer ! C'est choquant, je suis choquée ! Oh mon Dieu, je suis choquée ! Je suis véritablement choquée !
+Florence  : Tu serais pas un peu choquée toi des fois ?
+Catherine : (à Camille) Vous n'êtes pas choqué, vous ?
+Camille   : Si, évidemment : il a voulu m'embrasser.
+Catherine : Il faut que je prenne l'air, je vais sur le balcon. Je suis tellement choquée... (Catherine sort pour aller sur le balcon.)
+Camille   : Ce type est un fou, il faut l'enfermer.
+Florence  : Ah bon ? Qui ça ? (Florence voit la Thermos qui était restée sur la table.)
+Florence  : Tiens, ça a l'air drôlement bon ça. Hum ! Ça sent super bon en plus. T'en veux ?
+Camille   : Oui je veux bien. Il faut que je me remette de mes émotions. (Florence sert les deux verres qui étaient sur la table. Elle voit le bonnet posé sur la table.)
+Florence  : Tiens ? Un bonnet ? (Florence met le bonnet sur sa tête.) Il est vraiment très joli. Santé ! (Ils lèvent leurs verres et avalent la boisson.)
+Camille   : Aaaaaaaaaaaaaah ! (Camille crache, grimace, vacille, puis s'assoit lourdement sur une chaise, main sur le front, frappant l'arrière de sa tête plusieurs fois comme pour expulser la douleur. Pendant ce temps, Florence, les yeux écarquillés, reste figée, incapable du moindre mouvement.)
+Camille   : Je ne sens plus ma langue ! Qu'est-ce... Qu'est-ce que c'est que cette saloperie ? (Florence baisse le bonnet pour cacher ses yeux. Le liquide sort de sa bouche en dégoulinant. Ensuite, Florence ne bouge plus.)
+Camille   : Je n'ai plus de jambes... Et j'ai les orteils qui tremblent. C'est quoi ce truc ? Du poison ?! (Monsieur Lavache entre. Camille et Florence, toujours le bonnet sur les yeux, ne le voient pas entrer.)
+Camille   : On a voulu nous empoisonner ! La vache !
+Lavache   : Attention hein ! Pas de familiarité ! (à Camille) Qui êtes-vous et que faites-vous ici ?!
+Camille   : Pardon ?
+Lavache   : Je suis le propriétaire de ce logement et je vous demande ce que vous faites là ! C'est ma locataire qui vous a fait venir ?
+Camille   : Non, c'est la folle.
+Lavache   : (en indiquant Florence) Elle ?
+Camille   : Non, l'autre, la coach.
+Lavache   : J'avais été très clair avec ma locataire ! Aucune visite ! Vous devez partir tout de suite. Allez ! Ouste ! Du balai !
+Camille   : Rassurez-vous, je n'ai pas l'intention de rester plus longtemps dans cet asile. Mais pour l'instant je n'arrive pas à me lever. On a voulu nous empoisonner.
+Lavache   : Quoi ? C'est quoi ces salades ?
+Camille   : (en montrant la Thermos) Je n'ai jamais rien bu d'aussi immonde. Un mélange d'acide et d'eau de javel, peut-être... Je ne sais pas quel est le cinglé qui a préparé cette mixture mais il faut le mettre en taule ! (Florence lève le bonnet. Elle a retrouvé sa mobilité.)
+Florence  : Oui, c'est pas bon du tout. Je pouvais plus bouger et y'a des canards qui me parlaient dans ma tête, c'est normal ?
+Camille   : C'est vous le propriétaire de ce logement ?
+Lavache   : Oui, faut vous le dire en quelle langue ?
+Camille   : Votre frère est passé nous voir...
+Lavache   : Jean est venu ici ?
+Camille   : Malheureusement oui...
+Lavache   : Ne faites pas attention à lui, c'est un sociopathe de haut niveau. (Camille se lève brusquement. Il met une main devant sa bouche.)
+Camille   : Je... Je vais vomir ! La vache ! (Camille sort précipitamment pour aller dans le couloir qui mène aux autres pièces. Monsieur Lavache se dirige vers la porte d'entrée.)
+Lavache   : Lui, s'il continue à me chercher, il va me trouver ! Attention ! Faut pas me chatouiller trop longtemps moi ! Vous savez où elle est passée votre cousine ?
+Florence  : Nan, je sais pas.
+Lavache   : Vous lui laisserez un message de ma part.
+Florence  : D'accord, pas de problème. Au revoir monsieur.
+Lavache   : Je ne vous l'ai pas donné ! Écoutez-moi bien, dès que vous verrez votre cousine, vous lui direz qu'elle a trois jours pour faire ses valises. Trois jours ! C'est un vrai hall de gare ici ! Je la vire ! C'est compris ?!
+Florence  : Oui monsieur.
+Lavache   : Je vais passer une annonce. Les gens qui cherchent un appartement, ça court les rues. Et là, je serai très sévère dans la sélection. Très, très sévère ! Et n'oubliez pas de lui dire ! Trois jours ! (Monsieur Lavache sort.)
+Florence  : Pourquoi j'oublierais ? Je suis pas débile. (Florence voit le gâteau écrasé qui était resté sur la table.)
+Florence  : Oh ! Un gâteau ? Mince, il est tout écrasé... (Florence ouvre la boîte qui contient le gâteau. Camille et Catherine entrent.)
+Catherine : Comment vous vous sentez ? Vous n'êtes plus malade ?
+Camille   : Ça va mieux, merci. Je suis vraiment désolé pour votre plante sur le balcon...
+Catherine : Ne vous inquiétez pas, ce n'est pas grave et justement elle avait besoin d'un peu d'engrais.
+Camille   : Je vais rentrer chez moi, j'ai besoin de me reposer.
+Florence  : Tu veux du gâteau avant de partir ? Il a l'air drôlement bon et il sent bon en plus.
+Camille   : (peur) Ah non ! Non ! Non !
+Florence  : Ah bon ? Bah pourquoi ? (Muriel entre. Florence, le dos tourné, prend une part de gâteau.)
+Muriel    : J'ai fait les deux étages et le local à poubelles. J'y ai trouvé des souris et des rats mais je n'ai pas trouvé ta cousine ! (Muriel voit Florence qui vient de se retourner.)
+Muriel    : Ah ? T'es là ?
+Florence  : Oui, et toi t'es où ?
+Muriel    : Ça fait une demi-heure que je te cherche ! Vous en faites tous une tête, qu'est-ce qui s'est passé ?
+Catherine : On vient d'être pris en otage par le frère de mon propriétaire...
+Camille   : Il a voulu me tuer et m'embrasser !
+Muriel    : Lavache a une famille charmante...
+Camille   : Ça ne va pas recommencer avec les vaches ! Ça suffit !
+Muriel    : Eh oh ! On se calme ! Il va pas mieux lui !
+Catherine : Mais arrêtez donc de vous disputer tout le temps ! La violence verbale n'est jamais la bonne solution. Florence, tu peux enlever ce bonnet s'il te plaît ? Il me fait mal aux yeux.
+Florence  : Ah bon ? Quel bonnet ? (Florence enlève le bonnet et le met sur la table. Pendant la discussion elle mange sa part de gâteau.)
+Florence  : Au fait Catherine, ton propriétaire m'a laissé un message pour toi. (regarde le public) Eh oui, j'ai une excellente mémoire...
+Catherine : Qu'est-ce qu'il veut ? C'est important ?
+Florence  : Mince je sais plus... Ah si ! Il a fait ses valises et il va à la gare.
+Catherine : Il part en voyage ?
+Florence  : Oui, pendant trois jours.
+Catherine : Et il part quand ?
+Florence  : Là, maintenant, il est pressé, il court dans les rues.
+Catherine : Dans les rues ? Comment ça ?
+Muriel    : Et pourquoi il t'a raconté ça ? On s'en tape, il fait ce qu'il veut cette peau de vache. En tout cas, bon débarras !
+Catherine : Florence, tu m'as fait peur, j'ai cru un instant que mon propriétaire voulait me mettre à la porte.
+Florence  : (à Camille, en parlant de son gâteau) Il est super bon, t'en veux ?
+Camille   : N'insistez pas ! Bon, je vous laisse. Au revoir. (Camille se dirige vers la porte quand Jean entre avec un fusil. Il le gardera dans les mains et les menacera pendant toute la discussion.)
+Jean      : C'est fini la rigolade ! Les mains en l'air !
+Camille   : Aaaaaah ! Non ! Ça ne va pas recommencer !`;
+    </script>
+
+    <div class="header">
+        <h1 id="play-title"></h1>
+        <button class="fullscreen-btn" id="fullscreen-btn" title="Plein écran">⛶</button>
+    </div>
+
+    <div class="tabs">
+        <button class="tab" data-tab="read">Lire</button>
+        <button class="tab" data-tab="learn">Apprendre</button>
+        <button class="tab" data-tab="settings">Paramètres</button>
+    </div>
+
+    <div class="content">
+        <!-- Read Tab -->
+        <div class="tab-content" id="read-tab">
+            <div id="read-content"></div>
+        </div>
+
+        <!-- Learn Tab -->
+        <div class="tab-content" id="learn-tab">
+            <div class="learn-scene-header" onclick="openNavigation('learn')">
+                <span id="learn-current-scene">Acte 1, Scène 1</span>
+                <span id="line-counter" style="margin-left: auto; margin-right: 8px;">0 / 0</span>
+                <span class="arrow-icon">▼</span>
+            </div>
+            <div class="learn-content-area" id="learn-content"></div>
+            <div class="learn-controls">
+                <div class="button-group">
+                    <button class="btn-back" onclick="restartScene()">⏮ Début</button>
+                    <button class="btn-next" onclick="nextLine()">Suivant ▶</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings-tab">
+            <div class="settings-content">
+                <div class="settings-group">
+                    <label class="settings-label" for="character-select">Mon personnage</label>
+                    <select id="character-select">
+                        <option value="">-- Choisissez votre personnage --</option>
+                    </select>
+                </div>
+                <div class="settings-group">
+                    <label class="settings-label">Taille du texte</label>
+                    <div class="text-size-buttons">
+                        <button class="text-size-btn" data-size="small">Petit</button>
+                        <button class="text-size-btn active" data-size="normal">Normal</button>
+                        <button class="text-size-btn" data-size="large">Grand</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Modal -->
+    <div class="modal" id="navigation-modal" onclick="closeNavigation(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">Navigation</div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        // Parse the play text
+        function parsePlayText(text) {
+            const lines = text.split('\n');
+            const playData = {
+                title: '',
+                acts: []
+            };
+
+            let currentAct = null;
+            let currentScene = null;
+
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line) return;
+
+                // Title (# Title)
+                if (line.startsWith('#') && !line.startsWith('##')) {
+                    playData.title = line.substring(1).trim();
+                }
+                // Act (## Act X)
+                else if (line.startsWith('##') && !line.startsWith('###')) {
+                    currentAct = {
+                        title: line.substring(2).trim(),
+                        scenes: []
+                    };
+                    playData.acts.push(currentAct);
+                    currentScene = null;
+                }
+                // Scene (### Scene X)
+                else if (line.startsWith('###')) {
+                    if (currentAct) {
+                        currentScene = {
+                            title: line.substring(3).trim(),
+                            dialogues: []
+                        };
+                        currentAct.scenes.push(currentScene);
+                    }
+                }
+                // Dialogue (Character : Text)
+                else if (line.includes(':')) {
+                    const colonIndex = line.indexOf(':');
+                    const character = line.substring(0, colonIndex).trim();
+                    const text = line.substring(colonIndex + 1).trim();
+                    
+                    if (currentScene && character && text) {
+                        currentScene.dialogues.push({
+                            character: character,
+                            text: text
+                        });
+                    }
+                }
+            });
+
+            return playData;
+        }
+
+        // Parse the play data
+        const playData = parsePlayText(rawPlayText);
+
+        // Update page title
+        document.title = playData.title || 'Pièce de théâtre';
+
+        // State management
+        let currentTab = 'read';
+        let selectedCharacter = '';
+        let learnState = {
+            actIndex: 0,
+            sceneIndex: 0,
+            lineIndex: 0
+        };
+        let readState = {
+            actIndex: 0,
+            sceneIndex: 0
+        };
+
+        // Storage management functions (localStorage works with file://)
+        function setStorage(name, value) {
+            try {
+                localStorage.setItem(name, value);
+            } catch (e) {
+                console.error('Error saving to localStorage:', e);
+            }
+        }
+
+        function getStorage(name) {
+            try {
+                return localStorage.getItem(name);
+            } catch (e) {
+                console.error('Error reading from localStorage:', e);
+                return null;
+            }
+        }
+
+        // Extract unique characters
+        function getCharacters() {
+            const characters = new Set();
+            playData.acts.forEach(act => {
+                act.scenes.forEach(scene => {
+                    scene.dialogues.forEach(dialogue => {
+                        characters.add(dialogue.character);
+                    });
+                });
+            });
+            return Array.from(characters).sort();
+        }
+
+        // Generate a consistent color for each character
+        const characterColors = {};
+        
+        // Color palettes for light and dark modes
+        const colorPalettesLight = [
+            '#c0392b', // dark red
+            '#2980b9', // dark blue
+            '#27ae60', // dark green
+            '#d68910', // dark orange
+            '#8e44ad', // dark purple
+            '#16a085', // dark turquoise
+            '#d35400', // dark carrot
+            '#2c3e50', // very dark blue
+            '#117a65', // very dark green
+            '#922b21', // very dark red
+            '#6c3483', // dark wisteria
+            '#1e8449', // dark nephritis
+        ];
+
+        const colorPalettesDark = [
+            '#ff6b6b', // bright red
+            '#74b9ff', // bright blue
+            '#55efc4', // bright green
+            '#ffd93d', // bright yellow
+            '#dda0dd', // bright plum
+            '#6bcf7f', // bright mint
+            '#ffa07a', // bright salmon
+            '#87ceeb', // sky blue
+            '#98d8c8', // light teal
+            '#ff9999', // light coral
+            '#c39bd3', // light purple
+            '#90ee90', // light green
+        ];
+
+        function isDarkMode() {
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+
+        function getCharacterColor(character) {
+            if (!characterColors[character]) {
+                const colorPalette = isDarkMode() ? colorPalettesDark : colorPalettesLight;
+                const characters = Object.keys(characterColors);
+                const colorIndex = characters.length % colorPalette.length;
+                characterColors[character] = colorPalette[colorIndex];
+            }
+            return characterColors[character];
+        }
+
+        // Listen for theme changes and update colors
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                // Reset character colors to apply new palette
+                Object.keys(characterColors).forEach(key => delete characterColors[key]);
+                
+                // Re-render current tab
+                if (currentTab === 'read') {
+                    renderReadTab();
+                } else if (currentTab === 'learn') {
+                    renderLearnTab();
+                }
+            });
+        }
+
+        // Update page title with character if selected
+        function updateTitle() {
+            const baseTitle = playData.title;
+            const displayTitle = selectedCharacter ? `${baseTitle} - ${selectedCharacter}` : baseTitle;
+            document.getElementById('play-title').textContent = displayTitle;
+        }
+
+        // Initialize the app
+        function init() {
+            // Load settings first
+            loadSettings();
+            
+            // Setup UI
+            populateCharacterSelect();
+            updateTitle();
+            setupTabs();
+            
+            // Restore saved tab or default to 'read'
+            const savedTab = getStorage('currentTab') || 'read';
+            switchTab(savedTab);
+        }
+
+        // Populate character dropdown
+        function populateCharacterSelect() {
+            const select = document.getElementById('character-select');
+            const characters = getCharacters();
+            characters.forEach(char => {
+                const option = document.createElement('option');
+                option.value = char;
+                option.textContent = char;
+                select.appendChild(option);
+            });
+
+            select.addEventListener('change', (e) => {
+                selectedCharacter = e.target.value;
+                saveSettings();
+                updateTitle();
+                
+                // Re-render current tab
+                if (currentTab === 'read') {
+                    renderReadTab();
+                } else if (currentTab === 'learn') {
+                    renderLearnTab();
+                }
+            });
+            
+            // Text size buttons
+            document.querySelectorAll('.text-size-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const size = this.dataset.size;
+                    applyTextSize(size);
+                    setStorage('textSize', size);
+                });
+            });
+
+            // Fullscreen button
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            if (fullscreenBtn) {
+                fullscreenBtn.addEventListener('click', toggleFullscreen);
+            }
+        }
+
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
+                // Enter fullscreen
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                } else if (elem.mozRequestFullScreen) {
+                    elem.mozRequestFullScreen();
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                }
+            } else {
+                // Exit fullscreen
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        // Setup tab navigation
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+        }
+
+        // Switch between tabs
+        function switchTab(tabName) {
+            currentTab = tabName;
+            setStorage('currentTab', tabName);
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-tab') === tabName) {
+                    tab.classList.add('active');
+                }
+            });
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+
+            // Render specific tab content if needed
+            if (tabName === 'learn') {
+                renderLearnTab();
+            } else if (tabName === 'read') {
+                renderReadTab();
+            }
+        }
+
+        // Render Read Tab
+        function renderReadTab() {
+            const container = document.getElementById('read-content');
+            container.innerHTML = '';
+
+            playData.acts.forEach((act, actIndex) => {
+                act.scenes.forEach((scene, sceneIndex) => {
+                    const sceneTitle = document.createElement('div');
+                    sceneTitle.className = 'learn-scene-header';
+                    
+                    const titleSpan = document.createElement('span');
+                    titleSpan.textContent = `${act.title}, ${scene.title}`;
+                    
+                    const arrowSpan = document.createElement('span');
+                    arrowSpan.className = 'arrow-icon';
+                    arrowSpan.textContent = '▼';
+                    
+                    sceneTitle.appendChild(titleSpan);
+                    sceneTitle.appendChild(arrowSpan);
+                    sceneTitle.onclick = () => {
+                        readState.actIndex = actIndex;
+                        readState.sceneIndex = sceneIndex;
+                        setStorage('readState', readState);
+                        openNavigation('read');
+                    };
+                    
+                    container.appendChild(sceneTitle);
+
+                    const sceneBlock = document.createElement('div');
+                    sceneBlock.className = 'scene-block';
+
+                    scene.dialogues.forEach(dialogue => {
+                        const dialogueDiv = document.createElement('div');
+                        dialogueDiv.className = 'dialogue';
+                        
+                        if (selectedCharacter && dialogue.character === selectedCharacter) {
+                            dialogueDiv.classList.add('highlight');
+                        }
+
+                        const charSpan = document.createElement('span');
+                        charSpan.className = 'dialogue-character';
+                        charSpan.textContent = dialogue.character;
+                        charSpan.style.color = getCharacterColor(dialogue.character);
+
+                        const textSpan = document.createElement('span');
+                        textSpan.className = 'dialogue-text';
+                        textSpan.textContent = dialogue.text;
+
+                        dialogueDiv.appendChild(charSpan);
+                        dialogueDiv.appendChild(textSpan);
+                        sceneBlock.appendChild(dialogueDiv);
+                    });
+
+                    container.appendChild(sceneBlock);
+                });
+            });
+            
+            // Validate readState indices
+            if (readState.actIndex >= playData.acts.length) {
+                readState.actIndex = 0;
+            }
+            if (readState.sceneIndex >= playData.acts[readState.actIndex].scenes.length) {
+                readState.sceneIndex = 0;
+            }
+            
+            // Scroll to the saved scene position
+            setTimeout(() => {
+                const sceneBlocks = document.querySelectorAll('#read-content .scene-block');
+                let totalSceneIndex = 0;
+                for (let i = 0; i < readState.actIndex; i++) {
+                    totalSceneIndex += playData.acts[i].scenes.length;
+                }
+                totalSceneIndex += readState.sceneIndex;
+                
+                if (sceneBlocks[totalSceneIndex]) {
+                    sceneBlocks[totalSceneIndex].scrollIntoView({ behavior: 'auto', block: 'start' });
+                }
+            }, 0);
+        }
+
+        // Render Learn Tab
+        function renderLearnTab(clearContent = true) {
+            const content = document.getElementById('learn-content');
+            if (clearContent) {
+                content.innerHTML = '';
+            }
+
+            // Check if no character is selected
+            if (!selectedCharacter) {
+                content.innerHTML = '<div style="padding: 40px 20px; text-align: center;"><p style="color: var(--text-secondary); font-size: 18px; margin-bottom: 16px;">Aucun personnage sélectionné</p><p style="color: var(--text-muted); font-size: 14px;">Veuillez sélectionner un personnage dans l\'onglet Paramètres pour commencer l\'apprentissage.</p></div>';
+                document.getElementById('line-counter').textContent = '0 / 0';
+                const nextButton = document.querySelector('.btn-next');
+                const backButton = document.querySelector('.btn-back');
+                if (nextButton) nextButton.disabled = true;
+                if (backButton) backButton.disabled = true;
+                return;
+            }
+
+            // Validate learnState indices
+            if (learnState.actIndex >= playData.acts.length) {
+                learnState.actIndex = 0;
+            }
+            if (learnState.sceneIndex >= playData.acts[learnState.actIndex].scenes.length) {
+                learnState.sceneIndex = 0;
+            }
+
+            // Get current scene
+            const act = playData.acts[learnState.actIndex];
+            const scene = act.scenes[learnState.sceneIndex];
+
+            // Update scene header
+            document.getElementById('learn-current-scene').textContent = 
+                `${act.title}, ${scene.title}`;
+
+            const lines = scene.dialogues;
+
+            if (lines.length === 0) {
+                content.innerHTML = '<p style="color: #95a5a6; text-align: center;">Aucune réplique dans cette scène.</p>';
+                document.getElementById('line-counter').textContent = '0 / 0';
+                return;
+            }
+
+            // Find character's lines and their indices
+            const characterLines = [];
+            lines.forEach((dialogue, index) => {
+                if (dialogue.character === selectedCharacter) {
+                    characterLines.push(index);
+                }
+            });
+
+            if (characterLines.length === 0) {
+                content.innerHTML = '<p style="color: #95a5a6; text-align: center;">Aucune réplique pour ce personnage dans cette scène.</p>';
+                document.getElementById('line-counter').textContent = '0 / 0';
+                return;
+            }
+
+            // Update counter based on character's lines
+            document.getElementById('line-counter').textContent = 
+                `${learnState.lineIndex} / ${characterLines.length}`;
+
+            // When clearContent is true (initial load or restart), show all dialogues up to current state
+            // When clearContent is false (appending), show only the new dialogues
+            let startIndex, endIndex;
+            
+            if (clearContent) {
+                // Show all dialogues from start up to current lineIndex
+                startIndex = 0;
+                if (learnState.lineIndex === 0) {
+                    endIndex = characterLines[0];
+                } else {
+                    const currentCharLineIndex = Math.min(learnState.lineIndex - 1, characterLines.length - 1);
+                    endIndex = learnState.lineIndex < characterLines.length 
+                        ? characterLines[learnState.lineIndex] 
+                        : lines.length;
+                }
+            } else {
+                // Append mode: show only new dialogues
+                if (learnState.lineIndex === 0) {
+                    startIndex = 0;
+                    endIndex = characterLines[0];
+                } else {
+                    const currentCharLineIndex = Math.min(learnState.lineIndex - 1, characterLines.length - 1);
+                    startIndex = characterLines[currentCharLineIndex];
+                    endIndex = learnState.lineIndex < characterLines.length 
+                        ? characterLines[learnState.lineIndex] 
+                        : lines.length;
+                }
+            }
+
+            // Display the dialogues in the range
+            for (let i = startIndex; i < endIndex; i++) {
+                const dialogue = lines[i];
+                const dialogueDiv = document.createElement('div');
+                dialogueDiv.className = 'dialogue';
+                
+                // Highlight selected character's lines
+                if (dialogue.character === selectedCharacter) {
+                    dialogueDiv.classList.add('my-character');
+                }
+
+                const charSpan = document.createElement('span');
+                charSpan.className = 'dialogue-character';
+                charSpan.textContent = dialogue.character;
+                charSpan.style.color = getCharacterColor(dialogue.character);
+
+                const textSpan = document.createElement('span');
+                textSpan.className = 'dialogue-text';
+                textSpan.textContent = dialogue.text;
+
+                dialogueDiv.appendChild(charSpan);
+                dialogueDiv.appendChild(textSpan);
+                content.appendChild(dialogueDiv);
+            }
+            
+            // Update button state
+            const nextButton = document.querySelector('.btn-next');
+            const backButton = document.querySelector('.btn-back');
+            if (nextButton) {
+                nextButton.disabled = learnState.lineIndex >= characterLines.length;
+            }
+            if (backButton) {
+                backButton.disabled = learnState.lineIndex === 0;
+            }
+        }
+
+        // Next line in Learn mode
+        function nextLine() {
+            const act = playData.acts[learnState.actIndex];
+            const scene = act.scenes[learnState.sceneIndex];
+            const lines = scene.dialogues;
+
+            // If no character selected, advance one line at a time
+            if (!selectedCharacter) {
+                if (learnState.lineIndex < lines.length - 1) {
+                    learnState.lineIndex++;
+                    saveSettings();
+                    renderLearnTab();
+                }
+                return;
+            }
+
+            // Find character's lines
+            const characterLines = [];
+            lines.forEach((dialogue, index) => {
+                if (dialogue.character === selectedCharacter) {
+                    characterLines.push(index);
+                }
+            });
+
+            // Advance to next step
+            if (learnState.lineIndex < characterLines.length) {
+                const oldLineIndex = learnState.lineIndex;
+                learnState.lineIndex++;
+                saveSettings();
+                renderLearnTab(false); // Don't clear content, just append
+                
+                // Scroll to the first newly added dialogue
+                setTimeout(() => {
+                    const content = document.getElementById('learn-content');
+                    const newDialogues = content.querySelectorAll('.dialogue');
+                    
+                    // Calculate the index of the first new dialogue
+                    let firstNewIndex = 0;
+                    if (oldLineIndex === 0) {
+                        // On first click, scroll to the character's first line
+                        firstNewIndex = characterLines[0];
+                    } else {
+                        const prevCharLineIndex = oldLineIndex - 1;
+                        const prevEndIndex = oldLineIndex < characterLines.length 
+                            ? characterLines[oldLineIndex] 
+                            : lines.length;
+                        firstNewIndex = prevEndIndex;
+                    }
+                    
+                    if (newDialogues[firstNewIndex]) {
+                        newDialogues[firstNewIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 50);
+            }
+        }
+
+        // Restart scene in Learn mode
+        function restartScene() {
+            learnState.lineIndex = 0;
+            saveSettings();
+            renderLearnTab(true); // Clear content and restart
+        }
+
+        // Open navigation modal
+        function openNavigation(source) {
+            const modal = document.getElementById('navigation-modal');
+            const modalBody = document.getElementById('modal-body');
+            modalBody.innerHTML = '';
+
+            playData.acts.forEach((act, actIndex) => {
+                const actItem = document.createElement('div');
+                actItem.className = 'nav-item nav-act';
+                actItem.textContent = act.title;
+                actItem.onclick = () => navigateToScene(actIndex, 0, source);
+                modalBody.appendChild(actItem);
+
+                act.scenes.forEach((scene, sceneIndex) => {
+                    const sceneItem = document.createElement('div');
+                    sceneItem.className = 'nav-item nav-scene';
+                    sceneItem.textContent = scene.title;
+                    sceneItem.onclick = () => navigateToScene(actIndex, sceneIndex, source);
+
+                    if (source === 'learn' && actIndex === learnState.actIndex && sceneIndex === learnState.sceneIndex) {
+                        sceneItem.classList.add('current');
+                    }
+
+                    modalBody.appendChild(sceneItem);
+                });
+            });
+
+            modal.classList.add('active');
+        }
+
+        // Close navigation modal
+        function closeNavigation(event) {
+            if (event.target.id === 'navigation-modal') {
+                document.getElementById('navigation-modal').classList.remove('active');
+            }
+        }
+
+        // Navigate to a specific scene
+        function navigateToScene(actIndex, sceneIndex, source) {
+            if (source === 'learn') {
+                learnState.actIndex = actIndex;
+                learnState.sceneIndex = sceneIndex;
+                learnState.lineIndex = 0;
+                saveSettings();
+                renderLearnTab();
+            } else if (source === 'read') {
+                readState.actIndex = actIndex;
+                readState.sceneIndex = sceneIndex;
+                saveSettings();
+                
+                // Scroll to the scene block
+                const sceneBlocks = document.querySelectorAll('#read-content .scene-block');
+                let totalSceneIndex = 0;
+                for (let i = 0; i < actIndex; i++) {
+                    totalSceneIndex += playData.acts[i].scenes.length;
+                }
+                totalSceneIndex += sceneIndex;
+                
+                if (sceneBlocks[totalSceneIndex]) {
+                    sceneBlocks[totalSceneIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
+            closeNavigation({ target: { id: 'navigation-modal' } });
+        }
+
+        // Save settings to localStorage
+        function saveSettings() {
+            setStorage('selectedCharacter', selectedCharacter);
+            setStorage('readState', JSON.stringify(readState));
+            setStorage('learnState', JSON.stringify(learnState));
+        }
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const savedCharacter = getStorage('selectedCharacter');
+            if (savedCharacter) {
+                selectedCharacter = savedCharacter;
+                const select = document.getElementById('character-select');
+                if (select) {
+                    select.value = savedCharacter;
+                }
+            }
+
+            const savedReadState = getStorage('readState');
+            if (savedReadState) {
+                try {
+                    readState = JSON.parse(savedReadState);
+                } catch (e) {
+                    console.error('Error parsing readState:', e);
+                }
+            }
+
+            const savedLearnState = getStorage('learnState');
+            if (savedLearnState) {
+                try {
+                    learnState = JSON.parse(savedLearnState);
+                } catch (e) {
+                    console.error('Error parsing learnState:', e);
+                }
+            }
+            
+            // Load and apply text size
+            const textSize = getStorage('textSize') || 'normal';
+            applyTextSize(textSize);
+        }
+        
+        // Apply text size to body
+        function applyTextSize(size) {
+            document.body.classList.remove('text-small', 'text-normal', 'text-large');
+            document.body.classList.add(`text-${size}`);
+            
+            // Update button states
+            document.querySelectorAll('.text-size-btn').forEach(btn => {
+                if (btn.dataset.size === size) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // Initialize the app when DOM is ready
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

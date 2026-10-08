@@ -1,0 +1,2026 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pièce de théâtre</title>
+    <style>
+        :root {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: white;
+            --bg-header: #34495e;
+            --text-primary: #333;
+            --text-secondary: #555;
+            --text-muted: #666;
+            --text-light: #7f8c8d;
+            --border-color: #ddd;
+            --border-light: #ecf0f1;
+            --highlight-bg: #d6ebf7;
+            --highlight-border: #3498db;
+            --shadow-light: rgba(0,0,0,0.05);
+            --shadow-medium: rgba(0,0,0,0.08);
+            --shadow-dark: rgba(0,0,0,0.1);
+            --modal-overlay: rgba(0,0,0,0.5);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: #0d0d0d;
+                --bg-secondary: #3d3d3d;
+                --bg-header: #0d0d0d;
+                --text-primary: #ffffff;
+                --text-secondary: #f5f5f5;
+                --text-muted: #e0e0e0;
+                --text-light: #cccccc;
+                --border-color: #555555;
+                --border-light: #4a4a4a;
+                --highlight-bg: #2a5d8a;
+                --highlight-border: #a8daff;
+                --shadow-light: rgba(0,0,0,0.3);
+                --shadow-medium: rgba(0,0,0,0.4);
+                --shadow-dark: rgba(0,0,0,0.5);
+                --modal-overlay: rgba(0,0,0,0.7);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh; /* Dynamic viewport height for mobile */
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--bg-header);
+            color: white;
+            padding: 12px 16px;
+            text-align: center;
+            box-shadow: 0 2px 4px var(--shadow-dark);
+            z-index: 100;
+            order: 1;
+            flex-shrink: 0;
+            min-height: 50px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .fullscreen-btn {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+        }
+
+        .fullscreen-btn:hover {
+            opacity: 0.7;
+        }
+
+        .fullscreen-btn:active {
+            opacity: 0.5;
+        }
+
+        /* Tab Navigation */
+        .tabs {
+            display: flex;
+            background-color: #d5d5d5;
+            border-top: 2px solid var(--border-color);
+            box-shadow: 0 -4px 8px var(--shadow-light);
+            order: 3;
+            z-index: 999;
+            flex-shrink: 0;
+            min-height: 60px;
+            height: 60px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 16px 0;
+            text-align: center;
+            background-color: #e8e8e8;
+            border: none;
+            color: #555;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tab.active {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .tabs {
+                background-color: #2c3e50;
+            }
+            
+            .tab {
+                background-color: #3d3d3d;
+                color: #95a5a6;
+            }
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background-color: var(--bg-primary);
+            -webkit-overflow-scrolling: touch;
+            order: 2;
+            min-height: 0;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 16px;
+            animation: fadeIn 0.3s;
+        }
+
+        #read-tab,
+        #learn-tab {
+            padding: 0;
+        }
+        
+        #learn-tab.active {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Settings Tab */
+        .settings-content {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px var(--shadow-dark);
+        }
+
+        .settings-group {
+            margin-bottom: 24px;
+        }
+
+        .settings-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .settings-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .text-size-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .text-size-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .text-size-btn:hover {
+            border-color: #3498db;
+        }
+
+        .text-size-btn.active {
+            background-color: #3498db;
+            border-color: #3498db;
+            color: white;
+        }
+
+        /* Text size variations */
+        body.text-small {
+            font-size: 14px;
+        }
+
+        body.text-small .dialogue-text {
+            font-size: 14px;
+        }
+
+        body.text-small .dialogue-character {
+            font-size: 12px;
+        }
+
+        body.text-normal {
+            font-size: 16px;
+        }
+
+        body.text-normal .dialogue-text {
+            font-size: 16px;
+        }
+
+        body.text-normal .dialogue-character {
+            font-size: 14px;
+        }
+
+        body.text-large {
+            font-size: 18px;
+        }
+
+        body.text-large .dialogue-text {
+            font-size: 18px;
+        }
+
+        body.text-large .dialogue-character {
+            font-size: 16px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        /* Read Tab */
+        .scene-block {
+            background-color: transparent;
+            border-radius: 8px;
+            padding: 0 16px 16px 16px;
+            margin-bottom: 16px;
+        }
+
+        .dialogue {
+            margin-bottom: 12px;
+            line-height: 1.6;
+            background-color: var(--bg-secondary);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        .dialogue-character {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .dialogue-text {
+            color: var(--text-secondary);
+        }
+
+        .dialogue.highlight {
+            background-color: var(--highlight-bg);
+            border: 2px solid var(--highlight-border);
+        }
+
+        /* Learn Tab */
+        .learn-controls {
+            background-color: var(--bg-secondary);
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -2px 4px var(--shadow-dark);
+            flex-shrink: 0;
+        }
+
+        .learn-scene-header {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            box-shadow: 0 2px 4px var(--shadow-dark);
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            margin-bottom: 12px;
+        }
+
+        .learn-scene-header:active {
+            background-color: #2980b9;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-back {
+            background-color: #3498db;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-back:active {
+            background-color: #2980b9;
+        }
+
+        .btn-next {
+            background-color: #3498db;
+            color: white;
+            flex: 2;
+        }
+
+        .btn-next:active {
+            background-color: #2980b9;
+        }
+
+        .btn-back:disabled,
+        .btn-next:disabled {
+            background-color: var(--border-light);
+            color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .learn-content-area {
+            background-color: transparent;
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .dialogue.my-character {
+            background-color: var(--highlight-bg);
+            border: 2px solid var(--highlight-border);
+        }
+
+        /* Navigation Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--modal-overlay);
+            z-index: 1000;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--bg-secondary);
+            width: 90%;
+            max-width: 400px;
+            max-height: 70vh;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            background-color: var(--bg-header);
+            color: white;
+            padding: 16px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .modal-body {
+            overflow-y: auto;
+            max-height: calc(70vh - 60px);
+        }
+
+        .nav-item {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .nav-item:active {
+            background-color: var(--border-light);
+        }
+
+        .nav-item.current {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .nav-item.current {
+                background-color: #1e3a4a;
+            }
+        }
+
+        .nav-act {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .nav-scene {
+            color: var(--text-light);
+            padding-left: 20px;
+        }
+
+        .arrow-icon {
+            float: right;
+            color: #95a5a6;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Raw play text
+        const rawPlayText = `#À quelle heure on ment ?
+##Acte 1
+###Scène 1
+Arthur    : Ma chère Rosalie, sans vouloir me vanter, je peux affirmer que la filature Legendre ne s'est jamais aussi bien portée. Ce matin, le comptable m'a transmis les chiffres : nous avons encore progressé de 25 %. Vous verrez que l'année 1921 sera excellente.
+Anne      : Jules, vous êtes le meilleur entrepreneur de la ville.
+Arthur    : Allons, allons...
+Anne      : Cela fait maintenant plus de trois ans que vous gérez la filature de mon pauvre mari, mort à la guerre.
+Arthur    : Il est mort en héros.
+Anne      : (Elle chuchote) Paix à son âme.
+Arthur    : Il est mort en héros. Paix à son âme.
+Anne      : Jules, je suis très fière de vous.
+Arthur    : Vous êtes également fière de m'avoir épousé l'année prochaine ? l'année dernière ?
+Anne      : Oh ne me faites pas rougir. La bonne pourrait nous entendre.
+Arthur    : Mais non, Marie est à moitié aveugle.
+Anne      : (Elle chuchote) Non, elle est à moitié sourde.
+Arthur    : Mais non, Marie est à moitié sourde. (Anne et Arthur se regardent, ils semblent perturbés.)
+Arthur    : Elle devrait être là maintenant. Qu'est-ce qu'elle fout ? Elle était à son aquagym, ça fait plus d'une heure.
+Anne      : Sandra tu es là ? On a besoin de la bonne !!
+Arthur    : Sandra ! C'est à toi !
+Dominique : (Dominique, la metteuse en scène entre. Elle porte un jean et tient quelques feuilles de papier.) Allons, les enfants... Qu'est-ce qui se passe ?
+Anne      : Bah rien, on attend Sandra.
+Dominique : (En montrant une page) Arthur ton texte ! J'ai l'impression que tu as tout oublié !
+Arthur    : Excuse Dominique, tu as raison, je ne suis pas trop dedans.
+Dominique : Mais enfin, ça fait plus de huit mois qu'on répète la pièce « À quelle heure on ment ? » Et la première, c'est demain soir !... Et Sandra elle est où ?
+Arthur    : J'en sais rien moi, elle m'a dit qu'elle venait au théâtre juste après son aquagym.
+Dominique : Je vois bien que tu es perturbé et que ta femme n'est pas là... Vous avez un problème dans votre couple, c'est ça ?
+Arthur    : Mais non voyons !
+Dominique : Les enfants, je vous rappelle qu'on joue pour la première fois demain soir devant les habitants de Doulon, et il paraît que c'est un public exigeant : on n'a pas le droit de se planter.
+Anne      : Moi, on m'a dit qu'ils sont sympas les habitants de Doulon.
+Dominique : Ils sont sympas mais exigeants ! Et ils ont raison. Ils ne vont pas se déplacer pour voir des acteurs qui accrochent à tous les mots ! Votre texte les enfants ! Votre texte !
+Arthur    : T'inquiète pas Dominique, on sera prêt demain soir.
+Dominique : Et Arthur il faut mettre le ton ! J'ai l'impression que tu ne crois pas à l'histoire ! Allez, je refais le point une fois de plus : On est en 1921, Madame Rosalie Legendre.
+Anne      : C'est moi.
+Dominique : Madame Rosalie Legendre s'est remariée avec Monsieur Jules Dupantois.
+Arthur    : Oui c'est moi, ça je sais.
+Dominique : Elle est persuadée que son premier mari, Louis Legendre, Directeur d'une filature, est mort pendant la guerre 14-18.
+Anne      : Et après, coup de théâtre : le mari n'est pas mort et il revient !
+Arthur    : Oui, il avait été blessé à la tête par un éclat d'obus et il avait complètement perdu la mémoire.
+Dominique : Eh bien moi, j'ai l'impression que c'est vous qui perdez la mémoire ! Votre texte les enfants ! Allez on reprend la scène.
+Arthur    : Ma chère Rosalie, sans vouloir me vanter, je peux affirmer que la fitalure... hum, je peux vous affirmer que la filature Legendre ne s'est jamais aussi mal portée. Aussi bien portée. Ce matin, le... Ah ! Je ne sais plus. Le caissier, c'est ça ?
+Anne      : Non : le comptable.
+Arthur    : Ce matin, le comptable m'a transmis les chiffres : nous avons encore progressé de 5 %. Vous verrez que l'année 1921 sera excellente.
+Anne      : Jules, vous êtes le meilleur entrepreneur de la ville !
+Dominique : C'est le plus nul ! 25 % pas 5 % ! 25 % !
+Arthur    : Mais c'est pareil ! Le public s'en fout que ce soit 5 % ou 25 % : les spectateurs ne vont pas vérifier les comptes !
+Dominique : Mais c'est dans le texte ! Et, je ne vois pas pourquoi Dupantois irait dire à sa femme que les affaires sont bonnes si l'augmentation n'était que de 5 % !
+Arthur    : Une entreprise qui progresse de 5%, c'est déjà beau de nos jours.
+Dominique : Mais on est en 1921 ! En 1921 ! Allez les enfants, on reprend !
+Arthur    : O.K, O.K, t'énerve pas Dominique. Hum, hum (Il éclaircit sa voix). Ma chère Rosalie, sans vouloir me vanter, je peux affirmer que la ... (Il est interrompu par la sonnerie originale de son téléphone portable). Merde, on m'appelle. Excusez. (Il met son téléphone à son oreille.)
+Dominique : On ne va jamais y arriver... Bon, on fait une pause de cinq minutes.
+Anne      : J'ai fait un gâteau au chocolat ! Allez Dominique ne fais pas cette là, on sera prêt demain.
+Dominique : J'espère... le public de Doulon est tellement exigeant... (Elles sortent.)
+###Scène 2
+Arthur    : Allô ?... Oui, Arthur Poe à l'appareil... Oui, je sais... trois cent mille euros, oui je sais... bah... Pour vous dire la vérité, j'ai eu un peu de mal à réunir la totalité de la somme, mais ne vous inquiétez pas, le compte y est presque... Combien ? Euh... pour l'instant je peux vous donner 1412 euros, mais le reste suivra, ne vous inquiétez pas... mais non je ne me fous pas de vous... Combien j'ai de doigts ? ... (Il regarde ses doigts.) Bah dix, pourquoi vous me demandez combien j'ai de doigts ?... Comment ça je risque d'en avoir moins dans peu de temps ? Je ne comprends pas... Aaaah !.... Je.... Allô ?... Allô ? Il a raccroché... Il veut me couper les doigts un par un si je ne lui donne pas ses trois cent mille euros ! (Arthur s'assoit, il a la tête entre les mains.) C'est pas vrai... c'est pas vrai... dites-moi que ce n'est pas vrai... (Il contemple ses doigts.) Mes doigts, mes chers petits doigts... Mais pourquoi j'ai fait ça ?! Hein pourquoi ?! Quel abruti... mais quel abruti ! Comment je vais faire pour m'en sortir ?... Se ruiner sur une partie de poker... mais quel abruti... (Dominique entre. Elle mange une part de gâteau.)
+Arthur    : Comment je vais faire pour m'en sortir ? Je suis nul... nul !
+Dominique : Il ne faut pas prendre les choses comme ça, Arthur. Tu n'es pas nul mais tu oublies ton texte car tu as le trac. Tu sais, ça arrive aux plus grands comédiens d'avoir le trac. Il y en a même, qui vomissent de peur avant de monter sur scène. Allez ! Prends confiance !... Tu veux du gâteau ?
+Arthur    : Merci, je n'ai ni envie de vomir, ni envie de manger. (Anne entre avec une part de gâteau bien entamée.)
+Anne      : Et Sandra, elle n'est toujours pas là ? Il y a du gâteau pour elle.
+Sandra    : (Une femme, habillée normalement, sort du public, elle tient un sac de sport.) Je suis en retard ! Excusez-moi !
+Dominique : Ah ! La voilà ! (Sandra monte sur scène.)
+Dominique : Sandra, mais où est-ce que tu étais ? Ça fait trois quart d'heure qu'on t'attend !
+Sandra    : J'étais avec la police !
+Arthur    : Hein ? Qu'est-ce que... (Sandra pose son sac de sport sur le sol.)
+Sandra    : Oh là là qu'est-ce que j'ai eu peur ! Regardez mes mains... j'en tremble encore.
+Arthur    : Mais qu'est-ce que tu racontes ? Tu n'étais pas à ton aquagym ?
+Sandra    : J'ai fait piscine et police... En fait, après mon aquagym je suis allée acheter un cadeau pour Josiane, à la bijouterie.
+Arthur    : À la bijouterie ?
+Sandra    : Tu sais bien que ma copine Josiane va fêter ses 20 ans de mariage et je voulais lui offrir un collier.
+Arthur    : Ah oui c'est vrai... et alors ?
+Sandra    : Eh bien, j'étais dans la bijouterie, je regardais les colliers... Oh ! ils en ont des beaux vous savez.. et paf ! d'un seul coup, trois types avec une cagoule sont entrés !
+Anne      : Avec une cagoule ?
+Sandra    : Oui ! Ils avaient chacun une cagoule, on ne voyait pas leur visage et surtout : ils avaient des pistolets ! Des gros pistolets ! Oh là là, qu'est-ce que j'ai eu peur...
+Arthur    : Waouh !
+Sandra    : Avec leurs gros pistolets ils ont menacé le bijoutier et les clients. Un des types a même pointé son pistolet vers moi ! Il m'a visé je te jure ! Comme ça ! (Elle mime.) Je n'avais jamais vu un gros pistolet comme ça, moi !
+Anne      : Et il t'a tiré dessus ?
+Sandra    : Quoi ? Mais non voyons ! Ils ont mis plein de bijoux dans leur sac et hop ils ont disparu ! Ils ont même pris le collier que je voulais offrir à Josiane !
+Anne      : Non ?!
+Sandra    : Qu'est-ce que j'ai eu peur... Après la police est venue pour nous poser des questions. Le bijoutier a dit qu'il y en avait pour a peu près 500 000 euros.
+Arthur    : Ils ont disparu avec un butin d'un demi million d'euros ?!
+Sandra    : Oui et un policier a dit que ça va être difficile de les retrouver.. Oh là, là, je suis toute retournée, moi... Qu'est ce qu'il était gros le pistolet...
+Anne      : Bon... le principal, c'est que tu n'as pas été tuée, ou même pire : blessée.
+Sandra    : J'ai eu peur... j'ai eu tellement peur.
+Arthur    : 500 000 euros... eh bien, eux, ils n'ont pas perdu leur journée...
+Dominique : Sandra, ça va aller pour faire la répétition ?
+Sandra    : Oui, oui, ça va aller... Mais, qu'est-ce que j'ai eu peur...
+Dominique : Écoutez, on va reprendre la scène juste après « Jules, je suis fière de vous ». Sandra, s'il te plaît, tu mettras ton costume de bonne plus tard. Tu peux sortir de la scène ?
+Sandra    : Oui, oui.. Mais franchement, qu'est ce qu'il était gros le pistolet... (Sandra sort.)
+###Scène 3
+Dominique : Et Jacques il est là ? Je vous signale que ça va bientôt être à lui d'entrer en scène : Louis Legendre va arriver tout content avec un bouquet de fleurs et il va découvrir que sa femme s'est remariée avec Dupantois.
+Anne      : Il n'est jamais en retard d'habitude.
+Dominique : Personne ne l'a vu ? Il est peut-être entrain de mettre son costume. Allez on reprend. « À quelle heure on ment ? », Acte1, scène 1. Anne, c'est à toi.
+Anne      : Jules, je suis très fière de vous.
+Arthur    : Vous êtes également fière de m'avoir épousé l'année pro... l'année dernière ?
+Anne      : Oh ne me faites pas rougir. La bonne pourrait nous entendre.
+Arthur    : Mais non, Marie est à moitié aveu... à moitié sourde. (La bonne, Sandra, entre. Elle tient un plateau sur lequel est posée une carafe.)
+Sandra    : Hum, hum.
+Anne      : Oui Marie ?
+Sandra    : Un monsieur est dans le vetsibule... Il souhaiterait parler à madame.
+Arthur    : Faîtes-le entrer, je vous prie.
+Sandra    : Il m'a dit qu'il veut parler uniquement à madame.
+Arthur    : Allons donc ! Voilà un comportement un peu chevalier.
+Dominique : Cavalier ! Pas chevalier mais cavalier !!
+Arthur    : Allons donc ! Voilà un comportement un peu cavalier. Cet homme s'est présenté ?
+Sandra    : Oui, il s'est présenté.
+Arthur    : Et alors ? Comment s'appelle-t-il cet homme qui veut parler à mon épouse ?
+Sandra    : Il s'appelle Louis Legendre. Monsieur est revenu. Monsieur est mort à la guerre... Euh pardon, je me suis plantée. Monsieur n'est pas mort à la guerre.
+Anne      : Aaaah ! Mon Dieu ! mon mari n'est plus mort ! (Rosalie s'évanouit.)
+Arthur    : Mais c'est impossible ! Marie ! C'est impossible !
+Sandra    : C'est un miracle, monsieur.
+Dominique : C'est nul ! Vous allez voir : le public de Doulon va se foutre de nous !!!
+Anne      : On va y arriver Dominique, c'est juste une question de concentration. (Un homme entre, il est en peignoir et porte des lunettes noires. Il semble complètement déprimé.)
+Dominique : Ah Jacques ! Tu n'as pas mis ton costume ?
+Jacques   : Je ne vais pas bien du tout... vous savez que ma femme est avec un autre ?
+Dominique : Oui, elle est avec Dupantois, mais ce n'est pas ton texte Jacques !
+Jacques   : Ma femme, ma vraie femme, Nathalie... Elle est partie.
+Sandra    : Oh là là !
+Jacques   : Nathalie m'a quitté. Je pensais qu'elle resterait mais elle est partie ce matin. Hier, j'étais allongé sur le divan et mon psy m'a dit qu'elle resterait sûrement, que j'étais un type bien… Psychologue de mes fesses, oui ! Elle est partie pour de bon !
+Dominique : Ça va s'arranger, ça va s'arranger.
+Jacques   : Vous le trouvez beau, vous votre assureur ?
+Sandra    : Euh... Notre assureur ? Euh, non pas spécialement.
+Jacques   : Nathalie le trouve beau. Elle est partie avec lui.
+Dominique : Tout finira par s'arranger, c'est rien, Jacques. Les enfants, on reprend ?
+Jacques   : Il m'a fait signer un contrat assurance-vie et hop ! il est parti avec elle. Vous trouvez ça correct vous ?... Je n'ai plus de femme, plus d'avenir.
+Dominique : Ça va s'arranger.
+Jacques   : Cette année, je me suis pendu trois fois pour elle...
+Dominique : C'est rien, c'est rien.
+Sandra    : Il ne faut pas désespérer Jacques ! On est là, allez ! accroche-toi !
+Jacques   : Tu as raison Sandra, il faut que je m'accroche.
+Dominique : Oui, c'est ça, accroche-toi. Allez les enfants, on reprend.
+Jacques   : Je vais m'accrocher à une corde pour la quatrième fois !
+Sandra    : Mais non voyons !
+Jacques   : Mais si ! Et je ne me louperai pas cette fois-ci, vous verrez ! Ce soir, je me pends !
+Dominique : Non pas ce soir ! On joue demain !
+Anne      : Allez, Jacques tu vas aller mettre ton costume et faire la répète avec nous, ça va te changer les idées.
+Jacques   : Non, je préfère vous laisser, j'aimerais bien aller mourir tranquillement chez moi.
+Dominique : Mais non ! Il n'en n'est pas question ! Demain on joue pour la première fois et on a besoin de toi !
+Arthur    : Ouais, et là on est en forme : on maîtrise le texte à fond !
+Sandra    : Tu sais ce que tu vas faire ? Tu vas t'entraîner avec nous et après, tu rentreras chez toi, tu te feras couler un bon bain chaud et tu mettras de la musique à tue tête, et tu verras ça ira beaucoup mieux !
+Arthur    : Et après tu te feras un bon petit plat, il n'y a rien de tel pour garder le moral ! La bonne bouffe, c'est le meilleur des remèdes !
+Sandra    : Tu n'as pas le gaz au moins chez toi ?
+Jacques   : Non, tout est électrique, pourquoi ?
+Dominique : Allez, on fait comme ça.
+Jacques   : Oui... ce soir je prendrai un bain tiède et après je me ferai cuire une endive... Vous êtes gentils vous... Quand les gens sont trop gentils avec moi, j'ai les larmes qui me montent aux yeux... Regardez, je pleure.
+Dominique : Voilà, c'est parfait ! Allez, va mettre ton costume et joue-nous un Louis Legendre gai comme un pinson !
+Jacques   : Ça me fait chaud au cœur de pleurer.
+Dominique : C'est parfait. On t'attend Jacques. (Jacques sort.)
+Anne      : Sandra j'ai fait du gâteau au chocolat. Tu en veux ? Dominique, on peut faire une petite pause ?
+Dominique : Mais on vient d'en faire une !
+Sandra    : Bonne idée. Je vais aussi en profiter pour enfiler mon costume de bonne. Tu viens Arthur ?
+Arthur    : Oui, oui, je vous rejoins.
+Dominique : Cinq minutes pas plus ! Après on reprendra toute la scène. (Anne, Dominique et Sandra sortent. Arthur est seul, il regarde le sac de sport de Sandra.)
+###Scène 4
+Arthur    : Pourquoi j'ai joué au poker avec des types beaucoup plus forts que moi ? Hein ? Pourquoi ?... Je suis foutu... foutu... (Il s'approche du sac de sport.)
+Arthur    : Je vais ranger le sac de Sandra, tant que j'ai encore mes doigts... (Il soulève le sac et semble surpris par quelque chose. Il met son oreille sur le sac, le pose et l'ouvre.)
+Arthur    : C'est bizarre... Oohhh ! Mais qu'est-ce que c'est que ça ?!!! Il y a plein de bijoux là- dedans !... (Il regarde dans le sac.)... Y'en a plein !.... Le butin ! C'est le butin !! Un demi million dans le sac de Sandra ! 500 000 euros !!! Mais... mais... c'est Sandra qui a piqué tout ça ?... Ce n'est pas possible, pas elle... 500 000 !.. Il leur faut trois cent mille euros... Je... je vais arranger ça tout de suite ! Je vais sauver mes doigts ! (Arthur prend le sac et sort rapidement. Dominique entre, suivi de Anne qui tient une part de gâteau.)
+Anne      : Je ne sais pas si c'est le trac, mais je ne peux pas m'empêcher de me goinfrer de gâteau ! Au fait Dominique, toute la technique est opérationnelle ? Tu n'as pas de problème particulier ?
+Dominique : Non, je m'en charge personnellement et tout va pour le mieux. Allez, on reprend les enfants. Il est où Arthur ? Et Sandra ? (Sandra entre, elle est habillée en bonne.)
+Sandra    : Voilà, voilà, je suis prête.
+Dominique : Il vient Arthur ? (Elle l'appelle) Arthur ? On reprend !!! On va recommencer depuis le début. Jacques a mis son costume, tout est O.K. Arthur ! On t'attend !... Mais où il est passé Arthur ? Il le fait exprès ou quoi ?!
+Anne      : Je ne l'ai pas vu. Il a dû s'absenter, il avait peut-être une course à faire.
+Dominique : Mais on ne sort pas d'ici sans prévenir ! Allons les enfants ! Allez ! on n'a pas le temps de l'attendre. On reprend tout et c'est moi qui vais dire son texte. Sandra tu peux sortir s'il te plaît ?
+Sandra    : Oui, je me prépare. (Sandra sort.)
+Dominique : Allez, on y va.
+Anne      : J'irais bien me chercher une autre part de gâteau, moi.
+Dominique : Anne, plus tard, s'il te plaît. Allez... hum hum... (Dominique s'éclaircit la voix et lira son texte pendant toute la scène.) Ma chère Rosalie, sans vouloir me vanter, je peux affirmer que la filature Legendre ne s'est jamais aussi bien portée. Ce matin, le comptable m'a transmis les chiffres : nous avons encore progressé de 25 %. Vous verrez que l'année 1921 sera excellente.
+Anne      : Jules, vous êtes le meilleur entrepreneur de la ville.
+Dominique : Allons, allons...
+Anne      : Cela fait maintenant plus de trois ans que vous gérez la fitalure... Ah ! J'ai du mal avec ce mot ! La fi-la-ture de mon pauvre mari, mort à la guerre.
+Dominique : Il est mort en héros. Paix à son âme.
+Anne      : Jules, je suis très fière de vous.
+Dominique : Vous êtes également fière de m'avoir épousé l'année dernière ?
+Anne      : Oh ne me faites pas rougir. La bonne pourrait nous entendre.
+Dominique : Mais non, Marie est à moitié sourde.
+Sandra    : (La bonne entre, Sandra tient un plateau sur lequel est posée une carafe.) Hum, hum.
+Anne      : Oui Marie ?
+Sandra    : Un monsieur est dans le vetsibule.
+Dominique : Vestibule...
+Sandra    : J'arrive jamais à dire vetsibule.
+Dominique : Utilise un moyen mnémotechnique ! Par exemple, pense à une veste.
+Sandra    : Une veste ?
+Dominique : Oui, une veste, et comme tu auras le début du mot, le reste viendra tout seul.
+Sandra    : Ah c'est pas bête ! Veste ! Vestibule !
+Dominique : Allez, à toi. Donne ta réplique
+Sandra    : Un monsieur est dans le veste-ibule. Il souhaiterait parler à monsieur.
+Dominique : Pas à monsieur ! À madame ! Il veut parler à madame ! Ton texte Sandra, ton texte !
+Sandra    : Un monsieur est dans le veste-ibule, il souhaiterait parler à madame.
+Dominique : Faîtes-le entrer, je vous prie.
+Sandra    : Il m'a dit qu'il veut parler uniquement à madame.
+Dominique : Allons donc ! Voilà un comportement un peu cavalier. Cet homme s'est présenté ?
+Sandra    : Oui, il s'est présenté.
+Dominique : Et alors ? Comment s'appelle-t-il cet homme qui veut parler à mon épouse ?
+Sandra    : Il s'appelle Louis Legendre. Monsieur est revenu. Monsieur n'est pas mort à la guerre.
+Anne      : Aaaah ! Mon Dieu ! mon mari n'est plus mort ! (Rosalie s'évanouit.)
+Dominique : Mais c'est impossible ! Marie ! C'est impossible !
+Sandra    : C'est un miracle, monsieur.
+Dominique : Elle a perdu connaissance, Marie, vite donnez moi cette carafe !
+Sandra    : Monsieur ne préfère pas que je lui apporte du poivre ?
+Dominique : Du poivre ? Pourquoi du poivre ? Tu dois dire : « Monsieur ne préfère pas que je lui apporte des sels ? »
+Sandra    : À oui je confonds... C'est à cause de la vinaigrette.
+Dominique : À cause de la vinaigrette ? Quelle vinaigrette ?
+Sandra    : Le sel, le poivre, tout ça, c'est pour assaisonner.
+Dominique : Mais pas du tout ! Pas du tout ! À l'époque on soignait l’évanouissement en faisant respirer des sels à base d'ammoniac !
+Sandra    : Ah ? Je me disais aussi. À quoi ça sert de saler une personne qui est tombée dans les pommes ?
+Dominique : On reprend ! Sandra tu dis : « C'est un miracle, monsieur ».
+Sandra    : C'est un miracle, monsieur.
+Dominique : Elle a perdu connaissance, Marie, vite donnez moi cette carafe !
+Sandra    : Monsieur ne préfère pas que je lui apporte des sels ?
+Dominique : Bon à ce moment Dupantois prend la carafe et verse de l'eau sur le visage de sa femme. On le fera uniquement demain.
+Anne      : Il ne faudra pas trop me tremper, hein ? Je n'ai pas envie de recevoir toute cette flotte sur la tête !
+Dominique : Oui, Arthur fera attention. Allez, on continue. Sandra vas-y.
+Sandra    : C'est un miracle, monsieur.
+Dominique : Elle a perdu connaissance, Marie, vite donnez moi cette carafe !
+Sandra    : Monsieur ne préfère pas que je lui apporte du poi... des sels ?
+Dominique : Excusez-moi de vous arroser de la sorte mais vous devez absolument vous réveiller !
+Anne      : Où suis-je ? Ah mon Dieu ! Louis est ressuscité !
+Sandra    : Vous souhaitez que je le fasse entrer ?
+Dominique : Et à cet instant précis Louis Legendre entre avec un bouquet de fleurs. Il est jovial... Jacques ! C'est à toi !
+Jacques   : (Jacques est en costume d'époque, il tient un bouquet de fleurs artificielles. Il est complètement déprimé.) Quelle joie de retrouver son épouse. Quel bonheur.
+Dominique : Non Jacques ! Tu dois être fou de bonheur ! Tu retrouves ta femme que tu n'as pas vue depuis plus de trois ans !
+Jacques   : Nathalie est partie... je ne la reverrais peut-être jamais...
+Dominique : Jacques, s'il te plaît : tu sors et tu rentres.
+Jacques   : Je sors ou je rentre ?
+Dominique : Les deux ! Et tu deviens joyeux ! Tagada tsoin ! Tsoin ! Tu kiffes la vie !
+Jacques   : C'est ça... c'est ça, je kiffe... (Jacques sort.)
+Dominique : Mais on ne va jamais y arriver ! Ce n'est pas possible les enfants !... Rosalie dit « Ah mon Dieu ! Louis est ressuscité ! », tu dis « Vous souhaitez que je le fasse entrer ? » et là, il entre avec un grand sourire ! (Dominique montre du bras la porte)
+###Scène 5
+Arsène    : (Une femme sérieuse, habillée en civil ouvre la porte et entre. Elle montre sa carte de police. Elle n'est pas du tout souriant.) Mesdames, Monsieur... Commissaire Arsène. Je souhaiterais parler a madame Poe. Elle est là ?
+Sandra    : Oui, c'est moi.
+Arsène    : Vous êtes Sandra Poe?
+Sandra    : Sandra Poe, oui c'est moi... Je vous présente Dominique la metteuse en scène et Anne une actrice.
+Dominique : Nous répétons une pièce. La première se passe demain et nous n'avons pas trop le temps de...
+Arsène    : Moi non plus je n'ai pas beaucoup de temps.
+Sandra    : Madame le Commissaire, vous venez à cause du vol dans la bijouterie ? Vous avez retrouvé les trois voleurs ?
+Arsène    : Pas encore, pas encore mais ça ne va pas tarder... Les agents de police que vous avez vus à la bijouterie, m'ont expliqué la situation. Et, j'ai une question qui me turlupine... Chère madame, les autres témoins m'ont dit que les voleurs sont partis avec un sac.
+Sandra    : Oui c'est vrai, c'est ce que j'ai vu aussi.
+Arsène    : De quelle couleur était ce sac ?
+Sandra    : Alors là... Je ne sais plus... 
+Sandra    : (Arthur entre, il tient le sac de sport.) Eh bien le voilà !
+Arthur    : (Arthur sursaute en voyant une femme qu'il ne connaît pas. Arsène le regarde très sévèrement.) Euh... vous voulez quelque chose ?
+Arsène    : Oui, voilà ce que je veux ! (Elle montre du doigt le sac que tient Arthur.)
+Arthur    : (Arthur pose le sac et regarde ses doigts.) Vous voulez mes doigts ?
+Arsène    : Mais... Je m'en tape de vos doigts ! Je parle de ce sac ! Je suis le Commissaire Arsène . Et vous ?
+Sandra    : C'est mon mari !
+Arsène    : Vous êtes monsieur Poe ?
+Arthur    : (Nerveux) La police déjà ? Poe, Poe, oui c'est moi. Arthur Poe.
+Sandra    : Excusez-le il est très nerveux en ce moment, il dort mal.
+Arsène    : Ah ? Vous avez des ennuis ?
+Arthur    : Mais pas du tout, pas d'ennui, non merci, ça va... et vous ?
+Sandra    : Arthur, pourquoi es-tu parti avec mon sac de sport ? On le cherchait partout.
+Anne      : Oui, on se demandait où il était.
+Arthur    : Euh j'étais parti faire un tour...
+Arsène    : Où étiez-vous exactement ?
+Arthur    : Je me suis dit... tiens je vais aller marcher et je vais en profiter pour aller acheter quelques boissons. Je suis donc passé à la supérette qui est juste à côté du théâtre.
+Arsène    : Pourquoi vouliez-vous acheter des boissons ?
+Arthur    : Mais pour fêter notre dernière répétition ! Demain c'est la première, on joue devant les habitants de Doulon.
+Dominique : Et c'est un public très exigeant !
+Arsène    : Monsieur Poe, quel est le rapport entre ce sac et vos boissons ?
+Arthur    : Le sac, c''était pour mettre les bouteilles, voyons ! Suivez un peu...
+Arsène    : Eh bien, on va l'ouvrir ensemble ce sac.
+Arthur    : Oh non, ne vous donnez pas cette peine. Je vais aller le ranger tout de suite, n'en parlons plus...
+Arsène    : J'y tiens !
+Arsène    : (Arsène prend le sac et l'ouvre en laissant planer le suspens : le sac est vide.) Il n'y a rien dans ce sac, il est vide.
+Arthur    : Ah oui ?
+Arsène    : Où sont passées vos bouteilles ?
+Arthur    : C'est la caissière de la supérette ! Ah l'andouille ! Elle a oublié de mettre mes bouteilles dans le sac !
+Sandra    : Arthur, où sont mes affaires ?
+Arthur    : Hein ? Quoi ?
+Sandra    : Quand je suis arrivée avec mon sac, il y avait mes affaires dedans. Où est-ce que tu les as mises ?
+Arthur    : Mais... il n'y avait rien dans ce sac, il était vide.
+Sandra    : Mais si, je te jure qu'il était plein quand je suis arrivée avec.
+Arthur    : Non, il était vide.
+Arsène    : Il était vide ou il était plein ? Faudrait savoir !
+Sandra    : Plein.
+Arthur    : Vide.
+Sandra    : Plein.
+Arsène    : Madame ! Qu'est_ce qu'il y avait dans ce sac ?!
+Sandra    : Mes affaires de piscine : mon maillot de bain, ma serviette de bain, ma brosse à cheveux et un élastique pour les cheveux.
+Arthur    : Ah ! Vous voyez ! Un élastique, ce n'est rien ! J'ai pris le sac de sport, je l'ai vidé : j'ai enlevé les affaires de piscine de ma femme et une fois que le sac était vide je suis allé à la supérette. Voilà, c'est ce que je me tue à vous dire depuis le début !
+Arsène    : J'espère que tout ça, ce n'est pas du pipo, Poe !
+Arthur    : C'est la vérité, j'le jure !
+Arsène    : Bon, bon, bon... (Elle réfléchit.) Très bien, ça tient la route tout ça... Je ne vais pas vous déranger plus longtemps.. Au fait, elle s'appelle comment votre pièce ?
+Dominique : À quelle heure on ment ?
+Arsène    : Bah, je n'en sais rien moi, vous pouvez bien manger à l'heure que vous voulez. Qu'est-ce que vous voulez que ça me fasse ?!
+Dominique : C'est le titre de la pièce. Ce n'est pas : « À quelle heure on mange ? » mais c'est : « À quelle heure on ment ? ».
+Arsène    : Ah ? Et ?
+Dominique : C'est un petit jeu de mot.
+Arsène    : Et il est censé être drôle ce jeu de mot ?
+Dominique : Dans la pièce, à la fin du premier acte, Dupantois ment à sa femme comme un arracheur de dents. Et il fait un lapsus, au lieu de lui demander: « à quelle heure on mange ? ", il se trompe et dit : " à quelle heure on ment ? "… d'où le titre.
+Arsène    : Eh bien… ça a l'air complètement débile votre pièce.
+Dominique : On ne juge pas une pièce à son titre ! Et ce n'est pas moi qui l'ai choisi ce titre mais l'auteur !
+Arsène    : Eh bien... J'ai l'impression qu'il est dérangé des méninges votre auteur… Et ça parle de quoi cette pièce ?
+Dominique : Nous sommes en 1921. Une femme est persuadée que son mari est mort à la guerre. Son mari, c'est Monsieur Legendre , il était le directeur d'une filature. Et la femme s'est remariée avec un autre homme, Monsieur Dupantois qui a repris l'entreprise.
+Arsène    : Et alors ?
+Dominique : Et alors, coup de théâtre : Monsieur Legendre n'est pas mort et il réapparaît !
+Arsène    : Mouais... ça doit être chiant. Bon je vous laisse. Mesdames, Monsieur. (Le Commissaire Arsène sort.)
+##Acte 2
+###Scène 1
+Sandra    : (Arthur est avec sa femme, Sandra.) Dis-moi la vérité Arthur, je vois bien que ça ne va pas.
+Arthur    : Mais si ça va.
+Sandra    : Tu ne dors plus, tu es toujours nerveux, tu t'éclipses en plein milieu de la répétition sans rien dire... Tu as une maîtresse, c'est ça ?
+Arthur    : Mais non ! J'ai... Oh et puis, tant pis, tu as raison, je vais tout t'avouer...
+Sandra    : Tu vois une femme en cachette ?
+Arthur    : Non, c'est deux hommes.
+Sandra    : Pardon ?
+Arthur    : J'ai joué avec deux hommes.
+Sandra    : (abasourdie) Toi avec des hommes ?... avec des hommes... oh là là...
+Arthur    : J'ai joué et crois-moi ça fait très mal.
+Sandra    : Mais qu'est-ce que tu racontes ?!
+Arthur    : C'était la première fois... Et ce sera la dernière ! Je ne recommencerai plus, ça m'a servi de leçon, crois-moi !
+Sandra    : Arthur ? Je ne...
+Arthur    : Au début, ils me faisaient croire qu'ils étaient débutants, ils me laissaient faire, tranquillement, tu vois ?
+Sandra    : Euh...
+Arthur    : Et franchement, c'était génial ! Tu m'aurais vu, tu aurais été fière de moi !
+Sandra    : Bah...
+Arthur    : À chaque fois bingo ! Tout ce que j'entreprenais, ça marchait ! La chance du débutant ! Ils étaient minables ! Ils se couchaient à chaque fois ! Pif ! Paf ! Et tout ça, avec des petites paires en plus !
+Sandra    : Ah ?
+Arthur    : Et là le plus costaud, il met tout sur le tapis ! Tout ! Le truc énorme ! Et là j'avoue... ça me fait un peu peur.. Je fais les comptes... Trois cent mille si je gagne.
+Sandra    : Il y avait de l'argent à gagner ?
+Arthur    : Sandra, je suis désolé mais j'ai perdu 300 000 euros au poker. C'était un coup monté. Les deux types savaient très bien ce qu'ils faisaient. Ils m'ont laissé gagner au début pour pouvoir mieux me plumer à la fin.
+Sandra    : Tu as perdu au poker ?!
+Arthur    : 300 000 euros oui... C'était la première fois que je jouais. J'avais croisé ces deux types au petit bistrot de la rue. Je ne les connaissais pas. J'aurais dû me méfier...
+Sandra    : 300 000 euros...
+Arthur    : Après, ils m'ont fait chanter. Si je ne leur donnais pas les 300 000 euros, ils devaient me couper les doigts.
+Sandra    : 300 000 euros...
+Arthur    : Je ne dormais plus... j'étais foutu... Heureusement que tu as pris le sac des voleurs ! J'ai sauvé mes doigts Sandra ! Je leur ai donné leur fric !
+Sandra    : Ça me revient, leur sac était identique au mien... Un voleur à posé son sac à côté du mien, et après il a dû se tromper : il est parti avec mon sac de piscine ! Et moi je suis partie avec le sien qui était plein de bijoux ! Oh Arthur ! Il faut le dire au Commissaire Arsène ! Il faut rendre l'argent !
+Arthur    : Certainement pas ! Et qu'est-ce que tu vas dire à cette flic ? « Je vous rends une petite partie des bijoux. Les trois cinquième ne sont plus là. On avait une dette, on s'est servi »...
+Sandra    : Oh là là... Tu as raison, on n'a pas le choix.... On doit garder ces bijoux.
+Arthur    : (Ravi) Et ouais... on n'a pas le choix...
+Sandra    : Tu me jures que les voleurs ne vont pas nous retrouver ?
+Arthur    : Je te le jure, Sandra.
+Sandra    : Et si le Commissaire devinait tout ? Elle est venue ici pour poser des questions sur la couleur du sac ! Elle se doute de quelque chose !
+Arthur    : Mais non ! De toute façon, j'ai planqué les 200 000 euros de bijoux. Elle ne les trouvera jamais !
+Sandra    : Et tu les as cachés où ?
+Arthur    : (Arthur se retourne pour être sûr que personne ne l'entend.) Dans une de mes chaussettes. Elle est dans le vestiaire du théâtre.
+Sandra    : Mais pourquoi dans des chaussettes ? C'est idiot !
+Arthur    : j'ai pris ce que j'avais sur la main... Il nous faut un code, maintenant.
+Sandra    : Un code ? Pourquoi faire ?
+Arthur    : Quand on ment, ou si on est en danger. Il nous faut un code pour se prévenir discrètement. Par exemple, tu… je ne sais pas tu te grattes le nez ou les oreilles.
+Sandra    : Oh là là...
+Arthur    : Bon, je te laisse, à tout de suite. (Arthur sort.)
+###Scène 2
+Dominique : (Dominique, Anne et Jacques entrent sur la scène.) Tu en fais une tête Sandra, tu ne veux plus répéter ?
+Sandra    : Si, si Dominique. On va se gratter... on va répéter.
+Dominique : Alors, on ne perd plus de temps : les enfants, on va répéter la première scène du deuxième acte. Je vous fais un petit topo rapide : C'est le soir, il pleut, Louis Legendre vient voir son ex-femme. Il va essayer de la séduire. Il a deux objectifs : reprendre la main sur la filature et récupérer sa femme.
+Jacques   : On peut ?
+Dominique : Quoi ?
+Jacques   : On peut essayer de séduire sa femme pour pouvoir la récupérer quand elle est partie ?
+Dominique : Euh, oui on peut... Bon.. Au départ Rosalie est avec la bonne. Louis Legendre entre joyeux, il tient un parapluie et cache un bouquet de roses dans son dos. À vous les enfants, à vous de jouer. Jacques tu sors deux secondes s'il te plaît.
+Jacques   : Oui je sors et j'entre.
+Dominique : (Rosalie/Anne est avec la bonne/Sandra. Jacques entre, il semble triste.) Louis Legendre entre joyeux ! Fais-nous un beau sourire Jacques ! Allez ! (Jacques se force à sourire, il tient un parapluie et cache un bouquet de fleurs artificielles dans son dos.)
+Anne      : Dominique, on aura des vraies roses demain ? Ça fait vraiment pacotille ce plastique.
+Dominique : Oui, c'est prévu : Jacques passera chez le fleuriste demain, juste avant la représentation, comme ça les roses seront fraîches.
+Sandra    : Si monsieur veut bien me donner son parapluie... Ah oui autre chose : ce parapluie se coince tout le temps.
+Dominique : Comment ça, il se coince ?
+Sandra    : Je n'arrivais pas à le refermer tout à l'heure.
+Dominique : Ce sont juste les baleines qui sont un peu tordues. Je vais m'en occuper, il n'y a pas de problème. Sandra, tu reprends s'il te plaît.
+Sandra    : Si monsieur veut bien me donner son parapluie. Elle ne cessera donc jamais de tomber cette pluie ?
+Jacques   : C'est l'automne, Marie, c'est l'automne. (Il donne son parapluie à Sandra. Elle le met dans le porte-parapluies qui est situé à gauche de l'entrée.)
+Sandra    : Au fait, il faudra bien penser à le laisser ici ce porte-parapluies. La dernière fois quelqu'un l'a déplacé, et j'ai dû traverser toute la scène. Franchement, j'avais l'air d'une cruche.
+Dominique : Ne t'inquiète pas, le porte-parapluies sera à sa place. Allez ! On continue, et les enfants, je vous en prie : arrêtez de faire tout le temps des remarques !... C'est à toi Sandra.
+Sandra    : Je reprends... Si monsieur veut bien me donner son parapluie. (Le parapluie a été mis dans le porte-parapluies).
+Jacques   : Il est là mon parapluie... (Il montre le parapluie qui est dans le porte-parapluies.)
+Sandra    : Elle ne cessera donc jamais de tomber cette pluie ?
+Jacques   : C'est l'automne, Marie, c'est l'automne.
+Anne      : Vous pouvez rentrer chez vous Marie. Bonne soirée.
+Sandra    : (Aimable) Bonne soirée madame. Bonne soirée monsieur.
+Sandra    : (Marie) sort. Louis Legendre montre son bouquet de fleurs à Rosalie.
+Jacques   : Rosalie ! Cette soirée est la plus belle des soirées !
+Dominique : Non. Tu dois dire : « Rosalie ! Cette soirée pluvieuse est la plus belle des soirées ! » N'oublie pas : « pluvieuse ». C'est dans le texte.
+Jacques   : Ah oui... C'est vrai. Rosalie ! Cette soirée pluvieuse est la plus belle des soirées !
+Anne      : Oh Louis ! Vos roses sont resplendissantes !
+Jacques   : Ma chère Rosalie, ce ne sont pas vos... ce ne sont pas mes roses, mais les vôtres.
+Dominique : On continue.
+Anne      : Elles sont magnifiques ! Oh soyez gentil Louis, voulez-vous les déposer dans ce vase ? (Legendre met les fleurs dans le vase. Rosalie s'approche du vase et les respire.)
+Anne      : Leur parfum est si frais, si délicat.
+Jacques   : Je préfère mille fois le vôtre. Dieu que vous êtes belle Nathalie.
+Dominique : Rosalie ! Pas Nathalie !
+Jacques   : Pardon... Je préfère mille fois le vôtre. Dieu que vous êtes belle Rosalie.
+Anne      : Oh Louis... Il ne faut pas. Vous savez bien que je me suis remariée. Mon mari ne rentrera pas cette nuit... n'en profitez pas Louis, je vous en prie.
+Dominique : Très bien Anne.
+Jacques   : Dupantois est un imbécile ! Je vais entamer un bras de fer avec lui et vous verrez, je retrouverai la place qui est la mienne !
+Dominique : C'est parfait Jacques.
+Anne      : Louis... Oh cette situation me rend tellement malheureuse. Je vous croyais mort Louis...
+Jacques   : Vous avez devant vous un homme bien vivant ! Un homme de poigne ! Je vais me battre pour reprendre la tête de la filature et ensuite je pourrai la gérer d'une main de fer ! Nathalie, vous tomberez dans mes bras à nouveau, je vous le promets !
+Dominique : Rosalie ! Pas Nathalie ! Rosalie ! Fais gaffe Jacques !
+Jacques   : Euh... Rosalie, vous tomberez dans mes bras à nouveau, je vous le promets !
+Anne      : Ne dites pas cela Louis, il ne faut pas... Oh, je souffre tant...
+Jacques   : Je ne veux pas vous faire souffrir Na... Rosalie. Je souhaite seulement vous retrouver. (Louis s'approche de Rosalie.)
+Jacques   : Venez dans mes bras.
+Anne      : Oh Louis... (Rosalie et Louis s'enlacent. Rosalie repousse Louis Legendre.)
+Dominique : C'est bien les enfants ! C'est très bien. On continue.
+Anne      : Non, il ne faut pas !
+Jacques   : J'ai écrit un poème pour vous Nathalie... euh pour vous Rosalie. Voulez-vous approcher cette chaise et vous y installer ?
+Anne      : Ah oui autre chose : la chaise est bancale. On a même l'impression qu'elle risque de se casser.
+Dominique : Je vais m'en occuper, il n'y a pas de problème. Donc Rosalie prend la chaise et s'installe à côté de Louis Legendre qui va lui lire son poème. Jacques tu n'as pas besoin de l'apprendre, tu liras le papier qui sera dans ta poche.
+Jacques   : Oui, tant mieux, les poèmes, c'est compliqué à mémoriser.
+Dominique : Je vous écoute les enfants, on reprend.
+Anne      : Un poème ? Pour moi ? Oh Louis... (Rosalie déplace la chaise et s'assied. Jacques sort un papier de sa poche et le lit .)
+Jacques   : Ma douce Rosalie, je serai votre délivrance. J'ai passé des nuits mortelles à penser à vous, Tout au fond des tranchées, dans l'eau et la boue. Ce soir, je vous offre mon cœur en toute confiance. Ma charmante Rosalie, votre regard m'émerveille, Et mon cœur fond comme neige au soleil.
+Anne      : Louis, on ne m'a jamais rien dit d'aussi beau...
+Jacques   : Moi, je le trouve nul ce poème.
+Dominique : Comment ça nul ?
+Jacques   : Bah.. ce n'est pas du Rimbaud !... Mon cœur fond comme neige au soleil, gna gna gna... Sincèrement, je n'y connais pas grand chose mais je suis certainement capable d'écrire un poème vachement mieux que celui-là.
+Dominique : Mais on ne te demande pas d'écrire un poème ! Et Louis Legendre n'est pas un poète ! Il a juste écrit ce texte pour séduire son ex-femme. Ce poème est maladroit, mais touchant. C'est ça qui compte : maladroit, mais touchant.
+Jacques   : Ça marche d'écrire une poésie pour retrouver sa femme ?
+Dominique : Euh... oui, ça peut marcher. Allez, les enfants, on continue. Maintenant, vous vous enlacez. (Ils s'enlacent.)
+Anne      : Mais Louis, je croyais que vous aviez perdu la mémoire ? Vous pensiez à moi sur les champs de bataille ?
+Jacques   : Je ne sais plus... J'imagine que j'ai dû le faire.
+Dominique : Donc là, Rosalie est troublée et elle change de conversation. Vas-y Anne.
+Anne      : J'ai demandé à Marie de vous préparer un thé. Le voulez-vous ?
+Jacques   : Avec plaisir. Vous n'en prenez pas ?
+Anne      : Non, pas ce soir. Un sucre ?
+Jacques   : S'il vous plaît. (Rosalie met un sucre dans sa tasse.)
+Dominique : Jacques, tu prends la tasse et tu brasses avec la petite cuillère. On doit voir que tu es très distingué. Tu peux même lever le petit doigt lorsque tu bois ton thé.
+Jacques   : Comme ça ? …
+Dominique : C'est parfait. Allez, on continue.
+Jacques   : Il est excellent.
+Anne      : Louis, je voulais vous dire que j'ai peur...
+Jacques   : Peur de quoi ? Peur d'être ici, seule avec moi ?
+Dominique : Très bien. Après, Rosalie ouvre le tiroir de la commode et sort une arme à feu : un pistolet.
+Anne      : Il sera bien dans le tiroir demain ?
+Dominique : Mais oui, l'arme factice sera à sa place dans le tiroir. Je vérifierai tout. Allez, les enfants, on reprend.
+Anne      : Louis, je voulais vous dire que j'ai peur...
+Jacques   : Peur de quoi ? Peur d'être ici, seule avec moi ?
+Jacques   : (Anne fait semblant de sortir une arme du tiroir.) Mon Dieu ! Une arme ?
+Anne      : J'ai trouvé ce pistolet dans le bureau de mon mari. J'ai peur pour vous Louis !
+Jacques   : Vous pensez que Dupantois veut m’assassiner avec ça ?!
+Anne      : Hélas, je le crains...
+Dominique : Très bien les enfants, très bien ! C'était parfait.
+Anne      : On fait une petite pause ? J'ai une envie de gâteau, moi.
+Dominique : O.K pour la pause, c'est bien mérité ! (Jacques, Anne, Dominique sortent. Arthur et Sandra entrent.)
+Dominique : (En sortant) C'était très bien . Je suis persuadée que la pièce « À quelle heure on ment ? » sera un succès ! vous verrez ! (À Sandra et Arthur) On fait une petite pause, vous venez ?
+###Scène 3
+Arthur    : Oui, oui, on vous rejoint. (Il est seul avec sa femme.)
+Sandra    : Arthur, je crois que je ne vais pas y arriver... les mensonges ce n'est vraiment pas mon truc.
+Arthur    : Mais ne t'inquiète pas et la flic ne verra rien ! c'est une imbécile ! Arsène est une abrutie ! Une débile !
+Arsène    : (Le Commissaire Arsène entre. Elle tient un sac plastique.) Vous disiez ?
+Arthur    : (Arthur sursaute.) Hein ? … Je disais que Dupantois, est un abruti ! C'est mon rôle dans la pièce. Il est bête vous ne pouvez pas imaginer à quel point... Un vrai débile...
+Arsène    : Bon, bon, bon... si ça vous amuse de jouer un crétin... Passons aux choses sérieuses : je reviens vous voir car j'ai une bonne nouvelle pour vous Sandra Poe.
+Sandra    : Une bonne nouvelle ? Ah ?
+Arsène    : Vous pourrez bientôt retourner barboter à la piscine.
+Sandra    : Ah ? Euh... je ne comprends pas...
+Arsène    : J'ai votre maillot de bain.
+Sandra    : Vous... Vous l'avez mis sur vous ?
+Arsène    : Comment ça sur moi ? Mais non ! On a retrouvé votre maillot de bain.
+Arthur    : Tu l'avais perdu et tu as prévenu la police pour ça ?!
+Sandra    : Mais non, je ne l'ai jamais perdu.
+Arsène    : On a retrouvé à 500 mètres de la bijouterie un maillot de bain, une serviette de bain, une brosse à cheveux et un élastique pour les cheveux.
+Arthur    : Mais... mais, ce n'est pas à toi, hein ? Ma femme n'a jamais perdu ses affaires de piscine. (Arthur se gratte le nez.)
+Sandra    : Ah non jamais !
+Arsène    : Et si, c'est à vous.
+Arthur    : Mais non, ce n'est pas à elle ! (Arthur regarde sa femme et se gratte les oreilles.)
+Arsène    : Mais si.
+Arthur    : Mais non. (Il se gratte de plus en plus.)
+Arsène    : Sandra Poe c'est bien vous, n'est-ce pas ? Sur le maillot de bain, il y a une étiquette. Et sur cette étiquette il est écrit « Sandra Poe » !
+Sandra    : Ah ? Vraiment ? (Sandra se gratte le nez en regardant Arthur.)
+Arthur    : Tu... tu mets des étiquettes à ton nom sur tes maillots de bain ?!
+Sandra    : Bah oui. On ne sait jamais... c'est pour éviter les vols. (Sandra se gratte les oreilles.)
+Arthur    : Tu as peur qu'on te vole ton maillot de bain pendant que tu nages ?! (Arthur se gratte le nez et les oreilles.)
+Sandra    : Mais pourquoi pas ? De toute façon, j'ai toujours mis des étiquettes sur mes vêtements ! J'en mets aussi sur mes maillots de bain et si tu veux le savoir j'en mets aussi sur mes sous-vêtements ! Voilà, c'est une habitude ! (Sandra et Arthur se grattent les oreilles.)
+Arsène    : C'est une très bonne habitude madame, qui nous a permis de retrouver vos affaires ! Voilà, je vous les rends... Mais pourquoi vous vous grattez comme ça ?! Vous avez des puces ou quoi ?!
+Arthur    : Hein ? Euh... on est allergique.
+Sandra    : Oui au pollen.
+Arthur    : Et c'est plein de pollen ici... une invasion de pollen dans ce théâtre... Il y a certainement un truc qui les attire... (Arthur se gratte.)
+Arsène    : Ah ? Eh bien un petit conseil : passez à la pharmacie, il existe certainement des médicaments efficaces ! (Le Commissaire commence à se gratter à son tour. Elle donne le sac plastique à Sandra.)
+Sandra    : Merci madame le Commissaire ! C'est drôlement gentil.
+Arthur    : (Hypocrite, Arthur lui sert chaleureusement la main) Je tiens aussi à vous remercier sincèrement, madame le Commissaire. Si, si, j'insiste. Ma femme aurait eu l'air de quoi à la piscine, sans maillot de bain ? Hein ?
+Arsène    : Maintenant, il va falloir m'expliquer ce que faisaient vos affaires de piscine posées sur une poubelle, au coin d'une rue, à 500 mètres de la bijouterie qui a été cambriolée.
+Arthur    : Sur une poubelle ?... Oui, oui, oui... il va falloir vous l'expliquer...
+Arsène    : Car tout à l'heure vous m'avez bien dit que les affaires de piscine de madame étaient dans le sac de sport, et que vous l'avez vidé pour ensuite aller acheter du cidre à la supérette.
+Arthur    : Du jus de pomme... c'était du jus de pomme.
+Arsène    : C'est pareil ! Alors, comment expliquez-vous que ce maillot de bain était posé sur une poubelle ?
+Arthur    : Mais... mais c'est facile à comprendre... c'est très facile à comprendre.
+Arsène    : Eh bien puisque c'est facile à comprendre, expliquez-moi.
+Sandra    : Il va vous le dire... il essaie de se gratter... de se rappeler.
+Arthur    : C'est facile à comprendre ! Vas-y, dis-lui Sandra que tu le trouvais moche ce maillot de bain, dis-lui !
+Sandra    : Je... Je le trouve très moche ce maillot de bain !
+Arthur    : Voilà ! Je ne te le fais pas dire !... Je vais vous dire toute la vérité... Pas de cachotteries entre nous... Ma femme détestait ce maillot de bain. Et elle m'a fait comprendre qu'elle aimerait bien que je lui en offre un autre pour son anniversaire... Vous me suivez ?
+Arsène    : Évidemment. Continuez.
+Arthur    : Eh bien, elle ne me le disait pas franchement, mais elle faisait souvent des remarques du style « Oh là, là... j'adore l'aquagym mais j'ai vraiment honte... ».
+Arsène    : Elle avait honte de quoi ?
+Arthur    : Voilà ! C'est ce que je lui demandais tout le temps ! Mais de quoi pouvait-elle avoir honte ? Hein ? Sandra je te le demande ! De quoi ?
+Sandra    : Je... je me sentais un tout petit peu grosse dans ce maillot de bain...
+Arsène    : Vous vous sentiez grosse ?
+Arthur    : Et oui ! Elle se sentait très grosse ! Elle me disait : « J'ai l'air d'une otarie à la piscine ». Hein Sandra ?
+Sandra    : (Vexée) Et pourquoi pas une baleine, pendant que tu y-es ?!
+Arthur    : Hein ?
+Sandra    : (Vexée) Tu sais ce qu'elle va te dire la baleine ?!!
+Arthur    : Mais je dis ça en me grattant ! (Il se gratte l'oreille.)
+Arsène    : Donc, si je comprends bien, vous êtes allée à la piscine. Ensuite vous êtes entrée dans la bijouterie.
+Sandra    : Exactement, et là, j'ai été témoin de cet horrible cambriolage. C'est là, que j'ai vu les trois voleurs avec leurs gros pistolets... Oh là là, qu'est-ce que j'ai eu peur.
+Arsène    : Et une fois que vous êtes sortie de la bijouterie, vous avez vidé votre sac sur une poubelle pour vous débarrasser de votre maillot de bain.
+Arthur    : Voilà ! Vous voyez que c'est simple à comprendre !
+Arsène    : Et la serviette de bain, la brosse et l'élastique pour les cheveux, vous vouliez aussi les jeter ?
+Arthur    : Mais oui ! Je lui aurais fait un beau cadeau avec tout ce qu'il faut pour aller à la piscine ! De vous à moi, je pensais même lui acheter également un masque de plongé et un tuba.
+Arsène    : Un masque et un tuba pour l'aquagym ?
+Arthur    : Exactement... c'est nouveau. Elles s'en servent pour... Sandra tu veux lui expliquer ?
+Sandra    : (Elle mime) Euh, oui. On a de l'eau jusqu'à la taille, on fait un « lever, baisser les bras » dix fois de suite et... si on veut on peut mettre un masque de plongé sur la tête.
+Arsène    : Bon, bon, bon, ça tient la route tout ça... Écoutez, je ne vais pas vous embêter plus longtemps. Je vais vous laisser travailler. Enfin... si on considère que faire les marioles devant un public, c'est du travail...
+Jacques   : (Jacques entre, il tient une part de gâteau.) Vous ne venez pas ? Il y a du gâteau.
+Sandra    : On arrive, on était en train de discuter avec le Commissaire Arsène. Vous voulez venir manger une part de gâteau avec nous ?
+Arsène    : Non merci, je n'aime pas les pâtisseries et de toute façon, j'allais partir, j'ai du travail qui m'attend.
+Sandra    : Très bien, comme vous voulez. Au revoir madame.
+Arthur    : (Mielleux) Au revoir madame le Commissaire... Mes hommages... (Sandra et Arthur sortent.)
+###Scène 4
+Arsène    : Vous aussi vous faites le guignol ? Vous êtes un acteur ?
+Jacques   : Oui, je joue le rôle de Louis Legendre. Sinon, je suis Jacques. Jacques l'acteur, Jacques le dépressif ou Jacques le cocu si vous préférez.
+Arsène    : Enchantée, Commissaire Arsène. Vous avez des ennuis ? (Elle lui sert la main.)
+Jacques   : Ma femme m'a quitté... Oui, Nathalie est partie avec mon assureur.
+Arsène    : Avec un assureur ? Eh bien, mon pauvre vieux… Toutes mes condoléances.
+Jacques   : Un homme marié a toujours peur que sa femme le quitte. Il a tout le temps peur et le jour où ça arrive, il a mal. Il a tellement mal, qu'il veut disparaître. Par exemple, moi, je ne suis pas quelqu'un de sensible et pourtant je n'ai pas hésité à me pendre plusieurs fois pour Nathalie.
+Arsène    : Bon... Vous n'auriez pas un énorme coup de mou en ce moment, vous ?
+Jacques   : Vous croyez ? C'est possible.
+Arsène    : Vous connaissez le Prozac ? Vous devriez essayer. Ou si vous voulez je connais un psy très compétent qui pourrait vous aider, vous voulez son adresse ?
+Jacques   : Oh ce n'est pas la peine. Les psys, j'en ai eu trois : le premier s'est jeté d'un pont, le second a changé de métier, il est parti élever des chèvres dans le Larzac. Celui que j'ai actuellement n'arrête pas de pleurer quand je lui parle.
+Arsène    : Ah oui, quand même...
+Jacques   : Nathalie était formidable. Elle sublime, moi médiocre, on formait un beau couple, vous savez... Mais elle est partie et elle ne reviendra jamais.
+Arsène    : Mais si elle reviendra ! Mais après, pour qu'elle reste pour de bon, il faudra l'amuser, il faudra la surprendre !
+Jacques   : Une fois, je l'ai surpris.
+Arsène    : Ah c'est bien !!
+Jacques   : Avec mon assureur dans notre lit.
+Arsène    : Ah ?… et vous n'avez pas eu envie de lui casser la gueule ?
+Jacques   : Casser la gueule à ma femme ?
+Arsène    : Non ! Je parle de votre assureur !
+Jacques   : Même pas, je ne suis pas jaloux vous savez, je suis juste peiné, dévasté. L'amour c'est une maladie incurable. On en meurt.
+Arsène    : Mais non, mais non... Bon, j'aimerais vous parler de vos collègues acteurs : Arthur et Sandra Poe.
+Jacques   : Qu'est-ce qu'ils ont ?
+Arsène    : Vous n'avez rien remarqué de particulier ?
+Jacques   : Non rien... Ah si.
+Arsène    : Quoi donc ?
+Jacques   : Arthur m'a volé une paire de chaussettes.
+Arsène    : Une paire de chaussettes ? Comment ça, une paire de chaussettes ?
+Jacques   : J'ai mis mes vêtements dans mon armoire qui est voisine de celle d'Arthur. Je suis sûr que j'avais des chaussettes. Elles n'y sont plus. Il n'y a que les acteurs hommes qui entrent dans cette salle : Arthur et moi.
+Arsène    : Et pourquoi il vous aurait pris une paire de chaussettes ?
+Jacques   : J'en sais rien, moi. Vous êtes de la police, enquêtez.
+Arsène    : Mais je m'en tape de vos chaussettes ! J'enquête sur un vol de bijoux de 500 000 euros ! Allez-lui demander où il a mis vos chaussettes et n'en parlons plus ! Bon, parlez-moi plutôt de lui.
+Jacques   : Bah, je n'ai rien à dire. C'est un acteur. Un acteur médiocre, comme nous tous. Voilà, c'est tout.
+Arsène    : Il a d'autres passions que le théâtre ?
+Jacques   : Il joue.
+Arsène    : Il joue à quoi ? Foot ? Basket ?
+Jacques   : Non, il joue aux cartes. Il aime bien jouer à la belote au bistrot du coin.
+Arsène    : Il joue de l'argent ?
+Jacques   : Non, je ne crois pas. Mais je ne le surveille pas, il est grand, il fait ce qu'il veut.
+Arsène    : Et elle ? Sa femme, elle a des passions ? Un amant peut-être ?
+Jacques   : Sandra ? Oh non, ce n'est pas le genre de femme qui quitterait son mari pour aller avec un assureur.
+Arsène    : Bon... Vous étiez au courant pour son maillot de bain ?
+Jacques   : Quel maillot de bain ?
+Arsène    : Elle se trouve grosse dans son maillot de bain.
+Jacques   : Ah ? Et alors ?
+Arsène    : Son mari lui a offert un autre maillot de bain pour son anniversaire.
+Jacques   : Eh bien... C'est passionnant tout ça... Mais au fait, Sandra est née au mois de juin. Pourquoi lui a-t-il déjà acheté son cadeau ?
+Arsène    : Au mois de juin ? Mais c'est dans six mois... Vous êtes sûr ?
+Jacques   : Oui on est du même mois, on est tous les deux Gémeaux. La femme Gémeaux noue facilement des relations et est très appréciée. Tout le contraire de l'homme Gémeaux : lui il est renfermé, triste, pas intéressant, son destin c'est d'être cocu.
+Arsène    : Bon, bon, bon... Je vous remercie, c'était très instructif... Au revoir monsieur.
+Jacques   : Vous vous êtes garée dans la rue Molière ?
+Arsène    : Oui, exactement.
+Jacques   : Venez avec moi, il y a une porte du théâtre qui donne dans cette rue, c'est beaucoup plus court.
+Arsène    : Ah, c'est très aimable. Je vous suis alors.
+Jacques   : C'est par ici. (Jacques et Arsène sortent. Arthur et Sandra entrent de l'autre côté. Arthur avale la dernière bouchée de sa part de gâteau.)
+###Scène 5
+Arthur    : Il est écœurant son gâteau, non ? Il y a trop de crème.
+Sandra    : J'en n'ai pas mangé, rien ne passe... Arthur, j'ai tellement peur. Ils vont nous retrouver !
+Arthur    : Qui ça ? Les voleurs de la bijouterie ?
+Sandra    : Oui ! Ils ont dû voir mon nom sur les étiquettes du maillot de bain ! Ils vont venir ici pour nous tuer Arthur !
+Arthur    : Mais non ! Réfléchis un peu : Les types sont sortis de la bijouterie en emportant par erreur ton sac de sport. 500 mètres plus loin, au coin d'une rue, ils ont ouvert le sac pour sans doute se partager rapidement le magot, et là...
+Sandra    : Là, près des poubelles, ils ont découvert à la place des bijoux, mes affaires de piscine.
+Arthur    : Ils ont dû en faire une drôle de tête ! Ah les abrutis ! (Il sourit.)
+Sandra    : Mais ce n'est pas drôle Arthur ! Il y a mon nom sur mon maillot de bain ! J'ai tellement eu peur. Je te l'ai dit qu'ils avaient de gros pistolets ?
+Arthur    : Oublie leurs armes et arrête de t'inquiéter : Sandra, nous avons 200 000 euros en bijoux qui nous attendent dans une chaussette ! Au fait, je l'ai cachée dans le réservoir de la chasse d'eau des WC.
+Sandra    : Dans les WC du théâtre ? Mais c'est idiot ! Oh là là...
+Arthur    : Non, on s'en fout. Écoute Sandra, demain soir on joue la pièce devant le public de Doulon et dès que ce sera terminé, j'irai récupérer la chaussette dans les WC et on sera riche ! 200 000 euros Sandra ! 200 000 euros !
+Sandra    : (Ils sortent.) Eh bien moi, ça me fait peur tout ça...
+Arthur    : Moi je dis : Vivement demain soir ! 200 000 euros !
+##Acte 3
+###Scène 1
+Sandra    : (Anne, Dominique, Arthur et Sandra sont cachés derrière le rideau du théâtre. On les aperçoit en train d'observer le public qui est dans la salle.) Ils sont installés... Oh là là, il y a du monde...
+Arthur    : J'ai la trouille.
+Anne      : Moi, Je vais me changer, je suis trempé.
+Dominique : (saoule): C'est le tarc... le trac, c'est normal.
+Anne      : Non, je crois que j'ai mangé trop de gâteau hier...
+Dominique : Le pu... le public de Doulon (accroche le nom) est très exigeant, ne l'oubliez ja... ne l'oubliez jamais les enfants... Au fait, j'ai réparé la chaise, elle bougera... elle bougera plus. Y'a pu de problème. Oups !
+Arthur    : Mais Dominique tu pues la bière ! T'as picolé ?!
+Dominique : C'est le trac ! C'est pas de ma faute ! Quand j'ai peur, j'ai le gosier qui dessèche à vue d’œil ! J'suis tout le temps déshydraté comme le désert, moi quand j'ai peur ! Oups !
+Anne      : Eh bien retiens toi ! c'est du sérieux ce soir, le public est là !
+Dominique : J'peux pas me retenir, j'suis pas un dromadaire, moi ! Y m'faut une bière toutes les 15 minutes quand j'ai peur ! Et j'ai peur depuis ce matin ! Oups !
+Arthur    : Je te signale que les chameaux ne boivent que de l'eau...
+Dominique : Et ben c'est la preuve qu'y zont jamais essayé la bière ! S'ils l'avaient goûtée, y boiraient plus d'eau mais uniquement de la bière !... Et moi, de toute façon, j'te parle pas d'un chameau mais d'un dromadaire ! Un dromadaire avec deux bosses !! Oups !
+Arthur    : C'est le chameau qui a deux bosses.
+Dominique : J'vais t'en faire une belle bosse moi si tu continues à me parler de ces bêtes de malheur ! À boire !!! J'ai peur !
+Sandra    : Chut ! On va vous entendre ! Calmez-vous !
+Dominique : C'est lui qu'a commencé !
+Arthur    : C'est elle qu'est bourrée !
+Anne      : Allez, ça va être à nous !... Dominique, c'est le moment, vas-y !
+Dominique : J'y vais, mais j'ai peur !
+###Scène 2
+Arthur    : (Anne et Arthur entrent sur la scène et se positionnent. Au même moment, on voit Dominique, qui ne marche pas droit, frapper les trois coups avec un bâton.) Ma chère Rosalie, sans vouloir me vanter, je peux affirmer que la fitalure, la fitalure... la filature Legendre ne s'est jamais aussi bien portée. Ce matin, le... caissier m'a transmis les chiffres : nous avons encore progressé de 5 %. Vous verrez que l'année 1921 sera excellente.
+Anne      : Euh... vous ne m'aviez pas parlé de 25 % ?
+Arthur    : Exactement : 25 % ! Vous verrez que l'année 1921 sera excellente !
+Anne      : Jules, vous êtes le meilleur entrepreneur de la ville.
+Arthur    : Allons, allons...
+Anne      : Cela fait maintenant plus de trois ans que vous gérez la filature de mon pauvre mari, mort à la guerre.
+Arthur    : Il est mort en héros... (Silence, Anne attend la fin de la phrase qui ne vient pas.)
+Anne      : Paix à son âme... Jules, je suis très fière de vous.
+Arthur    : Vous êtes également fière de m'avoir épousé l'année prochaine ?
+Anne      : Oh ne me faites pas rougir. La bonne pourrait nous entendre.
+Arthur    : Mais non, Marie est à moitié aveugle.
+Sandra    : (Entre.) Hum, hum.
+Anne      : Oui Marie ?
+Sandra    : (Elle tient un plateau sur lequel est posée une carafe vide.) Un monsieur est dans la veste... Il souhaiterait parler à monsieur.
+Arthur    : Euh... Il ne souhaiterait pas plutôt parler à madame ?
+Sandra    : Un monsieur est dans la vetsibule. Il souhaiterait parler à madame.
+Arthur    : Faîtes-le entrer, je vous prie.
+Sandra    : Il m'a dit qu'il veut parler uniquement à madame.
+Arthur    : Allons donc ! Voilà un comportement un peu chevalier !
+Sandra    : Oui, il s'est présenté.
+Arthur    : Et alors ? Comment s'appelle-t-il cet homme qui ne veut pas parler à mon épouse ?
+Sandra    : Il s'appelle Louis Legendre. Monsieur est revenu : Monsieur est mort à la guerre.
+Anne      : Quoi ? Il n'est pas mort à la guerre ?! Aaaah ! Mon Dieu ! mon mari n'est plus mort ! (Rosalie s'évanouit.)
+Arthur    : Mais c'est impossible ! Marie ! C'est impossible !
+Sandra    : C'est impossible, monsieur.
+Arthur    : C'est un miracle, non ?
+Sandra    : C'est un miracle, monsieur !
+Arthur    : Elle a perdu connaissance, Marie, vite ! donnez moi cette carafe !
+Sandra    : Monsieur ne préfère pas que je lui apporte de la vinaigrette ?
+Arthur    : (Il prend la carafe mais elle est vide.) Merde, elle est vide...
+Arthur    : (Il fait semblant de l'arroser avec la carafe vide.) Excusez-moi de vous arroser de la sorte mais vous devez absolument vous réveiller !
+Dominique : (Dominique entre sur scène avec un seau d'eau. Elle titube.) J'ai de la flotte, si vous voulez... (Dominique donne le seau à Arthur et quitte la scène. Arthur prend le seau d'eau : il s’apprête à le verser sur Anne. Anne le voit et prend peur.)
+Anne      : Non ! Ça va aller, merci !! Oh je vais beaucoup mieux, moi !
+Arthur    : Excusez-moi de vous arroser de la sorte mais vous devez absolument vous réveiller !
+Anne      : Où suis-je ? Ah mon Dieu ! Louis est ressuscité !
+Sandra    : Vous souhaitez que je le fasse sortir ?
+Arthur    : Oui, faites le entrer.
+Jacques   : (Louis Legendre) entre avec un bouquet de fleurs. Il se force à sourire.
+Jacques   : (Triste) Quelle joie de retrouver son épouse... Quel bonheur...
+###Scène 3
+Arsène    : (Le Commissaire Arsène sort du public et entre sur scène en criant.) On arrête tout ! Stop ! Je vous demande de vous arrêter, immédiatement ! (Elle s'adresse au public) Messieurs-dames, excusez-moi d'interrompre la pièce, mais un événement grave vient de se produire.
+Dominique : (Dominique entre en titubant.) Vous n'avez pas le droit !! Ah non alors !! Oups !
+Arsène    : Je suis vraiment désolée, mais vous ne pouvez plus continuer. Il y a des voleurs dans cette salle.
+Dominique : Pardon ?! Qu'est-ce que vous ra... racontez ?!
+Arsène    : (Le Commissaire Arsène sort deux chaussettes de sa poche et les montre à Jacques. Ces chaussettes ne sont pas remplies de bijoux.) Est-ce que vous reconnaissez ces deux chaussettes ?
+Jacques   : Euh, oui, ce sont les miennes. Merci de les avoir retrouvées. Mais ce n'était peut-être pas la peine d'interrompre le spectacle pour mes chaussettes... (Arthur et Sandra sont inquiets, ils se regardent.)
+Dominique : C'est sandaleux ! scandaleux ! Vous osez interrompre ma pièce pour une histoire de vieilles chau... de vieilles chaussettes ! Oups !
+Jacques   : Bah, elles ne sont pas vieilles, elles ont à peine cinq ans.
+Anne      : Excusez-moi, mais j'ai vraiment trop mal au ventre, je... je vais aux toilettes. (Anne sort en courant.)
+Sandra    : Ça c'est sûr, elle a mangé beaucoup trop de gâteau...
+Arsène    : Donc, ces chaussettes, ce sont bien les vôtres ?!
+Jacques   : Oui, elles sont à moi.
+Arsène    : Eh bien, alors je vous arrête pour vol.
+Jacques   : Quoi ? Mais... enfin ! Je n'ai pas volé mes propres chaussettes !
+Arsène    : Nous avons arrêté aujourd'hui deux escrocs qui ont l'habitude d'arnaquer des gens en jouant au poker.
+Sandra    : Au... au poker ?
+Arsène    : Leur méthode est toujours la même : Ils entrent dans un bar pour repérer leur future victime. Ils choisissent une personne bien naïve, un couillon en quelque sorte.
+Arthur    : Un couillon, c'est vite dit...
+Arsène    : Ils lui proposent une partie de poker. Au départ, ils ne misent pas d'argent. Ils laissent le couillon gagner deux ou trois parties. Ils le flattent, en disant qu'ils n'ont jamais vu quelqu'un aussi fort, aussi brillant, aussi chanceux que lui... Et après...
+Sandra    : (Sandra regarde son mari .) Après ce couillon joue de l'argent, beaucoup d'argent ! Et d'un seul coup, les types lui prennent tout ! Et le couillon est ruiné ! Mais quel couillon ! Quel couillon !
+Arsène    : Exactement, madame Poe, exactement ! Mais heureusement nous avons arrêté ces deux escrocs, et vous savez ce qu'on a retrouvé sur eux ?
+Arthur    : Euh... des cartes ?
+Arsène    : (Elle regarde Jacques.) Vos deux chaussettes.
+Jacques   : Ils ont piqué mes chaussettes ? Mais pourquoi ? Ils n'en avaient pas ?
+Arsène    : Ces deux chaussettes étaient remplies de bijoux ! Les bijoux volés dans la bijouterie !
+Jacques   : Bah ça alors !
+Arthur    : (Ton non convainquant) Bah ça alors !...
+Arsène    : Il y avait trois cambrioleurs dans la bijouterie : ces deux escrocs et une autre personne. Votre collègue : Jacques !
+Jacques   : Moi ?... Eh bien... Remarquez, je ne suis pas étonné que ça tombe encore sur moi. Chaque jour je me prends une claque... mais là, je dois dire que c'est une sacrée baffe.
+Dominique : Mais enfin, c'est pas chérieux... sérieux ! Hier, au moment du cambirolage... au moment du cambriolage Jacques était ici entrain de retéper... de répéter le premier acte avec nous !
+Arthur    : Oui, on l'attendait, il est arrivé en retard, mais après il a répété avec nous.
+Arsène    : Ah ! C'est une preuve ! Il était en retard !
+Jacques   : Oui, c'est vrai, je n'étais pas en avance car ma femme m'a quitté. Nathalie est partie avec mon assureur.
+Arsène    : Mais personne ne l'a vu votre femme ! ni votre assureur ! Qui les a vus ici ?... Personne ! Ce sont des mensonges ! Vous avez inventé cette histoire pour justifier votre retard ! En fait, vous étiez en retard car juste avant d'arriver au théâtre, vous étiez dans la bijouterie avec une cagoule sur le visage !
+Jacques   : Je suis un martyr... je dois l'accepter...
+Arthur    : Ne t'inquiète pas Jacques, je suis sûr que le temps passera vite en prison.
+Arsène    : (Elle regarde Arthur) À propos, Poe, je vous arrête également.
+Arthur    : Hein ? Moi ? Mais... mais c'est un scandale ! Je n'ai jamais volé de chaussettes de ma vie, je le jure !
+Arsène    : Je vous arrête car je sais que c'est vous qui avez organisé le cambriolage ! Vous êtes le cerveau du vol des bijoux ! C'est vous qui avez tout organisé !
+Arthur    : Hein ? Mais ça ne va pas la tête ! Enfin ! Mais elle n'est pas bien elle ! Est-ce que j'ai une tête de cerveau ?! Mais Sandra dis-lui que je ne suis pas un cerveau !
+Sandra    : Oh là là ! Arthur tu vas aller en prison ! Je m'en doutais ! Je le savais !
+Arthur    : Mais je ne connais pas ces joueurs de poker ! Ils ont peut être volés des bijoux mais je ne les connais pas ! Je suis innocent ! Je veux un avocat ! Est-ce qu'il y a un avocat dans la salle ? Je veux un avocat ! (Arthur descend rapidement et va dans le public.) Que les avocats lèvent la main ! Je veux un avocat ! Je veux un avocat !!!!
+Sandra    : Arrête de te donner en spectacle ! Tu me fais honte Arthur ! J'ai honte...
+Dominique : Moi aussi, Arthur tu me déçois... zénormément !!! On à l'air de quoi devant le public de Doulon ? Hein ? On a l'air de quoi ?!
+Arthur    : Je n'ai rien fait moi ! Je ne connais pas ces joueurs de poker !!!! Je suis innocennnnt !
+Arsène    : Eh bien, eux ils vous connaissent très bien... Votre numéro est dans leur téléphone portable. Ils vous ont appelé plusieurs fois.
+Arsène    : Vous voulez d'autres preuves ? J'ai interrogé l'andouille de caissière de la supérette : elle ne vous a pas vu hier ! Vous n’êtes jamais allé acheter du cidre !
+Arsène    : Vous me mentez depuis le début ! Ça suffit !
+Arthur    : Qui ça ? Moi ? Je mens ? Mais qu'est-ce qu'il ne faut pas entendre !!!
+Arsène    : La vérité est simple : Arthur Poe a organisé le cambriolage de cette bijouterie. Les deux escrocs au poker et Jacques ont fait le vol. Arthur Poe a ensuite récupéré les bijoux qu'il a caché dans des chaussettes. C'est lui qui a fait le partage du butin.
+Arthur    : Je proteste ! Je veux un avocaaaaaaaaat !
+Arsène    : Messieurs, je vous demande de me suivre, vous êtes en état d'arrestation.
+Sandra    : Aaaah ! Aaaaah ! AAAArthur dis quelque chose !!!
+Arthur    : Je veux un avocaaaaaaaaat ! Je suis innocenttttttttttt !
+Jacques   : T'inquiète pas Arthur, avec un peu de chance on sera dans la même cellule.
+Arsène    : Allez ! Suivez-moi. (Elle s'adresse au public) Excusez-moi, messieurs-dames, mais le spectacle est terminé, vous pouvez rentrer chez vous. (Arthur et Jacques, la tête basse, suivent le Commissaire Arsène qui commence à sortir de scène.)
+Dominique : (Au public) Je suis navrée, mais sans mes Oups ! Sans mes acteurs on ne peut plus continuer... La pièce « À quelle heure on ment ? » est annulée... C'est un Oups ! un drame... un désastre...
+Arsène    : (Le téléphone portable du Commissaire sonne.) Oui c'est moi.... Qu'est-ce que vous dites ?!... Quand ça ?...Vous êtes sûr ?... Bon... Bon... Bon... Très bien. (Elle raccroche.)
+Arsène    : Il y a du nouveau : vous n'êtes plus en état d'arrestation...
+Arthur    : On ne va plus en taule ? C'est vrai ?!
+Arsène    : Les trois cambrioleurs de la bijouterie viennent d'être arrêtés. Ils ont tout avoué... Vous êtes libres.
+Arthur    : Ah ! Vous voyez que je suis innocent ! Et que je ne suis pas un menteur !!!
+Arsène    : Oui, vous avez certainement raison. Eh bien on va mettre ces cinq individus en prison. L'affaire est terminée. Je vais vous laisser maintenant. Excusez du petit dérangement...
+Jacques   : (Le téléphone portable de Jacques produit un son.) Pardon... Oh c'est un SMS de ma femme... Oh... Oh !...Oooooh ! Oooooh !... Je... Elle vient de quitter l'assureur et elle rentre à la maison ! Elle dit qu'elle m'aime !! Elle m'aime !!! (Jacques saute au cou du Commissaire et l'embrasse.) Oh je vous aime aussi !!!
+Jacques   : (Fou de joie, Jacques embrasse tout le monde. Il va dans le public et fait la bise à deux ou trois personnes) Je vous aime ! Je vous aime ! Nathalie revient ! Elle revient ! Je suis le plus heureux des cocus !
+Arsène    : Bon, bon, bon... Je vois que le moral va beaucoup mieux... je vais vous laisser fêter la bonne nouvelle... (Elle regarde le public) Au revoir messieurs-dames, et mille excuses d'avoir gâché votre spectacle.... Remarquez, de vous à moi, elle a l'air bien chiante cette pièce de théâtre, non ?... (Elle sort.)
+###Scène 4
+Sandra    : Dominique, alors, on fait quoi maintenant ? On continue la pièce ou on on arrête tout ?
+Jacques   : On pourrait peut être commencer directement l'acte 2. La soirée où Legendre va essayer de séduire sa femme...
+Dominique : C'est pas idiot... (Au public) Mesdames, messieurs, Oups ! Que ceux qui veulent qu'on commence tout de suite l'acte 2, lèvent les pieds ! Euh... lèvent les mains ! (Participation du public.) (À une femme du public) Mais non, madame ce ne sera pas trop long... Je vous promets que dans 4 ou 5 heures ce sera terminé. Allez les enfants, en place ! Et Oups ! faites attention, il y a eu quelques loupés tout à l'heure. Allez ! Que le spectacle continue !!
+Sandra    : (Les acteurs s'installent et l'acte 2 commence. Rosalie est avec la bonne. Jacques (Louis Legendre) entre avec un sourire radieux. Il cache quelque chose dans son dos.) Si monsieur veut bien me donner son parapluie... (Jacques est gêné car il n'a pas de parapluie. Au même moment on aperçoit Dominique qui jette un parapluie ouvert au pied de Jacques et Anne.)
+Sandra    : ... Elle ne cessera donc jamais de tomber cette pluie ?
+Jacques   : C'est l'automne, Marie, c'est l'automne... (Jacques ramasse le parapluie ouvert et le donne à Sandra.)
+Anne      : (Elle le prend et voit que le porte-parapluies n'est pas à gauche de l'entrée, comme il devrait l'être. Elle regarde autour d'elle et l’aperçoit qui est à l'autre bout de la scène. Elle se déplace et essaie d'abord de mettre le parapluie dans le porte-parapluies, ce qui est un impossible car il est ouvert. Elle le met donc à l'envers. La poignée est glissée dans le porte-parapluies et on voit donc le tissus. On la sent gênée et en colère.) Vous pouvez rentrer chez vous Marie. Bonne soirée.
+Sandra    : (En colère) Bonne soirée madame ! Bonne soirée monsieur !!! (Sandra sort.)
+Jacques   : Rosalie ! Cette pluvieuse est la plus belle des soirées ! (Jacques montre à Anne un petit cactus qu'il cachait dans son dos.)
+Anne      : Oh Louis ! Vos roses sont resplendissantes !
+Jacques   : Rupture de stock chez le fleuriste... Ma chère Rosalie, ce ne sont pas vos roses, mais les miennes... pas mes roses, mais les vôtres.
+Anne      : Elles sont magnifiques ! Oh soyez gentil Louis, voulez-vous les déposer dans ce vase ? (Jacques s'approche du vase. Il hésite et laisse tomber le petit cactus au fond du vase. Anne s'approche du vase respire profondément.)
+Anne      : Leur parfum est si frais, si délicat.
+Jacques   : (Jacques met la main droite au fond du vase pour essayer de récupérer le cactus et il n'arrive plus à retirer sa main du vase, elle est coincée.) Je préfère mille fois le vôtre. Dieu que vous êtes Aïe ! Saloperie de... (Il se pique la main avec le cactus) Dieu que vous êtes belle Nathalie... (Jacques essaie d'enlever sa main du vase mais il ne peut pas. Il décide alors de continuer à jouer en se déplaçant avec la main coincée dans ce vase.)
+Anne      : Oh Louis... Il ne faut pas. Vous savez bien que je me suis remariée. Mon mari ne rentrera pas cette nuit... n'en profitez pas Louis, je vous en prie.
+Jacques   : Dupantois est un imbécile ! Je vais entamer un bras de fer avec lui ! (Il lève son bras coincé dans le vase.) Et vous verrez, je retrouverai la place qui est la mienne !
+Anne      : Louis... Oh cette situation me rend tellement malheureuse.
+Jacques   : (Jacques regarde le vase dans lequel sa main est coincée.) Et moi donc...
+Anne      : Je vous croyais vivant Louis...
+Jacques   : Vous avez devant vous un homme bien mort ! Un homme de poigne ! (Il brandit la main avec le vase.) Je vais me battre pour reprendre la tête de la filature et ensuite je pourrai la gérer d'une main de fer ! Nathalie, vous tomberez dans mes bras à nouveau, je vous le promets ! Aïe ! Ah la vache ça pique !
+Anne      : Ne dites pas cela Louis, il ne faut pas... Oh, je souffre tant...
+Jacques   : Aïe ! moi aussi je souffre... Aïe ! Et je ne veux pas vous faire souffrir Rosalie. Je souhaite seulement vous retrouver.
+Jacques   : (Louis s'approche de Rosalie.) Venez dans mes bras. (Évidement on ne voit que ce vase...)
+Anne      : Oh Louis...
+Jacques   : (Rosalie et Louis s'enlacent.) Aïe ! Saloperie de cactu... saloperie de roses ! Euh... les roses sont très piquantes cette année...
+Anne      : (Rosalie repousse Louis Legendre.) Non, il ne faut pas !
+Jacques   : J'ai écrit un poème pour vous Nata... Rosalie. Voulez-vous approcher cette chaise et vous y installer ?
+Anne      : Un poème ? Pour moi ? Oh Louis... (Anne essaie de déplacer la chaise mais n'y arrive pas. Elle a été fixée au sol par Dominique. Anne force.)
+Jacques   : Oui, restez donc prêt de moi... j'ai écrit un super poème... Bon, ce n'est pas du Rimbaud, mais... je ne suis pas poète, hein ? Et ce qui compte c'est que ce soit touchant, non ? Maladroit, mais touchant !
+Jacques   : (Jacques sort un papier et commence à le lire.) Une boîte de petits pois, un pack de bières... c'est... la liste des courses...
+Dominique : (Dominique fait un pas.) J'ai entendu parler de bières... pardon, continuez... (Elle ressort. Jacques cherche le papier dans sa poche et ne le trouve pas.)
+Jacques   : Merde où est-ce que je l'ai mis ?
+Anne      : (Rosalie troublée, change de conversation.) J'ai demandé à Marie de vous préparer une bière, en voulez-vous ?
+Jacques   : Euh, je prendrais bien un petit thé, moi... Vous avez du thé ?
+Anne      : Je... J'ai demandé à Marie de vous préparer un thé. Le voulez-vous ?
+Jacques   : Avec plaisir. Vous n'en prenez pas ?
+Anne      : Non je n'ai plus de sucre ce soir.
+Jacques   : S'il vous plaît. (Rosalie met un sucre dans sa tasse. Louis prend la tasse et cherche la petite cuillère : il ne la trouve pas.)
+Jacques   : À la guerre, comme à la guerre... (Il trempe son index dans la tasse et brasse longuement. Il dit sans goûter son thé) Il est excellent.... Vraiment excellent... peut être un peu chaud... mais excellent.
+Jacques   : (Très distingué, il lève le petit doigt et boit une gorgée.) Pouah !!! (Il crache.) C'est de la bière !!! Aaaah !
+Dominique : (Dominique fait un pas.) C'est passeque c'est la même couleur que le thé. J'ai mis ce que j'avais sur la main... Oups ! Bon continuez. (Dominique ressort.)
+Anne      : Louis, je voulais vous dire que j'ai peur...
+Jacques   : Peur de quoi ? Peur d'être ici, seule avec moi ?
+Jacques   : (Rosalie ouvre le tiroir de la commode mais l'arme n'y est pas. À la place, il y a la petite cuillère. Elle sort la petite cuillère.) Mon Dieu ! Une arme ?
+Anne      : J'ai trouvé ce pistol... euh cette petite cuillère dans le bureau de mon mari. J'ai peur pour vous Louis !
+Jacques   : Vous pensez que Dupantois veut m’assassiner avec ça ?!
+Anne      : Hélas, je le crains...
+Dominique : (Dominique entre sur scène. Elle a une chaussette dans la main et la montre.) Y'a un problème ! Qui c'est le crétin qu'a voulu boucher les toilettes avec ça ? Hein qui c'est ?
+Anne      : Non !!! Chut Dominique ! La pièce n'est pas encore terminée !!! On n'y arrivera jamais... jamais... c'est une catastrophe, c'est foutu... la pièce est un échec... un échec...
+Dominique : J'ai trouvé cette chaussette dans le Oups ! Dans le réservoir de la chasse d'eau ! Y'avait plein de petits cailloux dedans ! J' les ai tous balancé dans la cuvette et j'ai tiré la chasse !... Mais j'vous préviens : j'veux plus qu'on me refasse ce coup là ! C'est vraiment pas drôle !
+Jacques   : Mais non... Anne, ce n'est pas un échec regarde le public !
+Anne      : (Arthur et Sandra entrent sur scène et applaudissent le public.) La pièce est un succès ! C'est un succès ! Bravo !!! (Tous: Bravo !!! Bravo !!! Le Commissaire Arsène les rejoint.)`;
+    </script>
+
+    <div class="header">
+        <h1 id="play-title"></h1>
+        <button class="fullscreen-btn" id="fullscreen-btn" title="Plein écran">⛶</button>
+    </div>
+
+    <div class="tabs">
+        <button class="tab" data-tab="read">Lire</button>
+        <button class="tab" data-tab="learn">Apprendre</button>
+        <button class="tab" data-tab="settings">Paramètres</button>
+    </div>
+
+    <div class="content">
+        <!-- Read Tab -->
+        <div class="tab-content" id="read-tab">
+            <div id="read-content"></div>
+        </div>
+
+        <!-- Learn Tab -->
+        <div class="tab-content" id="learn-tab">
+            <div class="learn-scene-header" onclick="openNavigation('learn')">
+                <span id="learn-current-scene">Acte 1, Scène 1</span>
+                <span id="line-counter" style="margin-left: auto; margin-right: 8px;">0 / 0</span>
+                <span class="arrow-icon">▼</span>
+            </div>
+            <div class="learn-content-area" id="learn-content"></div>
+            <div class="learn-controls">
+                <div class="button-group">
+                    <button class="btn-back" onclick="restartScene()">⏮ Début</button>
+                    <button class="btn-next" onclick="nextLine()">Suivant ▶</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings-tab">
+            <div class="settings-content">
+                <div class="settings-group">
+                    <label class="settings-label" for="character-select">Mon personnage</label>
+                    <select id="character-select">
+                        <option value="">-- Choisissez votre personnage --</option>
+                    </select>
+                </div>
+                <div class="settings-group">
+                    <label class="settings-label">Taille du texte</label>
+                    <div class="text-size-buttons">
+                        <button class="text-size-btn" data-size="small">Petit</button>
+                        <button class="text-size-btn active" data-size="normal">Normal</button>
+                        <button class="text-size-btn" data-size="large">Grand</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Modal -->
+    <div class="modal" id="navigation-modal" onclick="closeNavigation(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">Navigation</div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        // Parse the play text
+        function parsePlayText(text) {
+            const lines = text.split('\n');
+            const playData = {
+                title: '',
+                acts: []
+            };
+
+            let currentAct = null;
+            let currentScene = null;
+
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line) return;
+
+                // Title (# Title)
+                if (line.startsWith('#') && !line.startsWith('##')) {
+                    playData.title = line.substring(1).trim();
+                }
+                // Act (## Act X)
+                else if (line.startsWith('##') && !line.startsWith('###')) {
+                    currentAct = {
+                        title: line.substring(2).trim(),
+                        scenes: []
+                    };
+                    playData.acts.push(currentAct);
+                    currentScene = null;
+                }
+                // Scene (### Scene X)
+                else if (line.startsWith('###')) {
+                    if (currentAct) {
+                        currentScene = {
+                            title: line.substring(3).trim(),
+                            dialogues: []
+                        };
+                        currentAct.scenes.push(currentScene);
+                    }
+                }
+                // Dialogue (Character : Text)
+                else if (line.includes(':')) {
+                    const colonIndex = line.indexOf(':');
+                    const character = line.substring(0, colonIndex).trim();
+                    const text = line.substring(colonIndex + 1).trim();
+                    
+                    if (currentScene && character && text) {
+                        currentScene.dialogues.push({
+                            character: character,
+                            text: text
+                        });
+                    }
+                }
+            });
+
+            return playData;
+        }
+
+        // Parse the play data
+        const playData = parsePlayText(rawPlayText);
+
+        // Update page title
+        document.title = playData.title || 'Pièce de théâtre';
+
+        // State management
+        let currentTab = 'read';
+        let selectedCharacter = '';
+        let learnState = {
+            actIndex: 0,
+            sceneIndex: 0,
+            lineIndex: 0
+        };
+        let readState = {
+            actIndex: 0,
+            sceneIndex: 0
+        };
+
+        // Storage management functions (localStorage works with file://)
+        function setStorage(name, value) {
+            try {
+                localStorage.setItem(name, value);
+            } catch (e) {
+                console.error('Error saving to localStorage:', e);
+            }
+        }
+
+        function getStorage(name) {
+            try {
+                return localStorage.getItem(name);
+            } catch (e) {
+                console.error('Error reading from localStorage:', e);
+                return null;
+            }
+        }
+
+        // Extract unique characters
+        function getCharacters() {
+            const characters = new Set();
+            playData.acts.forEach(act => {
+                act.scenes.forEach(scene => {
+                    scene.dialogues.forEach(dialogue => {
+                        characters.add(dialogue.character);
+                    });
+                });
+            });
+            return Array.from(characters).sort();
+        }
+
+        // Generate a consistent color for each character
+        const characterColors = {};
+        
+        // Color palettes for light and dark modes
+        const colorPalettesLight = [
+            '#c0392b', // dark red
+            '#2980b9', // dark blue
+            '#27ae60', // dark green
+            '#d68910', // dark orange
+            '#8e44ad', // dark purple
+            '#16a085', // dark turquoise
+            '#d35400', // dark carrot
+            '#2c3e50', // very dark blue
+            '#117a65', // very dark green
+            '#922b21', // very dark red
+            '#6c3483', // dark wisteria
+            '#1e8449', // dark nephritis
+        ];
+
+        const colorPalettesDark = [
+            '#ff6b6b', // bright red
+            '#74b9ff', // bright blue
+            '#55efc4', // bright green
+            '#ffd93d', // bright yellow
+            '#dda0dd', // bright plum
+            '#6bcf7f', // bright mint
+            '#ffa07a', // bright salmon
+            '#87ceeb', // sky blue
+            '#98d8c8', // light teal
+            '#ff9999', // light coral
+            '#c39bd3', // light purple
+            '#90ee90', // light green
+        ];
+
+        function isDarkMode() {
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+
+        function getCharacterColor(character) {
+            if (!characterColors[character]) {
+                const colorPalette = isDarkMode() ? colorPalettesDark : colorPalettesLight;
+                const characters = Object.keys(characterColors);
+                const colorIndex = characters.length % colorPalette.length;
+                characterColors[character] = colorPalette[colorIndex];
+            }
+            return characterColors[character];
+        }
+
+        // Listen for theme changes and update colors
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                // Reset character colors to apply new palette
+                Object.keys(characterColors).forEach(key => delete characterColors[key]);
+                
+                // Re-render current tab
+                if (currentTab === 'read') {
+                    renderReadTab();
+                } else if (currentTab === 'learn') {
+                    renderLearnTab();
+                }
+            });
+        }
+
+        // Update page title with character if selected
+        function updateTitle() {
+            const baseTitle = playData.title;
+            const displayTitle = selectedCharacter ? `${baseTitle} - ${selectedCharacter}` : baseTitle;
+            document.getElementById('play-title').textContent = displayTitle;
+        }
+
+        // Initialize the app
+        function init() {
+            // Load settings first
+            loadSettings();
+            
+            // Setup UI
+            populateCharacterSelect();
+            updateTitle();
+            setupTabs();
+            
+            // Restore saved tab or default to 'read'
+            const savedTab = getStorage('currentTab') || 'read';
+            switchTab(savedTab);
+        }
+
+        // Populate character dropdown
+        function populateCharacterSelect() {
+            const select = document.getElementById('character-select');
+            const characters = getCharacters();
+            characters.forEach(char => {
+                const option = document.createElement('option');
+                option.value = char;
+                option.textContent = char;
+                select.appendChild(option);
+            });
+
+            select.addEventListener('change', (e) => {
+                selectedCharacter = e.target.value;
+                saveSettings();
+                updateTitle();
+                
+                // Re-render current tab
+                if (currentTab === 'read') {
+                    renderReadTab();
+                } else if (currentTab === 'learn') {
+                    renderLearnTab();
+                }
+            });
+            
+            // Text size buttons
+            document.querySelectorAll('.text-size-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const size = this.dataset.size;
+                    applyTextSize(size);
+                    setStorage('textSize', size);
+                });
+            });
+
+            // Fullscreen button
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            if (fullscreenBtn) {
+                fullscreenBtn.addEventListener('click', toggleFullscreen);
+            }
+        }
+
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
+                // Enter fullscreen
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                } else if (elem.mozRequestFullScreen) {
+                    elem.mozRequestFullScreen();
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                }
+            } else {
+                // Exit fullscreen
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        // Setup tab navigation
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+        }
+
+        // Switch between tabs
+        function switchTab(tabName) {
+            currentTab = tabName;
+            setStorage('currentTab', tabName);
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-tab') === tabName) {
+                    tab.classList.add('active');
+                }
+            });
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+
+            // Render specific tab content if needed
+            if (tabName === 'learn') {
+                renderLearnTab();
+            } else if (tabName === 'read') {
+                renderReadTab();
+            }
+        }
+
+        // Render Read Tab
+        function renderReadTab() {
+            const container = document.getElementById('read-content');
+            container.innerHTML = '';
+
+            playData.acts.forEach((act, actIndex) => {
+                act.scenes.forEach((scene, sceneIndex) => {
+                    const sceneTitle = document.createElement('div');
+                    sceneTitle.className = 'learn-scene-header';
+                    
+                    const titleSpan = document.createElement('span');
+                    titleSpan.textContent = `${act.title}, ${scene.title}`;
+                    
+                    const arrowSpan = document.createElement('span');
+                    arrowSpan.className = 'arrow-icon';
+                    arrowSpan.textContent = '▼';
+                    
+                    sceneTitle.appendChild(titleSpan);
+                    sceneTitle.appendChild(arrowSpan);
+                    sceneTitle.onclick = () => {
+                        readState.actIndex = actIndex;
+                        readState.sceneIndex = sceneIndex;
+                        setStorage('readState', readState);
+                        openNavigation('read');
+                    };
+                    
+                    container.appendChild(sceneTitle);
+
+                    const sceneBlock = document.createElement('div');
+                    sceneBlock.className = 'scene-block';
+
+                    scene.dialogues.forEach(dialogue => {
+                        const dialogueDiv = document.createElement('div');
+                        dialogueDiv.className = 'dialogue';
+                        
+                        if (selectedCharacter && dialogue.character === selectedCharacter) {
+                            dialogueDiv.classList.add('highlight');
+                        }
+
+                        const charSpan = document.createElement('span');
+                        charSpan.className = 'dialogue-character';
+                        charSpan.textContent = dialogue.character;
+                        charSpan.style.color = getCharacterColor(dialogue.character);
+
+                        const textSpan = document.createElement('span');
+                        textSpan.className = 'dialogue-text';
+                        textSpan.textContent = dialogue.text;
+
+                        dialogueDiv.appendChild(charSpan);
+                        dialogueDiv.appendChild(textSpan);
+                        sceneBlock.appendChild(dialogueDiv);
+                    });
+
+                    container.appendChild(sceneBlock);
+                });
+            });
+            
+            // Validate readState indices
+            if (readState.actIndex >= playData.acts.length) {
+                readState.actIndex = 0;
+            }
+            if (readState.sceneIndex >= playData.acts[readState.actIndex].scenes.length) {
+                readState.sceneIndex = 0;
+            }
+            
+            // Scroll to the saved scene position
+            setTimeout(() => {
+                const sceneBlocks = document.querySelectorAll('#read-content .scene-block');
+                let totalSceneIndex = 0;
+                for (let i = 0; i < readState.actIndex; i++) {
+                    totalSceneIndex += playData.acts[i].scenes.length;
+                }
+                totalSceneIndex += readState.sceneIndex;
+                
+                if (sceneBlocks[totalSceneIndex]) {
+                    sceneBlocks[totalSceneIndex].scrollIntoView({ behavior: 'auto', block: 'start' });
+                }
+            }, 0);
+        }
+
+        // Render Learn Tab
+        function renderLearnTab(clearContent = true) {
+            const content = document.getElementById('learn-content');
+            if (clearContent) {
+                content.innerHTML = '';
+            }
+
+            // Check if no character is selected
+            if (!selectedCharacter) {
+                content.innerHTML = '<div style="padding: 40px 20px; text-align: center;"><p style="color: var(--text-secondary); font-size: 18px; margin-bottom: 16px;">Aucun personnage sélectionné</p><p style="color: var(--text-muted); font-size: 14px;">Veuillez sélectionner un personnage dans l\'onglet Paramètres pour commencer l\'apprentissage.</p></div>';
+                document.getElementById('line-counter').textContent = '0 / 0';
+                const nextButton = document.querySelector('.btn-next');
+                const backButton = document.querySelector('.btn-back');
+                if (nextButton) nextButton.disabled = true;
+                if (backButton) backButton.disabled = true;
+                return;
+            }
+
+            // Validate learnState indices
+            if (learnState.actIndex >= playData.acts.length) {
+                learnState.actIndex = 0;
+            }
+            if (learnState.sceneIndex >= playData.acts[learnState.actIndex].scenes.length) {
+                learnState.sceneIndex = 0;
+            }
+
+            // Get current scene
+            const act = playData.acts[learnState.actIndex];
+            const scene = act.scenes[learnState.sceneIndex];
+
+            // Update scene header
+            document.getElementById('learn-current-scene').textContent = 
+                `${act.title}, ${scene.title}`;
+
+            const lines = scene.dialogues;
+
+            if (lines.length === 0) {
+                content.innerHTML = '<p style="color: #95a5a6; text-align: center;">Aucune réplique dans cette scène.</p>';
+                document.getElementById('line-counter').textContent = '0 / 0';
+                return;
+            }
+
+            // Find character's lines and their indices
+            const characterLines = [];
+            lines.forEach((dialogue, index) => {
+                if (dialogue.character === selectedCharacter) {
+                    characterLines.push(index);
+                }
+            });
+
+            if (characterLines.length === 0) {
+                content.innerHTML = '<p style="color: #95a5a6; text-align: center;">Aucune réplique pour ce personnage dans cette scène.</p>';
+                document.getElementById('line-counter').textContent = '0 / 0';
+                return;
+            }
+
+            // Update counter based on character's lines
+            document.getElementById('line-counter').textContent = 
+                `${learnState.lineIndex} / ${characterLines.length}`;
+
+            // When clearContent is true (initial load or restart), show all dialogues up to current state
+            // When clearContent is false (appending), show only the new dialogues
+            let startIndex, endIndex;
+            
+            if (clearContent) {
+                // Show all dialogues from start up to current lineIndex
+                startIndex = 0;
+                if (learnState.lineIndex === 0) {
+                    endIndex = characterLines[0];
+                } else {
+                    const currentCharLineIndex = Math.min(learnState.lineIndex - 1, characterLines.length - 1);
+                    endIndex = learnState.lineIndex < characterLines.length 
+                        ? characterLines[learnState.lineIndex] 
+                        : lines.length;
+                }
+            } else {
+                // Append mode: show only new dialogues
+                if (learnState.lineIndex === 0) {
+                    startIndex = 0;
+                    endIndex = characterLines[0];
+                } else {
+                    const currentCharLineIndex = Math.min(learnState.lineIndex - 1, characterLines.length - 1);
+                    startIndex = characterLines[currentCharLineIndex];
+                    endIndex = learnState.lineIndex < characterLines.length 
+                        ? characterLines[learnState.lineIndex] 
+                        : lines.length;
+                }
+            }
+
+            // Display the dialogues in the range
+            for (let i = startIndex; i < endIndex; i++) {
+                const dialogue = lines[i];
+                const dialogueDiv = document.createElement('div');
+                dialogueDiv.className = 'dialogue';
+                
+                // Highlight selected character's lines
+                if (dialogue.character === selectedCharacter) {
+                    dialogueDiv.classList.add('my-character');
+                }
+
+                const charSpan = document.createElement('span');
+                charSpan.className = 'dialogue-character';
+                charSpan.textContent = dialogue.character;
+                charSpan.style.color = getCharacterColor(dialogue.character);
+
+                const textSpan = document.createElement('span');
+                textSpan.className = 'dialogue-text';
+                textSpan.textContent = dialogue.text;
+
+                dialogueDiv.appendChild(charSpan);
+                dialogueDiv.appendChild(textSpan);
+                content.appendChild(dialogueDiv);
+            }
+            
+            // Update button state
+            const nextButton = document.querySelector('.btn-next');
+            const backButton = document.querySelector('.btn-back');
+            if (nextButton) {
+                nextButton.disabled = learnState.lineIndex >= characterLines.length;
+            }
+            if (backButton) {
+                backButton.disabled = learnState.lineIndex === 0;
+            }
+        }
+
+        // Next line in Learn mode
+        function nextLine() {
+            const act = playData.acts[learnState.actIndex];
+            const scene = act.scenes[learnState.sceneIndex];
+            const lines = scene.dialogues;
+
+            // If no character selected, advance one line at a time
+            if (!selectedCharacter) {
+                if (learnState.lineIndex < lines.length - 1) {
+                    learnState.lineIndex++;
+                    saveSettings();
+                    renderLearnTab();
+                }
+                return;
+            }
+
+            // Find character's lines
+            const characterLines = [];
+            lines.forEach((dialogue, index) => {
+                if (dialogue.character === selectedCharacter) {
+                    characterLines.push(index);
+                }
+            });
+
+            // Advance to next step
+            if (learnState.lineIndex < characterLines.length) {
+                const oldLineIndex = learnState.lineIndex;
+                learnState.lineIndex++;
+                saveSettings();
+                renderLearnTab(false); // Don't clear content, just append
+                
+                // Scroll to the first newly added dialogue
+                setTimeout(() => {
+                    const content = document.getElementById('learn-content');
+                    const newDialogues = content.querySelectorAll('.dialogue');
+                    
+                    // Calculate the index of the first new dialogue
+                    let firstNewIndex = 0;
+                    if (oldLineIndex === 0) {
+                        // On first click, scroll to the character's first line
+                        firstNewIndex = characterLines[0];
+                    } else {
+                        const prevCharLineIndex = oldLineIndex - 1;
+                        const prevEndIndex = oldLineIndex < characterLines.length 
+                            ? characterLines[oldLineIndex] 
+                            : lines.length;
+                        firstNewIndex = prevEndIndex;
+                    }
+                    
+                    if (newDialogues[firstNewIndex]) {
+                        newDialogues[firstNewIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 50);
+            }
+        }
+
+        // Restart scene in Learn mode
+        function restartScene() {
+            learnState.lineIndex = 0;
+            saveSettings();
+            renderLearnTab(true); // Clear content and restart
+        }
+
+        // Open navigation modal
+        function openNavigation(source) {
+            const modal = document.getElementById('navigation-modal');
+            const modalBody = document.getElementById('modal-body');
+            modalBody.innerHTML = '';
+
+            playData.acts.forEach((act, actIndex) => {
+                const actItem = document.createElement('div');
+                actItem.className = 'nav-item nav-act';
+                actItem.textContent = act.title;
+                actItem.onclick = () => navigateToScene(actIndex, 0, source);
+                modalBody.appendChild(actItem);
+
+                act.scenes.forEach((scene, sceneIndex) => {
+                    const sceneItem = document.createElement('div');
+                    sceneItem.className = 'nav-item nav-scene';
+                    sceneItem.textContent = scene.title;
+                    sceneItem.onclick = () => navigateToScene(actIndex, sceneIndex, source);
+
+                    if (source === 'learn' && actIndex === learnState.actIndex && sceneIndex === learnState.sceneIndex) {
+                        sceneItem.classList.add('current');
+                    }
+
+                    modalBody.appendChild(sceneItem);
+                });
+            });
+
+            modal.classList.add('active');
+        }
+
+        // Close navigation modal
+        function closeNavigation(event) {
+            if (event.target.id === 'navigation-modal') {
+                document.getElementById('navigation-modal').classList.remove('active');
+            }
+        }
+
+        // Navigate to a specific scene
+        function navigateToScene(actIndex, sceneIndex, source) {
+            if (source === 'learn') {
+                learnState.actIndex = actIndex;
+                learnState.sceneIndex = sceneIndex;
+                learnState.lineIndex = 0;
+                saveSettings();
+                renderLearnTab();
+            } else if (source === 'read') {
+                readState.actIndex = actIndex;
+                readState.sceneIndex = sceneIndex;
+                saveSettings();
+                
+                // Scroll to the scene block
+                const sceneBlocks = document.querySelectorAll('#read-content .scene-block');
+                let totalSceneIndex = 0;
+                for (let i = 0; i < actIndex; i++) {
+                    totalSceneIndex += playData.acts[i].scenes.length;
+                }
+                totalSceneIndex += sceneIndex;
+                
+                if (sceneBlocks[totalSceneIndex]) {
+                    sceneBlocks[totalSceneIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
+            closeNavigation({ target: { id: 'navigation-modal' } });
+        }
+
+        // Save settings to localStorage
+        function saveSettings() {
+            setStorage('selectedCharacter', selectedCharacter);
+            setStorage('readState', JSON.stringify(readState));
+            setStorage('learnState', JSON.stringify(learnState));
+        }
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const savedCharacter = getStorage('selectedCharacter');
+            if (savedCharacter) {
+                selectedCharacter = savedCharacter;
+                const select = document.getElementById('character-select');
+                if (select) {
+                    select.value = savedCharacter;
+                }
+            }
+
+            const savedReadState = getStorage('readState');
+            if (savedReadState) {
+                try {
+                    readState = JSON.parse(savedReadState);
+                } catch (e) {
+                    console.error('Error parsing readState:', e);
+                }
+            }
+
+            const savedLearnState = getStorage('learnState');
+            if (savedLearnState) {
+                try {
+                    learnState = JSON.parse(savedLearnState);
+                } catch (e) {
+                    console.error('Error parsing learnState:', e);
+                }
+            }
+            
+            // Load and apply text size
+            const textSize = getStorage('textSize') || 'normal';
+            applyTextSize(textSize);
+        }
+        
+        // Apply text size to body
+        function applyTextSize(size) {
+            document.body.classList.remove('text-small', 'text-normal', 'text-large');
+            document.body.classList.add(`text-${size}`);
+            
+            // Update button states
+            document.querySelectorAll('.text-size-btn').forEach(btn => {
+                if (btn.dataset.size === size) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // Initialize the app when DOM is ready
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
