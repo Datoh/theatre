@@ -332,7 +332,8 @@
         .stats-table thead th {
             font-weight: 600;
             color: var(--text-primary);
-            border-bottom: 2px solid var(--border-color);
+            border-top: 2px solid var(--text-light);
+            border-bottom: 2px solid var(--text-light);
         }
 
         .stats-table td {
@@ -350,8 +351,12 @@
         }
 
         .stats-table .stats-total td {
-            border-top: 2px solid var(--border-color);
-            border-bottom: none;
+            border-top: 2px solid var(--text-light);
+            border-bottom: 2px solid var(--text-light);
+        }
+
+        .stats-table tr.act-start td {
+            border-top: 2px solid var(--text-light);
         }
 
         .stats-table .mine {
@@ -1956,7 +1961,7 @@ Eugénie       : Le prochain weekend de Pâques.`;
             const container = document.getElementById('stats-table');
             const totals = {};
             const rows = [];
-            playData.acts.forEach(act => {
+            playData.acts.forEach((act, actIndex) => {
                 act.scenes.forEach(scene => {
                     const counts = {};
                     scene.dialogues.forEach(dialogue => {
@@ -1964,7 +1969,7 @@ Eugénie       : Le prochain weekend de Pâques.`;
                         totals[dialogue.character] = (totals[dialogue.character] || 0) + 1;
                     });
                     const label = act.scenes.length > 1 ? `${act.title}, ${scene.title}` : act.title;
-                    rows.push({ label, counts, total: scene.dialogues.length });
+                    rows.push({ label, counts, total: scene.dialogues.length, actIndex });
                 });
             });
             const characters = Object.keys(totals).sort((a, b) => totals[b] - totals[a] || a.localeCompare(b));
@@ -1989,8 +1994,11 @@ Eugénie       : Le prochain weekend de Pâques.`;
             addCell(head, 'th', 'Total');
 
             const body = table.createTBody();
-            rows.forEach(row => {
+            rows.forEach((row, index) => {
                 const tr = body.insertRow();
+                if (index > 0 && row.actIndex !== rows[index - 1].actIndex) {
+                    tr.className = 'act-start';
+                }
                 addCell(tr, 'td', row.label);
                 characters.forEach(character => {
                     const count = row.counts[character] || 0;
