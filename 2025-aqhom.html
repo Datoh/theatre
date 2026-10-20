@@ -298,6 +298,66 @@
             border-color: #3498db;
         }
 
+        /* Line count table */
+        .stats-wrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        .stats-table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 14px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stats-table th,
+        .stats-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border-light);
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .stats-table th:first-child,
+        .stats-table td:first-child {
+            text-align: left;
+            position: sticky;
+            left: 0;
+            background-color: var(--bg-secondary);
+        }
+
+        .stats-table thead th {
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .stats-table td {
+            color: var(--text-secondary);
+        }
+
+        .stats-table td.zero {
+            color: var(--text-light);
+        }
+
+        .stats-table .stats-total td,
+        .stats-table .stats-total-col {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stats-table .stats-total td {
+            border-top: 2px solid var(--border-color);
+            border-bottom: none;
+        }
+
+        .stats-table .mine {
+            background-color: var(--highlight-bg);
+        }
+
         /* Read Tab */
         .scene-block {
             background-color: transparent;
@@ -513,7 +573,8 @@
 <body>
     <script>
         // Raw play text
-        const rawPlayText = `#À quelle heure on ment ?
+        const rawPlayText = `@Vivien Lheraux
+#À quelle heure on ment ?
 ##Acte 1
 ###Scène 1
 Arthur    : Ma chère Rosalie, sans vouloir me vanter, je peux affirmer que la filature Legendre ne s'est jamais aussi bien portée. Ce matin, le comptable m'a transmis les chiffres : nous avons encore progressé de 25 %. Vous verrez que l'année 1921 sera excellente.
@@ -1320,6 +1381,10 @@ Anne      : (Arthur et Sandra entrent sur scène et applaudissent le public.) La
                         <button class="text-size-btn" data-size="large">Grand</button>
                     </div>
                 </div>
+                <div class="settings-group">
+                    <label class="settings-label">Nombre de répliques</label>
+                    <div class="stats-wrap" id="stats-table"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -1492,6 +1557,7 @@ Anne      : (Arthur et Sandra entrent sur scène et applaudissent le public.) La
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
                 // Reset character colors to apply new palette
                 Object.keys(characterColors).forEach(key => delete characterColors[key]);
+                renderStats();
                 
                 // Re-render current tab
                 if (currentTab === 'read') {
@@ -1500,6 +1566,64 @@ Anne      : (Arthur et Sandra entrent sur scène et applaudissent le public.) La
                     renderLearnTab();
                 }
             });
+        }
+
+        // Render the line count table (scenes x characters, with totals)
+        function renderStats() {
+            const container = document.getElementById('stats-table');
+            const totals = {};
+            const rows = [];
+            playData.acts.forEach(act => {
+                act.scenes.forEach(scene => {
+                    const counts = {};
+                    scene.dialogues.forEach(dialogue => {
+                        counts[dialogue.character] = (counts[dialogue.character] || 0) + 1;
+                        totals[dialogue.character] = (totals[dialogue.character] || 0) + 1;
+                    });
+                    const label = act.scenes.length > 1 ? `${act.title}, ${scene.title}` : act.title;
+                    rows.push({ label, counts, total: scene.dialogues.length });
+                });
+            });
+            const characters = Object.keys(totals).sort((a, b) => totals[b] - totals[a] || a.localeCompare(b));
+            const grandTotal = rows.reduce((sum, row) => sum + row.total, 0);
+
+            const table = document.createElement('table');
+            table.className = 'stats-table';
+            const addCell = (tr, tag, text, className) => {
+                const cell = document.createElement(tag);
+                cell.textContent = text;
+                if (className) cell.className = className;
+                tr.appendChild(cell);
+                return cell;
+            };
+            const mine = character => character === selectedCharacter ? 'mine' : '';
+
+            const head = table.createTHead().insertRow();
+            addCell(head, 'th', 'Scène');
+            characters.forEach(character => {
+                addCell(head, 'th', character, mine(character)).style.color = getCharacterColor(character);
+            });
+            addCell(head, 'th', 'Total');
+
+            const body = table.createTBody();
+            rows.forEach(row => {
+                const tr = body.insertRow();
+                addCell(tr, 'td', row.label);
+                characters.forEach(character => {
+                    const count = row.counts[character] || 0;
+                    addCell(tr, 'td', count || '–', [mine(character), count ? '' : 'zero'].join(' ').trim());
+                });
+                addCell(tr, 'td', row.total, 'stats-total-col');
+            });
+
+            const totalRow = body.insertRow();
+            totalRow.className = 'stats-total';
+            addCell(totalRow, 'td', 'Total');
+            characters.forEach(character => addCell(totalRow, 'td', totals[character], mine(character)));
+            addCell(totalRow, 'td', grandTotal);
+
+            container.innerHTML = '';
+            container.appendChild(table);
         }
 
         // Update page title with character if selected
@@ -1517,6 +1641,7 @@ Anne      : (Arthur et Sandra entrent sur scène et applaudissent le public.) La
             // Setup UI
             populateCharacterSelect();
             updateTitle();
+            renderStats();
             setupTabs();
             
             // Restore saved tab or default to 'read'
@@ -1539,6 +1664,7 @@ Anne      : (Arthur et Sandra entrent sur scène et applaudissent le public.) La
                 selectedCharacter = e.target.value;
                 saveSettings();
                 updateTitle();
+                renderStats();
                 
                 // Re-render current tab
                 if (currentTab === 'read') {

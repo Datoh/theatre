@@ -298,6 +298,66 @@
             border-color: #3498db;
         }
 
+        /* Line count table */
+        .stats-wrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        .stats-table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 14px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stats-table th,
+        .stats-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border-light);
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .stats-table th:first-child,
+        .stats-table td:first-child {
+            text-align: left;
+            position: sticky;
+            left: 0;
+            background-color: var(--bg-secondary);
+        }
+
+        .stats-table thead th {
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .stats-table td {
+            color: var(--text-secondary);
+        }
+
+        .stats-table td.zero {
+            color: var(--text-light);
+        }
+
+        .stats-table .stats-total td,
+        .stats-table .stats-total-col {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stats-table .stats-total td {
+            border-top: 2px solid var(--border-color);
+            border-bottom: none;
+        }
+
+        .stats-table .mine {
+            background-color: var(--highlight-bg);
+        }
+
         /* Read Tab */
         .scene-block {
             background-color: transparent;
@@ -513,7 +573,8 @@
 <body>
     <script>
         // Raw play text
-        const rawPlayText = `#À tous les coups !
+        const rawPlayText = `@Vivien Lheraux
+#À tous les coups !
 ##Acte 1
 ###Scène 1
 Catherine : (Le logement de Catherine est insalubre. Les murs jaunis sont tachés d'humidité, le papier peint se détache par endroits et laisse apparaître le plâtre fissuré. Un seau est posé dans un coin de la pièce. Le mobilier est rare, usé et dépareillé : une table abîmée, quelques chaises bancales, un vieux fauteuil. Un petit meuble avec un tiroir supporte une lampe fatiguée, dont la lumière vacillera régulièrement, s'allumant et s'éteignant pour signaler les fréquentes pannes de courant. Une porte s'ouvre sur un couloir desservant la chambre, la cuisine et le balcon extérieur. Catherine est assise dans le fauteuil affaissé. Elle porte des vêtements sombres et sans éclat, ils sont propres mais fatigués. Une couverture usée repose sur ses genoux. D'une main, Catherine tient un stylo avec lequel elle note les mots qu'elle inscrit dans une grille de mots croisés. Elle porte par moments à ses lèvres une tasse de tisane. La lampe clignote par instants, plongeant brièvement la scène dans la pénombre.) Voyons... En 10 lettres : désastre, événement destructeur. Facile : cataclysme. En 11 lettres : situation tragique, soudaine. Catastrophe ? Oui, ça doit être ça. Catastrophe. En 11 lettres : (familier), embêtement, dérangement. (étonnée, elle regarde le public) Emmerdement ? C'est ça ? (Catherine regarde l'heure à son collier-montre. Elle a du mal à la lire car le cadran est inversé.)
@@ -1513,6 +1574,10 @@ Florence  : (au public) Oui ! Et on fêtera ensemble mon anniversaire !!! (Flore
                         <button class="text-size-btn" data-size="large">Grand</button>
                     </div>
                 </div>
+                <div class="settings-group">
+                    <label class="settings-label">Nombre de répliques</label>
+                    <div class="stats-wrap" id="stats-table"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -1685,6 +1750,7 @@ Florence  : (au public) Oui ! Et on fêtera ensemble mon anniversaire !!! (Flore
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
                 // Reset character colors to apply new palette
                 Object.keys(characterColors).forEach(key => delete characterColors[key]);
+                renderStats();
                 
                 // Re-render current tab
                 if (currentTab === 'read') {
@@ -1693,6 +1759,64 @@ Florence  : (au public) Oui ! Et on fêtera ensemble mon anniversaire !!! (Flore
                     renderLearnTab();
                 }
             });
+        }
+
+        // Render the line count table (scenes x characters, with totals)
+        function renderStats() {
+            const container = document.getElementById('stats-table');
+            const totals = {};
+            const rows = [];
+            playData.acts.forEach(act => {
+                act.scenes.forEach(scene => {
+                    const counts = {};
+                    scene.dialogues.forEach(dialogue => {
+                        counts[dialogue.character] = (counts[dialogue.character] || 0) + 1;
+                        totals[dialogue.character] = (totals[dialogue.character] || 0) + 1;
+                    });
+                    const label = act.scenes.length > 1 ? `${act.title}, ${scene.title}` : act.title;
+                    rows.push({ label, counts, total: scene.dialogues.length });
+                });
+            });
+            const characters = Object.keys(totals).sort((a, b) => totals[b] - totals[a] || a.localeCompare(b));
+            const grandTotal = rows.reduce((sum, row) => sum + row.total, 0);
+
+            const table = document.createElement('table');
+            table.className = 'stats-table';
+            const addCell = (tr, tag, text, className) => {
+                const cell = document.createElement(tag);
+                cell.textContent = text;
+                if (className) cell.className = className;
+                tr.appendChild(cell);
+                return cell;
+            };
+            const mine = character => character === selectedCharacter ? 'mine' : '';
+
+            const head = table.createTHead().insertRow();
+            addCell(head, 'th', 'Scène');
+            characters.forEach(character => {
+                addCell(head, 'th', character, mine(character)).style.color = getCharacterColor(character);
+            });
+            addCell(head, 'th', 'Total');
+
+            const body = table.createTBody();
+            rows.forEach(row => {
+                const tr = body.insertRow();
+                addCell(tr, 'td', row.label);
+                characters.forEach(character => {
+                    const count = row.counts[character] || 0;
+                    addCell(tr, 'td', count || '–', [mine(character), count ? '' : 'zero'].join(' ').trim());
+                });
+                addCell(tr, 'td', row.total, 'stats-total-col');
+            });
+
+            const totalRow = body.insertRow();
+            totalRow.className = 'stats-total';
+            addCell(totalRow, 'td', 'Total');
+            characters.forEach(character => addCell(totalRow, 'td', totals[character], mine(character)));
+            addCell(totalRow, 'td', grandTotal);
+
+            container.innerHTML = '';
+            container.appendChild(table);
         }
 
         // Update page title with character if selected
@@ -1710,6 +1834,7 @@ Florence  : (au public) Oui ! Et on fêtera ensemble mon anniversaire !!! (Flore
             // Setup UI
             populateCharacterSelect();
             updateTitle();
+            renderStats();
             setupTabs();
             
             // Restore saved tab or default to 'read'
@@ -1732,6 +1857,7 @@ Florence  : (au public) Oui ! Et on fêtera ensemble mon anniversaire !!! (Flore
                 selectedCharacter = e.target.value;
                 saveSettings();
                 updateTitle();
+                renderStats();
                 
                 // Re-render current tab
                 if (currentTab === 'read') {

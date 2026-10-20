@@ -1,0 +1,2535 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pièce de théâtre</title>
+    <style>
+        :root {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: white;
+            --bg-header: #34495e;
+            --text-primary: #333;
+            --text-secondary: #555;
+            --text-muted: #666;
+            --text-light: #7f8c8d;
+            --border-color: #ddd;
+            --border-light: #ecf0f1;
+            --highlight-bg: #d6ebf7;
+            --highlight-border: #3498db;
+            --shadow-light: rgba(0,0,0,0.05);
+            --shadow-medium: rgba(0,0,0,0.08);
+            --shadow-dark: rgba(0,0,0,0.1);
+            --modal-overlay: rgba(0,0,0,0.5);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: #0d0d0d;
+                --bg-secondary: #3d3d3d;
+                --bg-header: #0d0d0d;
+                --text-primary: #ffffff;
+                --text-secondary: #f5f5f5;
+                --text-muted: #e0e0e0;
+                --text-light: #cccccc;
+                --border-color: #555555;
+                --border-light: #4a4a4a;
+                --highlight-bg: #2a5d8a;
+                --highlight-border: #a8daff;
+                --shadow-light: rgba(0,0,0,0.3);
+                --shadow-medium: rgba(0,0,0,0.4);
+                --shadow-dark: rgba(0,0,0,0.5);
+                --modal-overlay: rgba(0,0,0,0.7);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh; /* Dynamic viewport height for mobile */
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--bg-header);
+            color: white;
+            padding: 12px 16px;
+            text-align: center;
+            box-shadow: 0 2px 4px var(--shadow-dark);
+            z-index: 100;
+            order: 1;
+            flex-shrink: 0;
+            min-height: 50px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .fullscreen-btn {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+        }
+
+        .fullscreen-btn:hover {
+            opacity: 0.7;
+        }
+
+        .fullscreen-btn:active {
+            opacity: 0.5;
+        }
+
+        /* Tab Navigation */
+        .tabs {
+            display: flex;
+            background-color: #d5d5d5;
+            border-top: 2px solid var(--border-color);
+            box-shadow: 0 -4px 8px var(--shadow-light);
+            order: 3;
+            z-index: 999;
+            flex-shrink: 0;
+            min-height: 60px;
+            height: 60px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 16px 0;
+            text-align: center;
+            background-color: #e8e8e8;
+            border: none;
+            color: #555;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tab.active {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .tabs {
+                background-color: #2c3e50;
+            }
+            
+            .tab {
+                background-color: #3d3d3d;
+                color: #95a5a6;
+            }
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background-color: var(--bg-primary);
+            -webkit-overflow-scrolling: touch;
+            order: 2;
+            min-height: 0;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 16px;
+            animation: fadeIn 0.3s;
+        }
+
+        #read-tab,
+        #learn-tab {
+            padding: 0;
+        }
+        
+        #learn-tab.active {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Settings Tab */
+        .settings-content {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px var(--shadow-dark);
+        }
+
+        .settings-group {
+            margin-bottom: 24px;
+        }
+
+        .settings-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .settings-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .text-size-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .text-size-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .text-size-btn:hover {
+            border-color: #3498db;
+        }
+
+        .text-size-btn.active {
+            background-color: #3498db;
+            border-color: #3498db;
+            color: white;
+        }
+
+        /* Text size variations */
+        body.text-small {
+            font-size: 14px;
+        }
+
+        body.text-small .dialogue-text {
+            font-size: 14px;
+        }
+
+        body.text-small .dialogue-character {
+            font-size: 12px;
+        }
+
+        body.text-normal {
+            font-size: 16px;
+        }
+
+        body.text-normal .dialogue-text {
+            font-size: 16px;
+        }
+
+        body.text-normal .dialogue-character {
+            font-size: 14px;
+        }
+
+        body.text-large {
+            font-size: 18px;
+        }
+
+        body.text-large .dialogue-text {
+            font-size: 18px;
+        }
+
+        body.text-large .dialogue-character {
+            font-size: 16px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        /* Line count table */
+        .stats-wrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        .stats-table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 14px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stats-table th,
+        .stats-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border-light);
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .stats-table th:first-child,
+        .stats-table td:first-child {
+            text-align: left;
+            position: sticky;
+            left: 0;
+            background-color: var(--bg-secondary);
+        }
+
+        .stats-table thead th {
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .stats-table td {
+            color: var(--text-secondary);
+        }
+
+        .stats-table td.zero {
+            color: var(--text-light);
+        }
+
+        .stats-table .stats-total td,
+        .stats-table .stats-total-col {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stats-table .stats-total td {
+            border-top: 2px solid var(--border-color);
+            border-bottom: none;
+        }
+
+        .stats-table .mine {
+            background-color: var(--highlight-bg);
+        }
+
+        /* Read Tab */
+        .scene-block {
+            background-color: transparent;
+            border-radius: 8px;
+            padding: 0 16px 16px 16px;
+            margin-bottom: 16px;
+        }
+
+        .dialogue {
+            margin-bottom: 12px;
+            line-height: 1.6;
+            background-color: var(--bg-secondary);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        .dialogue-character {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .dialogue-text {
+            color: var(--text-secondary);
+        }
+
+        .dialogue.highlight {
+            background-color: var(--highlight-bg);
+            border: 2px solid var(--highlight-border);
+        }
+
+        /* Learn Tab */
+        .learn-controls {
+            background-color: var(--bg-secondary);
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -2px 4px var(--shadow-dark);
+            flex-shrink: 0;
+        }
+
+        .learn-scene-header {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            box-shadow: 0 2px 4px var(--shadow-dark);
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            margin-bottom: 12px;
+        }
+
+        .learn-scene-header:active {
+            background-color: #2980b9;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-back {
+            background-color: #3498db;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-back:active {
+            background-color: #2980b9;
+        }
+
+        .btn-next {
+            background-color: #3498db;
+            color: white;
+            flex: 2;
+        }
+
+        .btn-next:active {
+            background-color: #2980b9;
+        }
+
+        .btn-back:disabled,
+        .btn-next:disabled {
+            background-color: var(--border-light);
+            color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .learn-content-area {
+            background-color: transparent;
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .dialogue.my-character {
+            background-color: var(--highlight-bg);
+            border: 2px solid var(--highlight-border);
+        }
+
+        /* Navigation Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--modal-overlay);
+            z-index: 1000;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--bg-secondary);
+            width: 90%;
+            max-width: 400px;
+            max-height: 70vh;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            background-color: var(--bg-header);
+            color: white;
+            padding: 16px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .modal-body {
+            overflow-y: auto;
+            max-height: calc(70vh - 60px);
+        }
+
+        .nav-item {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .nav-item:active {
+            background-color: var(--border-light);
+        }
+
+        .nav-item.current {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .nav-item.current {
+                background-color: #1e3a4a;
+            }
+        }
+
+        .nav-act {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .nav-scene {
+            color: var(--text-light);
+            padding-left: 20px;
+        }
+
+        .arrow-icon {
+            float: right;
+            color: #95a5a6;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Raw play text
+        const rawPlayText = `@Antoine Rivoire et Jérôme Cartier
+#Un week-end de Pâques
+##Samedi
+###17h30
+Eugénie       : (Le canapé est en position lit. Fred est assis sur le matelas, les yeux dans le vide. La couette et l'oreiller sont au sol. Eugénie arrive. Elle tient dans ses bras un drap-housse, une housse de couette et une taie d'oreiller. Au-dessus du linge, elle maintient également un plateau contenant un mug et une assiette pleine de cookies.) (voyant la couette et l'oreiller, et s'arrêtant) Fred, fais attention !
+Fred          : (sans l'entendre, préoccupé) C'est peut-être mes slips.
+Eugénie       : (sans faire attention, laissant tomber le linge de lit sur le matelas et posant le plateau) Je veux que tout soit impeccable.
+Fred          : (dans ses pensées) Ou alors mes bières.
+Eugénie       : (se retournant vers Fred) Quoi, tes bières ?
+Fred          : C'est peut-être pour ça qu'elle m'a quitté.
+Eugénie       : (allant vers la couette) Arrête de ressasser tout ça !
+Fred          : Je laisse tout traîner…
+Eugénie       : Ne pense plus à Clara. Il faut aller de l'avant. Je t'ai fait un chocolat et des cookies. (Elle ramasse la couette et l'oreiller.)
+Fred          : Un chocolat et des … ? Pourquoi ?
+Eugénie       : (posant la couette et l'oreiller sur la chaise) Pour ton goûter.
+Fred          : (ironique) Mon goûter ? Non mais, je suis plus en sixième, qu'est-ce que tu…
+Eugénie       : (le coupant) On s'y met parce que… (Geste du temps qui file.)
+Fred          : (alors qu'Eugénie lui met dans chaque main un coin du drap-housse) Qui est-ce qui va dormir ici ?
+Eugénie       : (tenant l'autre côté du drap) Tends-le.
+Fred          : (sans bouger, les yeux de nouveau dans le vague) Après la douche, je laissais toujours mes slips sur la porte…
+Eugénie       : Tends-le ! (Machinalement, Fred tend brusquement le drap-housse et manque de faire tomber Eugénie.) Ah !
+Fred          : Et mes cannettes de bière… elles s'empilaient devant la télé…
+Eugénie       : (mettant avec peine le drap-housse sur le matelas, car Fred traîne les pieds) Fred… Clara est partie… c'est de l'histoire ancienne… passe à autre chose !
+Fred          : (faisant tourner les souvenirs dans sa tête) Ou bien les rouleaux de PQ.
+Eugénie       : (lançant la housse de couette à Fred) Attrape ! (Fred ne l'attrape pas et la laisse tomber à terre, les yeux dans ses pensées.) Fred, s'il te plaît !
+Fred          : (comme sortant d'un rêve et ramassant la housse) Je sais, faut que je bouge, tu me l'as déjà dit…
+Eugénie       : (tentant d'enfiler la couette dans la housse alors que Fred recule) Oui, dans la vie, il faut se bouger ! Regarde, moi, je ne compte pas moisir longtemps dans cette boîte d'intérim. (Tous les deux décrivent des cercles car l'un recule quand l'autre avance…) Je n'ose même plus appeler mes copines… Tu te rends compte ? À l'âge que j'ai ? Pas mariée, pas en couple, pas d'enfant, pas propriétaire, pas de CDI, pas de… (S'arrêtant :) Qu'est-ce que tu fais ?
+Fred          : (s'arrêtant également) Quoi ?
+Eugénie       : Comment veux-tu qu'on y arrive ? T'arrêtes pas de bouger.
+Fred          : (perdu) C'est toi qui viens de me dire que dans la vie, il fallait se…
+Eugénie       : (le coupant) Je sais que ça a été dur pour toi. Se faire licencier comme ça… je sais ce que c'est ! Et après, Clara qui s'en va… Mais moi je donne de ma personne, je fais heures sup sur heures sup pour que tu sois bien…
+Fred          : Attends, moi, je t'ai jamais demandé de me…
+Eugénie       : Je me saigne aux quatre veines…
+Fred          : Tout de suite les grands mots…
+Eugénie       : (montrant le mug) Ceci est mon sang. (Montrant les cookies :) Et ça, c'est mon corps.
+Fred          : (pour lui) Putain… (Il jette couette et housse-de-couette et sort.)
+Eugénie       : Fred ? Fred ! (Soupir, puis, à mi-voix :) Oh non c'est pas vrai… (Elle s'effondre et pleure.) (Max entre.)
+Max           : Nini ? Ça va pas ?
+Eugénie       : (essuyant vivement ses larmes) C'est plein de poussière, ici…
+Max           : J'ai croisé ton frère, il m'a à peine dit bonjour.
+Eugénie       : On s'engueule tout le temps…
+Max           : (sortant un papier qu'il montre à Eugénie) Regarde…
+Eugénie       : C'est ton diplôme ?
+Max           : (triomphant) Yes !
+Eugénie       : (sincèrement heureuse) Wouah ! (Ils se prennent dans les bras l'un l'autre.)
+Max           : (se présentant) Coach certifié !
+Eugénie       : Félicitations !
+Max           : Merci.
+Eugénie       : C'était dans quelle fac ?
+Max           : Quoi ?
+Eugénie       : Ta formation, c'était dans quelle fac ?
+Max           : Ah, euh… c'était pas dans une fac…
+Eugénie       : C'était où, alors ?
+Max           : Eh bien c'était euh… un genre de campus privé, tu vois…
+Eugénie       : Mais euh… reconnu par l'État ?
+Max           : Euh… non. Privé-privé. (Un peu gêné, se justifiant :) Les méthodes nouvelles, ça met toujours un peu de temps à être reconnu…
+Eugénie       : Mais alors, ton diplôme ?
+Max           : Oh… un simple bout de papier… histoire de marquer le coup…
+Eugénie       : Donc, tu te lances ?
+Max           : Je veux ! Surtout à quatre-vingts de l'heure.
+Eugénie       : Eh ben… tu doutes de rien…
+Max           : La qualité, ça se paie ! (Il sort une carte et la donne à Eugénie.)
+Eugénie       : (lisant la carte) « Max Brod, coach personnel et professionnel, stratégie par objectifs ».
+Max           : Et je garantis des résultats 100% gagnants. Satisfait ou remboursé !
+Eugénie       : C'est quoi, le secret ?
+Max           : Le secret : c'est toi.
+Eugénie       : Moi ?
+Max           : Toi ! Tu peux tout réaliser, si tu t'en donnes la peine.
+Eugénie       : Moi ? Moi, je peux tout ?
+Max           : Tout !
+Eugénie       : Mais j'arrive à rien.
+Max           : Alors remets-toi en question !
+Eugénie       : T'as raison…
+Max           : Fais un bilan rapide de ta vie. Vas-y.
+Eugénie       : Quoi ? Là ? Tout de suite ?
+Max           : Un bon bilan, ça se fait en une minute.
+Eugénie       : (réfléchissant) Un bilan rapide de ma vie… d'accord… alors… bon… Déjà… À mon âge, je suis toujours pas proprio…
+Max           : Pourquoi ?
+Eugénie       : Quand tu bosses en intérim, les banques sont réticentes à te prêter de l'argent…
+Max           : (ironique) Oh les vilaines ! (Sérieux :) C'était ton choix.
+Eugénie       : Euh…non ! Je t'assure qu'elles ne m'ont pas laissé le choix…
+Max           : Les banques traditionnelles, peut-être. Mais si tu étais allée dans une néo-banque, tu aurais un prêt à taux révisable et tu serais proprio.
+Eugénie       : (saisie) Peut-être.
+Max           : Pas d'illusion : tu es responsable de ta situation.
+Eugénie       : T'as raison.
+Max           : Poursuis.
+Eugénie       : (réfléchissant) Eh bien… euh… Sur le plan pro, je me suis fait licencier de mon poste comme une malpropre. À ma place, ils ont engagé une petite jeune. J'ai atterri dans l'intérim…
+Max           : (ironique) Oh ! Tes anciens patrons, ils étaient vraiment pas sympas… (Sérieux :) Mais tu les as bien aidés.
+Eugénie       : Je les ai aidés ? Aidés à me virer ?
+Max           : Si tu avais revu à la baisse tes exigences de salaire, ils n'auraient pas eu besoin d'embaucher quelqu'un avec moins d'expérience et tu bosserais encore chez eux.
+Eugénie       : (saisie) Peut-être.
+Max           : Pas d'illusion : tu es responsable de ta situation.
+Eugénie       : T'as raison.
+Max           : Poursuis.
+Eugénie       : Euh… C'est vraiment très intéressant Max, mais… il faut tout de même que je prépare le lit…
+Max           : T'en fais pas, je ferai ça tout à l'heure quand je me coucherai.
+Eugénie       : Tu ne dors pas là.
+Max           : Hein ?
+Eugénie       : Je t'ai mis au-dessus du garage.
+Max           : Je suis puni ?
+Eugénie       : J'ai invité quelqu'un d'autre. Je dormirai là.
+Max           : Ah ?
+Eugénie       : Édouard Saint-Benoist. C'est le SB de l'agence TWSB. Je le mets dans ma chambre.
+Max           : Tu le connais d'où ?
+Eugénie       : j'ai fait une mission chez eux et… on a bien accroché et…
+Max           : Et tu l'as invité en weekend. Et il a accepté…
+Eugénie       : S'il pouvait me proposer quelque chose, ça me sortirait vraiment de la… (Son téléphone sonne.) C'est lui ! (Décrochant, aimable :) Oui, Édouard ? (Un temps.) Quoi ? (Un autre temps.) Non ! (Nouveau temps.) Mais vous… vous allez pouvoir venir ou ?... (Un temps.) Ah. (Un temps.) D'ici une heure ? (Un temps.) Non, non, venez, je vous en prie ! (Un temps.) Nous vous attendons, Édouard. (Un temps.) Mais, vous voulez que je vienne vous chercher ? (Un temps.) Vous êtes sûr ? C'est dommage de prendre un taxi alors que je vous… (Un temps.) Comme vous voulez. (Un temps.) Moi aussi, Édouard, à tout à l'heure. (Elle raccroche.) Il a fait un malaise.
+Max           : Grave ?
+Eugénie       : Un coup de fatigue, apparemment.
+Max           : En voilà encore un qu'a besoin d'un coach.
+###18h
+Eugénie       : (Max et Eugénie sont en train d'émincer des légumes.) Toujours pas de nouvelles…
+Max           : Il va te rappeler… il a sûrement des examens à faire…
+Eugénie       : Peut-être.
+Max           : (sortant un sachet) J'ai amené mon blé khorasan pour le petit-déjeuner.
+Eugénie       : Mis à part toi, je ne sais pas qui peut manger ça…
+Max           : Il a des vertus aphrodisiaques…
+Eugénie       : Comme tu vois, la cuisine est un peu sommaire. Alors je me suis dit : une bolognaise, c'est l'idéal.
+Max           : Justement, je voulais que tu me montres comment faire.
+Eugénie       : On coupe tout, on jette tout dans la sauteuse et y a plus qu'à laisser cuire à petit feu.
+Max           : Et c'est un plat que tu fais divinement. (Un petit sourire :) Tu veux vraiment le séduire…
+Eugénie       : Le séduire ? Je ne dirais pas non … C'est vrai qu'il a de la classe… Il paraît qu'il a une petite maison, à Étretat. Une sorte de … de garçonnière… Si seulement… si seulement… il me glissait, au détour d'une phrase : « Eugénie, pourquoi ne viendriez-vous pas passer quelques jours à Étretat ? » Je saurais que j'ai franchi une étape… En tout cas, il pourrait nous faire profiter de quelques opportunités. Et donner du boulot à Fred.
+Max           : Fred doit se trouver un boulot tout seul.
+Eugénie       : Dans un monde parfait, peut-être. Mais Fred a besoin d'un petit coup de pouce.
+Max           : Arrête de lui trouver des excuses. Il est responsable de ce qui lui arrive.
+Eugénie       : Responsable de ce qui lui arrive ? Tu sais bien comment ça s'est passé. Sa boîte a plongé, ils ont fait plusieurs charrettes et il était dans la deuxième.
+Max           : Il est tout de même responsable.
+Eugénie       : Responsable de quoi ? D'avoir eu des patrons incapables d'anticiper les transformations du marché ?
+Max           : Responsable de la façon dont il a réagi à son licenciement. (Un bref silence désapprobateur d'Eugénie.) Je vois bien : il refuse de faire face, il fuit.
+Eugénie       : Aide-nous.
+Max           : Nous ?
+Eugénie       : Oui, nous. Fred et moi.
+Max           : Toi ?
+Eugénie       : Je bosse comme une bête de somme pour zéro reconnaissance…
+Max           : Et tu veux que je vous aide ?
+Eugénie       : On serait tes premiers clients.
+Max           : Je ne sais pas…
+Eugénie       : Je croyais que tu voulais te lancer.
+Max           : (hésitant) Je veux me lancer…
+Eugénie       : Tu n'as plus l'air si motivé…
+Max           : Je ne suis pas motivé, je suis hyper motivé ! Notre vie ne ressemble plus à celle de nos parents. Aujourd'hui il faut sans cesse s'adapter et inventer des dispositifs agiles, susceptibles d'accompagner les grandes mutations du monde. Grâce aux compétences que j'ai acquises, j'ai envie d'aider les gens à développer leur plein potentiel, tout simplement parce que j'ai la conviction qu'une vie réussie, c'est une vie professionnelle réussie. Bien entendu, je proposerai des consultations personnelles ou des interventions en milieu professionnel. Mais je veux aller plus loin : organiser des conférences qui me permettront de synthétiser ma façon de voir. D'ailleurs j'ai commencé à écrire un livre dans lequel je raconte mon parcours et les enseignements que j'en ai tirés. D'ici quelques jours, je lancerai ma chaîne Youtube. L'idée, c'est de diffuser des petites capsules donnant des conseils simples mais opérationnels pour améliorer sa vie au quotidien et me procurer ainsi une audience plus large. On peut coacher les individus, j'en ai eu la preuve. On peut coacher des entreprises, je sais que ça se fait. Mais je suis persuadé qu'on peut aller encore plus loin : coacher la France, coacher l'Europe, coacher le monde.
+Eugénie       : Alors tu veux bien ?
+Max           : Quoi ?
+Eugénie       : Ben, nous coacher, Fred et moi.
+Max           : Je sais pas si vous êtes prêts.
+Eugénie       : Moi toute seule, alors.
+Max           : C'est la même chose.
+Eugénie       : T'exagères…
+Max           : Est-ce que ça correspond à quelque chose de profond chez toi ?
+Eugénie       : Oui.
+Max           : Tu dis ça, tu dis ça… Mais tu serais bien le genre à me renier trois fois avant que le coq ait chanté…
+Eugénie       : Pourquoi ?
+Max           : Tout le monde veut s'améliorer, mais peu osent s'affirmer et endosser un rôle de catalyseur, un rôle de leader.
+Eugénie       : C'est tellement vrai… Alors, tu vois, d'abord l'huile d'olive.
+Max           : Par exemple : le travail. Beaucoup disent : « Quoi, je dois gagner ma vie ? Je croyais que c'était gratuit ! »
+Eugénie       : J'y avais jamais pensé !
+Max           : Tu la laisses chauffer ?
+Eugénie       : Un petit peu.
+Max           : D'autres ne se voient pas dans un bureau jusqu'à soixante-sept ans.
+Eugénie       : Moi non plus ! On commence par les oignons.
+Max           : À petit feu ?
+Eugénie       : Faut surtout pas que ça crame.
+Max           : Surtout pour appliquer bien sagement les directives d'un patron incompétent.
+Eugénie       : J'adhère complètement. Tu touilles un peu pour éviter que ça adhère.
+Max           : Tu adhères ?
+Eugénie       : Moi oui, mais pas les oignons !
+Max           : Tu adhères, tu adhères…
+Eugénie       : Après tu mets l'ail.
+Max           : C'est facile de tout envoyer promener comme un ado irresponsable. Chacun ici a une contribution à apporter. Alors assume tes devoirs envers la communauté et verse-lui ton tribut.
+Eugénie       : Je verse le bœuf haché…
+Max           : Ne mélange pas tout.
+Eugénie       : On mélange bien la viande, les oignons et l'ail…
+Max           : Ne confonds pas liberté et oisiveté.
+Eugénie       : Oui, au fond, c'est vrai…
+Max           : Bosse, bosse, rebosse et défonce-toi !
+Eugénie       : Yes ! J'ai tendance à me laisser dévier de mes objectifs… (Se mettant à touiller avec énergie.) Tu vois, comme ça, rapidement, pour que la viande soit cuite de tous les côtés…
+Max           : Quand on est le nez dans le guidon, on a parfois du mal à prendre de la distance…
+Eugénie       : (touillant toujours, essoufflée) C'est un peu le problème, c'est vrai.
+Max           : C'est là que j'entends dire : « Je dois fonder un couple et devenir parent ? Pourquoi voulez-vous que je me jette dans un piège dont certains mettent une vie à se défaire ? »
+Eugénie       : La question se pose… Maintenant, c'est la purée de tomates. Et on mélange.
+Max           : Ne mélange pas tout, Eugénie.
+Eugénie       : Ben si. Il faut que le bœuf s'imprègne bien du jus et de ses saveurs.
+Max           : Ne mélange pas toutes les valeurs : liberté et transmission. Nous avons reçu un cadeau inestimable : la vie. Il est de notre devoir de l'offrir à notre tour. Les choses deviennent plus claires ?
+Eugénie       : (touillant toujours) Je ne sais pas… J'ai l'impression que tout est en train de… (Elle cherche le mot.)
+Max           : En train de quoi ?
+Eugénie       : (touillant toujours) En train de… de… (Elle regarde la sauteuse :) En train de se mélanger.
+Max           : Ah.
+Eugénie       : (touillant toujours) Comme ma sauce. (Déprimée :) J'ai de la bolognaise dans le cerveau. (Son téléphone sonne :) C'est lui ! (Répondant, charmeuse :) Allô Édouard ? Ah, voilà une bonne nouvelle ! (Un silence, puis, déçue :) Quoi ?
+Max           : Qu'est-ce qui se passe ?
+Eugénie       : (confidentielle) Il veut amener quelqu'un. Une personne qui l'a aidé après son malaise, qui l'a « sauvé », apparemment…
+Max           : Eugénie, c'est le moment d'affirmer ta personnalité. Refuse.
+Eugénie       : (confidentielle) Je ne peux pas lui faire ça !
+Max           : Dis-lui que c'est un weekend entre amis, et que tu ne veux pas imposer aux autres quelqu'un qu'on ne connaît pas du tout et…
+Eugénie       : (dans le téléphone) Pas de souci, Édouard ! Venez avec cette personne. Les amis de nos amis sont nos amis. Nous sommes positivement ravis de rencontrer votre sauveur. (Un temps.) Votre sauveuse ? Ah c'est une… (Un temps.) Oui, c'est cela, à tout à l'heure… (Défaite :) Il ramène une femme…
+Max           : Bien. On va tout reprendre depuis le début.
+###18h30
+Max           : (Eugénie est en train de mettre la table. Max est au téléphone.) Le prélèvement a été refusé, oui, je suis au courant, madame ! (Bref silence :) J'ai procédé au lancement de ma nouvelle activité d'indépendant, mais j'ai dû faire face à des dépenses imprévues qui ont entraîné des… (Il s'interrompt. Un silence :) Quoi ? C'est honteux ! (Un temps.) Mais la situation va s'arranger, madame. J'ai justement des rentrées d'argent en vue. (Un temps.) Prochainement. (Un autre temps.) Prochainement, je vous dis. (Un autre temps, criant :) Pro-chai-ne-ment ! (Il raccroche :) Quelle conne !
+Eugénie       : (dont les oreilles ont été heurtées par ce mot) Max…
+Max           : Excuse-moi, Nini, mais elle m'a poussé à bout. Ma banque…
+Eugénie       : À cette heure-ci ?
+Max           : Une plateforme délocalisée je ne sais plus où…
+Eugénie       : Un problème ?
+Max           : Un copain devait me filer du fric pour m'aider à m'installer, mais ce judas m'a trahi, alors maintenant j'ai la banque qui me…
+Eugénie       : Aide-moi, ils ne vont pas tarder…
+Max           : Ah oui, c'est vrai… (Saint-Benoist entre, suivi de Daria.)
+Saint-Benoist : Eugénie ? Vous êtes là ?
+Eugénie       : (nerveuse mais se voulant cordiale) Édouard ! (Elle s'approche de lui pour lui faire la bise mais ils ne savent pas comment s'y prendre.) Je vous présente Max, un ami qui passe le weekend avec nous.
+Saint-Benoist : (serrant la main de Max) Enchanté.
+Max           : Bonjour.
+Eugénie       : Ils vous ont laissé sortir sans problème ?
+Saint-Benoist : Ils voulaient me garder. Mais je leur ai dit : « L'invitation d'une amie, c'est sacré. »
+Eugénie       : (aux anges) Vous êtes trop chou…
+Saint-Benoist : Je vous présente Daria, ma sauveuse, que vous avez eu l'extrême amabilité de…
+Eugénie       : (serrant la main à Daria, froide) Bonjour.
+Daria         : (très aimable) Merci beaucoup de m'accueillir. Je ne voulais pas m'imposer…
+Eugénie       : (comme un coup de cravache) Trop tard.
+Max           : (serrant la main à Daria) Bonjour et bravo.
+Daria         : Bravo ?
+Max           : D'avoir sauvé M. Saint-Benoist.
+Saint-Benoist : Appelez-moi Édouard. Je dois dire que si Daria n'avait pas été là, je serais peut-être mort actuellement !
+Daria         : Vous exagérez, Édouard…
+Saint-Benoist : Ne soyez pas modeste. Je m'étais arrêté pour prendre un café sur la route, quand j'ai eu un étourdissement et j'ai commencé à tituber. Vous auriez vu la rapidité avec laquelle Daria m'a pris en charge…
+Eugénie       : (faussement aimable, à Daria) Je vous félicite. Et vous vous jetez souvent sur des inconnus, comme ça ?
+Saint-Benoist : Elle m'a tout de suite fait un massage pectoral…
+Eugénie       : (cassante, à Daria) Vous lui avez touché les seins, quoi.
+Saint-Benoist : … pour terminer avec un bouche-à-bouche énergique.
+Eugénie       : (crispée, à Daria) Avec ou sans la langue ?
+Saint-Benoist : (à Eugénie) Comment ?
+Max           : (à Daria) Le bouche-à-bouche était nécessaire ?
+Daria         : Réflexe de secourisme…
+Saint-Benoist : Ce petit incident m'a fait réfléchir. Nous n'avons qu'une vie et elle est précieuse. Jusqu'ici j'ai travaillé sans compter. Je suis un patron avant d'être un homme. Ça doit changer. Je veux apprendre à redevenir un Homme, je veux dire un être humain, avant d'être un dirigeant d'entreprise préoccupé par ses parts de marché. Et je suis prêt à mettre le prix qu'il faudra. J'aimerais trouver quelqu'un qui… qui pourrait me conseiller… me guider…
+Eugénie       : Exactement comme mon frère…
+Saint-Benoist : Votre frère ?
+Eugénie       : Lui aussi aurait besoin d'être conseillé, guidé… Voilà plus d'un an qu'il n'est pas sorti de la maison !
+Saint-Benoist : Un an ?
+Eugénie       : Une dépression ou quelque chose dans ce genre…
+Daria         : Je peux faire quelque chose.
+Eugénie       : (après un silence) Vous ?
+Daria         : (sortant sa carte et la donnant à Eugénie) Daria Krapchenko, hypnothérapeute.
+Saint-Benoist : L'hypnose ? Intéressant…
+Daria         : (donnant une autre carte à Saint-Benoist) Elle permet d'obtenir de très bons résultats. (À Eugénie :) En ce qui concerne votre frère, je vous garantis que je suis en mesure de le faire sortir.
+Max           : Moi aussi.
+Eugénie       : (avec réprobation) Max…
+Saint-Benoist : Vous ?
+Max           : (donnant sa carte à Saint-Benoist) « Max Brod, coach personnel et professionnel, stratégie par objectifs ». Pour ce qui est de Fred, je vous certifie que je peux lui faire redécouvrir la notion d'« extérieur ».
+Saint-Benoist : Eh bien, Eugénie, on est aux petits soins pour votre frère… J'ai envie de dire : « Que le meilleur gagne ! » (Daria et Max se regardent avec un air de défi.)
+Eugénie       : Venez Édouard, je vais vous montrer votre chambre, la mienne…
+Saint-Benoist : Inutile, j'ai réservé à L'Hôtel du Parc.
+Eugénie       : À l'hôtel ? Mais je vous avais proposé de…
+Saint-Benoist : Oui, je sais, et je vous en sais gré ! Mais je voulais remercier Daria pour son geste, sans pour autant vous ennuyer avec des histoires de coucherie (Se reprenant :) de couchage… Alors j'ai pris une chambre à L'Hôtel du Parc, et j'ai réussi à en trouver une pour Daria, au même étage que la mienne.
+Eugénie       : (contrariée) C'est… c'est vraiment une délicate attention…
+Saint-Benoist : Par-dessus le marché, il se trouve que pour un petit hôtel de campagne, cet établissement propose de belles prestations : piscine, jacuzzi, sauna, salle de sport, mini-golf…
+Eugénie       : (vexée) Dans ces conditions, bien-sûr, je ne peux pas rivaliser…
+Saint-Benoist : Vous n'êtes pas contrariée ?
+Eugénie       : (avec un sourire crispé) Pas du tout. Vous serez bien mieux là-bas qu'ici !
+Saint-Benoist : (sans prendre conscience de sa maladresse) C'est ce que je pensais !
+Eugénie       : Eh bien je… Je vous suggère de passer sur la terrasse. Profitons de cette exceptionnelle douceur…
+Saint-Benoist : Comme ça, nous pourrons admirer la vue. (Saint-Benoist et Daria sortent.)
+Eugénie       : Je vous apporte quelques rafraîchissements !
+Max           : (à part) Je connais cette fille. Ou j'ai entendu parler d'elle…
+Eugénie       : Je vais leur préparer de la citronnade.
+Max           : Qu'est-ce qui te prend ?
+Eugénie       : Quoi ?
+Max           : Tu veux qu'il t'invite dans sa garçonnière, oui ou non ?
+Eugénie       : Oui !
+Max           : Alors qu'est-ce que tu attends ? Attaque ! Sinon, l'autre, elle va te le bouffer !
+Eugénie       : Tu crois ?
+Max           : C'est évident ! (Max sort. Eugénie reste seule quelques secondes, perplexe. Puis Zora apparaît. Elle n'ose pas entrer complètement. Vêtue de loques, son visage est complètement recouvert de saleté. Perdue dans ses pensées, Eugénie ne la voit pas.)
+Zora          : (hésitant) Excusez-moi…
+Eugénie       : (se retournant, apercevant Zora et prenant peur) Ah ! Qui êtes-vous ?
+Zora          : (ayant du mal à parler) Je… j'ai eu un accident de voiture… Mon radiateur a comme… explosé…
+Eugénie       : (avançant vers Zora) Mon dieu ! Mais… vous n'avez rien ?
+Zora          : Je ne crois pas…
+Eugénie       : Entrez, je vous en prie.
+Zora          : Merci.
+Eugénie       : Attention à la nappe ! Elle est toute propre…
+Zora          : Oui.
+Eugénie       : (lui servant un verre d'eau) Et votre voiture ?
+Zora          : Elle a été remorquée dans un garage…
+Eugénie       : Le garage Rochart ?
+Zora          : Euh… oui… c'est ça… (Elle boit.)
+Eugénie       : Vous êtes du coin ?
+Zora          : Non. (Elle veut reposer le verre sur la table.)
+Eugénie       : (prenant le verre) Non, non, je vais le faire, parce que… (Allusion à la saleté de Zora. Elle tend la main :) Eugénie.
+Zora          : (tendant également la main) Zora. (Eugénie recule sa main puis se décide à serrer la main de Zora.)
+Eugénie       : (s'essuyant la main) Où dormez-vous ce soir ?
+Zora          : Je ne sais pas.
+Eugénie       : Restez. J'ai un lit qui vient de se libérer.
+Zora          : Je ne veux pas…
+Eugénie       : Vous n'allez pas repartir sur les routes comme ça…
+Zora          : Merci. C'est très généreux.
+Eugénie       : Vous partirez quand vous voudrez.
+Zora          : Je partirai quand la maison changera de peau.
+Eugénie       : (ne comprenant pas) Pardon ? (Daria entre.)
+Daria         : Eugénie, auriez-vous ?... (Elle s'arrête à la vue de Zora.)
+Eugénie       : (faisant les présentations) Zora, Daria. (À Zora :) La salle de bain est au fond du couloir. (Zora sort alors qu'entre Saint-Benoist.)
+Saint-Benoist : Ah Daria, vous êtes là ! Connaissez-vous Étretat ? (À ces paroles, Eugénie se fige.)
+###20h
+Eugénie       : (Eugénie est debout, tous les autres sont assis à table, en plein repas.) (apportant le pain et le déposant sur la table) Prenez, et mangez-en tous. (Elle s'assoit.)
+Saint-Benoist : Merci, chère hôtesse !
+Daria         : Vous voyez, Eddy… Vous permettez que je vous appelle Eddy ?
+Eugénie       : (acide) Surtout, ne vous gênez pas.
+Saint-Benoist : (à Daria) Faites.
+Daria         : Vous voyez, Eddy, l'hypnose est un outil extraordinaire. Elle permet d'activer des zones auxquelles notre conscience n'a pas accès.
+Saint-Benoist : (intéressé) Ah oui ?
+Daria         : L'être humain accepte rarement de regarder son Moi profond en face. C'est une des phrases clefs de la formation que j'ai reçue à l'Institut Wolf Messing.
+Saint-Benoist : Hélas, c'est très vrai.
+Max           : Comme on nous le disait lors du stage que j'ai suivi au Campus MacRoss, la stratégie par objectifs a un avantage indéniable : elle donne à l'individu une méthodologie structurante. Structurante pour son job, mais aussi structurante pour tous les domaines de la vie.
+Saint-Benoist : (intéressé) Ça me semble assez complet. Et peut-être plus simple à mettre en pratique que l'hypnose.
+Max           : Très simple, en effet. Tout repose sur l'action.
+Zora          : (dont le visage a été nettoyé, même s'il comporte encore quelques traces de saleté) L'inaction c'est bien, aussi. (Cette affirmation suscite l'étonnement.)
+Fred          : Je valide…
+Saint-Benoist : L'inaction, c'est-à-dire ?
+Zora          : Rien faire, quoi.
+Saint-Benoist : (cherchant à comprendre) Rien faire ? Rien faire, selon vous, c'est bien ?
+Zora          : Ah ouais !
+Fred          : C'est hyper important !
+Saint-Benoist : (effaré) Hyper important ? Hyper important de ne rien faire ?
+Fred          : Hyper !
+Zora          : Hyper !
+Saint-Benoist : (incrédule) Enfin, toutes les grandes figures de l'Histoire, tous les grands inventeurs sont des Hommes d'action !
+Max           : C'est évident !
+Daria         : Ils savaient aussi exploiter leur Inconscient.
+Zora          : Ils savaient surtout ne rien faire !
+Saint-Benoist : (riant) Ne rien faire…
+Zora          : Traîner, rêvasser, procrastiner…
+Fred          : Buller, glander, somnoler…
+Zora          : On en a besoin aussi. Pour réfléchir, pour divaguer, pour se perdre…
+Fred          : Pour se retrouver, pour prendre de la distance, pour se protéger…
+Saint-Benoist : (à Fred) J'ai l'impression que vous êtes du genre casanier, je me trompe ?
+Fred          : Si tu veux.
+Saint-Benoist : Vous travaillez ?
+Zora          : On s'en fout.
+Eugénie       : (réprobatrice) Zora !
+Saint-Benoist : (quelque peu vexé) Laissez Eugénie. Il se peut que mes questions ne soient pas intéressantes…
+Daria         : Au contraire, Eddy ! C'est tout de même une attente sociale forte : exercer une activité.
+Fred          : (persifleur) Amen.
+Zora          : Y a une autre attente humaine forte : laisser les gens vivre.
+Daria         : On ne peut pas éternellement se replier sur soi. C'est là que l'hypnose peut déclencher des choses. (Se levant et passant derrière Saint-Benoist.) Si, par exemple, je vous masse comme ça… (Elle joint le geste à la parole.)
+Saint-Benoist : C'est agréable.
+Max           : (bas, à Eugénie) Allez !
+Daria         : (massant toujours Saint-Benoist) Je ne dis rien, mais je fais passer, à travers mon mouvement, une certaine énergie…
+Eugénie       : (bas, à Max) Quoi ?
+Saint-Benoist : (à Daria) Je confirme…
+Max           : (bas, à Eugénie) Avance tes pions ! Tu vois pas qu'elle sort l'artillerie lourde.
+Daria         : (massant toujours) Cette énergie détend et ouvre une certaine vacance…
+Eugénie       : (bas, à Max) Je vais quand même pas lui sauter dessus !
+Daria         : (massant toujours) Eddy, vous sentez que vous êtes en train de vous ouvrir ?
+Saint-Benoist : (les yeux mi-clos) Oui là je sens que je suis en train de m'ouvrir…
+Eugénie       : (poussant Daria) C'est pas du tout comme ça ! (Elle masse à présent Saint-Benoist.) Voilà, c'est comme ça…
+Saint-Benoist : C'est pas mal non plus…
+Daria         : Plusieurs études scientifiques ont prouvé l'effet actif de l'hypnose.
+Max           : Tout à fait : ça s'appelle de la manipulation.
+Daria         : Pardon ?
+Max           : De la pression psychologique par des mensonges plus ou moins habiles…
+Daria         : De la manipulation ?
+Max           : Pour ne pas dire de la magouille.
+Daria         : (à Fred) Vous pouvez essayer de fixer mon doigt ?
+Fred          : Et vous, vous pouvez essayer de fixer mes couilles ? (Cette remarque jette un froid. Saint-Benoist rouvre les yeux.)
+Saint-Benoist : (à Zora) Alors, si j'ai bien compris, vous ne faisiez que passer dans la région ?
+Zora          : Voilà.
+Saint-Benoist : Et où alliez-vous, si ce n'est pas indiscret ?
+Zora          : Chez des amis. (Voyant que Saint-Benoist en attend plus :) Qui ont des problèmes. (Face à la déconvenue de Saint-Benoist, pour dédramatiser :) Ça arrive. (Elle se lève :) Eugénie, je ne vous ai pas dit, mais je faisais le voyage avec un ami.
+Eugénie       : Où est-il ?
+Zora          : Je ne voulais pas abuser de votre gentillesse. Il est dehors.
+Eugénie       : Faites-le entrer immédiatement. (Zora disparaît.)
+Saint-Benoist : Elle est pleine de mystère. Elle me fait penser à une espèce de Mary Poppins revue et corrigée par… je ne sais qui…
+Eugénie       : J'adore Mary Poppins !
+Saint-Benoist : (ravi) Moi aussi !
+Eugénie       : C'est une oeuvre à la fois légère et profonde. Une harmonie, un équilibre, aucune faute de goût.
+Saint-Benoist : C'est vrai, c'est exquis. (Zora rentre avec une lovedoll masculine et l'assoit à sa place. Cela jette un froid. Fred rit sous cape.)
+Max           : Qu'est-ce que c'est ?
+Zora          : (montrant la lovedoll) Je vous présente Ken, mon ami.
+Daria         : C'est censé être drôle ?
+Eugénie       : Mais enfin, Zora, qu'est-ce que…
+Zora          : C'est très gentil à vous de m'avoir autorisée à le laisser rentrer.
+Saint-Benoist : Je ne suis pas sûr de comprendre…
+Zora          : Il n'est pas très bavard mais il est ravi. Regardez : il sourit.
+Saint-Benoist : (regardant attentivement la lovedoll) Il sourit, là ?
+Zora          : Oui.
+Saint-Benoist : (fixant la lovedoll) J'avoue que j'ai du mal à apercevoir un…
+Max           : Si, en insistant, on finit par voir un…
+Eugénie       : (coupant Max) Écoutez Zora, j'aime bien rire, mais j'aimerais que vous remportiez cette poupée dehors…
+Fred          : Elle bouge pas d'ici.
+Eugénie       : Fred, reste en dehors de ça…
+Fred          : La poupée, elle reste ici.
+Eugénie       : (souriante mais crispée) Tu penses qu'elle peut nous être utile ?
+Fred          : Elle tiendra compagnie à Barbie.
+Eugénie       : Barbie ?
+Fred          : Ma lovedoll.
+Max           : T'as une lovedoll, toi aussi ?
+Eugénie       : Tu me l'as jamais montrée !
+Fred          : Jusqu'ici, c'est moi qui jouais avec.
+Eugénie       : (au bord de la crise de nerf) Alors là, c'est… mais c'est…
+Max           : (emmenant Eugénie) Viens prendre l'air…
+Saint-Benoist : (essayant de détendre l'atmosphère et s'adressant à la lovedoll) Bonjour Ken.
+###21h
+Eugénie       : (Ken est assis sur le canapé-lit qui est défait. Eugénie et Zora sont en pleine discussion.) Puisqu'Édouard ne dort plus là, je réintègre ma chambre. Vous pouvez prendre le canapé.
+Zora          : Merci.
+Eugénie       : (furieuse) Oui, ça, vous pouvez me remercier !
+Zora          : Je vous ai froissée ?
+Eugénie       : Écoutez, Zora, je… je voudrais que vous le mettiez dehors.
+Zora          : Qui ?
+Eugénie       : (désignant Ken) Ça.
+Zora          : Ken ?
+Eugénie       : Oui.
+Zora          : Mais… il va avoir froid.
+Eugénie       : (agacée) Je vous en prie…
+Zora          : Il vous déplaît ?
+Eugénie       : Ce… cette chose ne peut pas rester là cette nuit.
+Zora          : S'il n'est pas là, j'ai du mal à m'endormir…
+Eugénie       : Allez donc chercher vos affaires.
+Zora          : Encore merci, Eugénie. (Elle sort.)
+Eugénie       : (saisissant Ken) Je vais m'occuper de toi. (Entre Max.)
+Max           : (voyant les mains d'Eugénie sur Ken) Je dérange ?
+Eugénie       : Qu'est-ce que tu vas t'imaginer ? Je vais mettre cette obscénité à la cave.
+Max           : (prenant Ken) Je vais le faire.
+Eugénie       : Merci.
+Max           : Toi, ne laisse pas l'affamée seule avec Saint-Benoist.
+Eugénie       : De qui tu parles ?
+Max           : L'autre, là…
+Eugénie       : Daria ?
+Max           : Elle est en train de le gober !
+Eugénie       : Tu crois ?
+Max           : Sors les armes de destruction massive.
+Eugénie       : Euh… tu peux me laisser gérer, s'il te plaît ?
+Max           : Je suis ton coach oui ou non ?
+Eugénie       : Oui, oui…
+Max           : Alors, sois offensive ! (Max sort.)
+Eugénie       : (pour elle-même) Tout va bien, la soirée est sympa, les gens s'amusent… (Max rentre avec Ken et le met dans les bras d'Eugénie.)
+Max           : Elle, je peux plus la voir…
+Eugénie       : Quoi ?
+Max           : Je t'expliquerai ! (Max sort.)
+Eugénie       : (à Ken) Tu sais que tu commences à me pomper l'air ? (Max sort.)
+Daria         : (voyant Eugénie parlant à Ken) Je dérange ?
+Eugénie       : Non, non… je dérange… enfin, je veux dire… je range…
+Daria         : Je cherche votre frère.
+Eugénie       : Il n'est pas là.
+Daria         : Je vais essayer par ici. (Elle sort.)
+Eugénie       : (pour elle-même) Je suis belle, je suis séduisante, je suis professionnelle, je suis… (Entre Fred.)
+Fred          : Je dérange ?
+Eugénie       : (énervée) Arrêtez, tous, avec ça !
+Fred          : Quoi ?
+Eugénie       : Daria vient de passer.
+Fred          : Je sais…
+Eugénie       : Elle te cherche.
+Fred          : Tout le monde me cherche.
+Eugénie       : (gentille) Tu as du succès…
+Fred          : Ils me saoulent, tes potes. Ils peuvent pas me lâcher deux minutes ?
+Eugénie       : (excédée) Mais… mais… mais vous allez finir par vous aimer les uns les autres ? (Elle sort avec Ken.)
+Fred          : (restant sur la phrase de Eugénie) C'est dans quel film, déjà ? (Zora rentre avec un sac.)
+Zora          : (surprise par la présence de Fred) Eugénie n'est pas là ?
+Fred          : Vous avez perdu Ken ?
+Zora          : (regardant autour d'elle) Il a dû aller faire un tour.
+Fred          : Dommage. (Souriant :) Je crois que Barbie aurait aimé le rencontrer.
+Zora          : (souriant) On va leur arranger un rendez-vous. (Fred sort.)
+Zora          : (appelant) Ken ? (Fred rentre.)
+Fred          : Je suis dans la merde !
+Zora          : Qu'est-ce qui se passe ?
+Fred          : Faut que je me planque ! (Il se glisse sous la couette.) (Max rentre.)
+Max           : (voyant Zora) Ah… pardon… je cherchais Fred…
+Zora          : Il n'y a que moi… (Désignant le lit.) Et Ken.
+Max           : (suspicieux) C'est marrant, parce que je jurerais avoir vu Fred entrer ici…
+Zora          : Traitez-moi de menteuse.
+Max           : Non, non, ce n'est pas ce que je voulais dire !
+Zora          : Et puis parlez moins fort. Vous dérangez Ken. (Elle s'assoit sur le lit.) Il essaie de dormir.
+Max           : (flairant quelque chose) Je… je peux le voir ?
+Zora          : Vous aimeriez qu'on vienne vous voir quand vous êtes sur le point de tomber dans le sommeil ?
+Max           : Il avait l'air très… très ressemblant. (Il tâte la forme sous les draps.) Ah oui… oui… on y croirait…
+Zora          : Laissez-le tranquille…
+Max           : Vous êtes la petite copine de Fred, c'est ça ?
+Zora          : Sortez.
+Max           : (se levant) En tout cas, votre topo sur le thème dans la vie, faut pas en foutre une rame, c'était pas très convaincant…
+Zora          : Mais vous, vous êtes convaincant ?
+Max           : Moi ? Je me fixe des objectifs réalistes, j'avance, peu à peu, pour ma réussite et celle de mes clients…
+Zora          : C'est pas ce que montrent tes comptes en banque.
+Max           : (après un temps) Hein ?
+Zora          : Un découvert comme ça, je sais pas comment tu vas t'en remettre…
+Max           : (la fixant) T'es qui, toi ? (Daria rentre avec deux verres.)
+Daria         : Je dérange ?
+Max           : (à part) Oh non pas elle…
+Zora          : Ken est en train de dormir…
+Daria         : Je ne serai pas longue… (À Max, lui tendant un verre :) Cher confrère, je crois qu'il est temps de faire la paix.
+Max           : La paix ?
+Daria         : J'ai cru sentir entre nous comme une crispation.
+Max           : Une crispation ? Loin de moi l'idée de…
+Daria         : Arrêtons de nous tirer dans les pattes : hypnose et méthode par objectifs sont complémentaires.
+Max           : Certes.
+Daria         : Alors entraidons-nous.
+Zora          : C'est vraiment touchant, mais si vous pouviez aller ailleurs…
+Max           : On a fini. (À Daria, prenant le verre :) Tu as raison. (Portant un toast :) Au coaching !
+Daria         : Au coaching ! (Ils boivent.) (Daria sort.)
+Zora          : Maintenant que la clause de non-concurrence est adoptée, vous pouvez peut-être… ?
+Max           : Peut-être ? …
+Zora          : Vous barrer d'ici ? (Eugénie entre.)
+Eugénie       : (voyant Zora et Max) Vous êtes là…
+Zora          : (montrant le lit) Chut ! Ken dort…
+Eugénie       : Ken ? Mais je viens de le… (Elle s'arrête.)
+Zora          : De le ?...
+Eugénie       : (regardant la forme sous les draps qui bouge) On dirait que Ken a des problèmes respiratoires…
+Max           : (donnant son verre à Eugénie) J'ai chaud…
+Eugénie       : (regardant le verre, elle y plonge un doigt et le met sur sa langue) Tu as pris du dormiphyl ?
+Max           : Sûrement pas, je suis allergique...
+Zora          : Dormiphyl ?
+Eugénie       : Un somnifère.
+Zora          : Il faut aller le faire vomir.
+Eugénie       : C'est vous qui ?
+Zora          : Daria.
+Fred          : (faisant irruption de sous les draps) On étouffe là-dessous !
+Max           : (s'évanouissant) Ah…
+Zora          : Max !
+Eugénie       : Max !
+##Dimanche
+###9h
+Eugénie       : (Max, seul, est accroupi dans un coin. Il se tient le ventre. Peu après entre Eugénie.) Ça va ?
+Max           : (ironique) Super.
+Eugénie       : Je veux dire : ça va mieux ?
+Max           : J'ai pas dormi de la nuit.
+Eugénie       : Mon pauvre…
+Max           : C'est cette salope.
+Eugénie       : (réprobatrice) Max…
+Max           : Quoi ? Comment t'appelles une nana qui veut absolument se taper un type pour lui soutirer du fric ? (Silence d'Eugénie.) Moi j'appelle ça une salope.
+Eugénie       : Elle a peut-être fait une erreur…
+Max           : Une erreur ?
+Eugénie       : Elle a voulu prendre un somnifère, et puis elle a échangé son verre et le…
+Max           : Tu parles ! Elle a voulu me neutraliser, parce qu'elle a senti que Saint-Benoist était plus réceptif à ma méthode qu'à ses conneries !
+Eugénie       : Ça ne te réussit pas, le coaching. Tu deviens parano. (Elle sort.)
+Max           : (seul) Parano… pff… « Cher confrère, je te propose de faire la paix… » La paix… Tu vas voir… « Qui veut la paix prépare la guerre ». (Daria, tenue de sport, entre à petites foulées.)
+Daria         : Ah ! Cher confrère… Tu es bien matinal…
+Max           : Toi aussi, à ce que je vois…
+Daria         : J'aime courir aux premières lueurs de l'aube.
+Max           : Tu es seule ?
+Daria         : Eddy arrive.
+Max           : (se levant) Ah…
+Daria         : Tu n'es toujours pas remis ?
+Max           : Ça va, ça va…
+Daria         : Désolée, encore une fois… Je ne comprends pas comment ça a pu arriver… (Entre Saint-Benoist, lui aussi en tenue de sport.)
+Saint-Benoist : (très essoufflé mais avec le sourire) Putain que ça fait du bien !
+Daria         : Je vous l'avais dit, Eddy.
+Saint-Benoist : (essoufflé) Mais pourquoi je fais pas ça plus souvent, putain !
+Max           : (à part) Parce que t'aurais un arrêt cardiaque, ducon…
+Saint-Benoist : (encore essoufflé) Tiens ! Max, bonjour… Vous devriez essayer… parce que c'est… c'est… oh putain !
+Max           : (l'œil noir) Je vois…
+Saint-Benoist : (ayant peine à respirer) Je crois qu'il faut que j'aille prendre un peu l'air parce que là…
+Max           : C'est toujours ce que je dis : trop de sport tue le sportif…
+Saint-Benoist : (à Daria) Je vais sur la terrasse. Et si vous m'apportiez un jus d'orange, Dada ?
+Daria         : Tout de suite, Eddy.
+Max           : Comment il t'a appelée ? (Saint-Benoist sort.)
+Daria         : Où est le jus d'orange ?
+Max           : Y en a plus.
+Daria         : Ah…
+Max           : Il faut descendre à la cave.
+Daria         : C'est par où ?
+Max           : Par là. Attention, l'escalier est raide.
+Daria         : Merci. (Elle sourit :) Je suis vraiment contente qu'on ait pu dissiper tous les malentendus.
+Max           : (souriant également) Moi aussi. (Daria sort.)
+Max           : (seul, après avoir attendu un peu) OK Domestis, éteins la lumière de la cave. (À cet instant on entend un cri de Daria et un bruit de chute. Max esquisse un sourire mauvais. On entend ensuite quelques plaintes et pleurnicheries.) (Daria entre, comme cassée.)
+Max           : (s'approchant d'elle, avec une compassion apparente) Que se passe-t-il, chère confrère ?
+Daria         : (boitant et ayant peine à contenir ses larmes sous la douleur) Je ne sais pas… Je descendais l'escalier et tout à coup… la lumière s'est éteinte…
+Max           : (triste en apparence mais jubilant intérieurement) Oh ça c'est vraiment pas de chance…
+Daria         : (tentant d'étouffer ses sanglots) Mais pourquoi ? … pourquoi ça a fait ça ? …
+Max           : Mais je ne sais pas ! Je ne sais vraiment pas… Tout était normal… Parfaitement normal… Enfin, maintenant que tu me le dis, je crois qu'on a eu une petite coupure de courant. Légère. Je m'en suis aperçu en regardant le four…
+Daria         : (essuyant ses larmes) Juste au moment où je descendais…
+Max           : Oh oui, tu parles d'une malheureuse coïncidence…
+Daria         : (marchant avec difficulté) Il faut que j'aille voir Eddy…
+Max           : (la prenant en charge) Surtout pas ! Tu risques de te déboîter quelque chose… Dans ces cas-là, il faut s'allonger et ne plus bouger… J'ai une chambre au-dessus du garage…
+Daria         : D'accord, mais pas longtemps…
+Max           : Non, pas longtemps, deux trois heures…
+Daria         : Deux trois heures ? (Ils sortent alors qu'entrent Eugénie et Fred.)
+Fred          : Fais pas l'innocente, je l'ai retrouvé dans la cave.
+Eugénie       : Dans la cave ? Mais où ça ?
+Fred          : Dans la réserve de vin.
+Eugénie       : Non ?
+Fred          : Derrière les grands crus. Il était bien planqué.
+Eugénie       : Mais c'est fou, ce que tu me racontes…
+Fred          : Arrête de faire semblant, je sais que c'est toi !
+Eugénie       : Moi ? Avec mon sens de la propriété individuelle ?
+Fred          : Quand ça t'arrange. Si quelque chose te déplaît, plus rien n'appartient à personne.
+Eugénie       : Il m'a déplu, je veux bien l'admettre, mais…
+Fred          : Je l'ai remonté.
+Eugénie       : Tu l'as ? … Où tu l'as mis ?
+Fred          : Dans ma chambre. Comme ça, ça fera un copain à Barbie.
+Eugénie       : Je m'y oppose !
+Fred          : J'ai dû mal entendre, là…
+Eugénie       : C'est obscène !...
+Fred          : Et te frotter à Saint-Benoist dès que l'occasion se présente, c'est pas obscène ?
+Eugénie       : (choquée) Oh ! Alors ça, c'est vraiment, vraiment…
+Fred          : Je sais que tu peux pas supporter l'idée… Barbie… ça te répugne, hein ? Pourtant en quelques mois elle m'a apporté plus de réconfort que toi en quarante ans ! (Il sort.)
+Eugénie       : (écrasant quelques larmes) Je suis crucifiée… Mais comment peut-on ? … des poupées… (Max entre.)
+Max           : Qu'est-ce qui se passe ?
+Eugénie       : (se cachant) Rien, rien…
+Max           : Allons Eugénie, pas à moi…
+Eugénie       : Je t'assure, ça va passer…
+Max           : Parle-moi.
+Eugénie       : C'est Fred.
+Max           : Encore Fred… Toujours Fred…
+Eugénie       : Il a retrouvé Ken.
+Max           : Cette blague !
+Eugénie       : Et il veut l'unir à… à Barbie…
+Max           : À Barbie ?
+Eugénie       : Mais oui, il… (Elle n'a pas la force de poursuivre.)
+Max           : C'est vrai qu'il en a une, lui aussi… Écoute Eugénie. Tu dois te ressaisir. Tu dois réaffirmer ton autorité. C'est toi la cheffe de famille, c'est à toi de fixer le cap.
+Eugénie       : Tais-toi.
+Max           : (après un silence) Pardon ?
+Eugénie       : Arrête de parler, s'il te plaît.
+Max           : (après un silence) Mais je… je suis ton coach.
+Eugénie       : Plus maintenant.
+Max           : (après un silence) D'accord… J'espère que tu seras remise pour la chasse aux œufs.
+Eugénie       : (se rendant compte de quelque chose) Les œufs ! J'ai oublié les œufs… Quelle nulle ! (Elle sort alors que Fred rentre.)
+Max           : Alors Fred, comment ça va ?
+Fred          : (froid, se servant un café) Ça va.
+Max           : Qu'est-ce que tu as fait ce matin ?
+Fred          : (surpris par cet intérêt artificiel) J'ai fait des fouilles dans la cave.
+Max           : (jouant le type impressionné) Des fouilles dans la cave ? Voyez-vous ça… C'est complètement… complètement… Je crois qu'on rêverait tous d'être au chômage pour avoir le loisir de faire des fouilles dans sa cave…
+Fred          : (très calme) Et si tu fermais ta grande gueule de con ?
+Max           : (saisi, il se reprend, puis) Voilà. On y est ! ça fait tellement longtemps que j'attends ce moment. Le moment où on va enfin jeter bas les masques.
+Fred          : (à part) Quel guignolo… (Saint-Benoist entre en courant.)
+Saint-Benoist : (hurlant) Venez, vite !
+Max           : Qu'est-ce qui se passe ?
+Saint-Benoist : C'est Eugénie !
+Fred          : Ben, quoi ?
+Saint-Benoist : Elle s'est jetée par la fenêtre !
+###17h
+Max           : (Eugénie est couchée sur le canapé-lit. Max est assis à côté d'elle.) Tu nous as fait peur…
+Eugénie       : Je ne sais pas ce qui m'a pris…
+Max           : Tu devais être… sans espoir aucun… et en même temps…
+Eugénie       : En même temps ?
+Max           : Se jeter par la fenêtre de son rez-de-chaussée…
+Eugénie       : C'est se dire que, peut-être, tout n'est pas perdu…
+Max           : Je te reconnais bien là : optimiste jusque dans ton désespoir.
+Eugénie       : Je n'étais plus moi-même…
+Max           : Si j'ai un bon conseil à te donner…
+Eugénie       : Oh non…
+Max           : En tant qu'ami…
+Eugénie       : Je commence à en avoir ma claque de tes conseils… (Daria paraît.)
+Eugénie       : (agressive) Qu'est-ce que vous voulez ?
+Daria         : Excusez-moi, mais…
+Eugénie       : Mais quoi ?
+Daria         : Max m'a conseillé de me reposer…
+Eugénie       : (se levant, pas aimable) Mais bien sûr. Vous voulez vous reposer ? Quoi de plus normal. Moi, après tout, je peux bien crever !
+Daria         : Si vous avez besoin de garder le lit, je peux très bien…
+Eugénie       : (sèche) Pas du tout. Vous êtes l'invitée, je m'aplatis devant vous.
+Daria         : Je me permets d'insister, si…
+Eugénie       : (envoyant rudement Daria sur le lit) Mais allongez-vous, puisqu'on vous le dit !
+Max           : (répondant au téléphone) Allô ? Encore vous ?
+Daria         : (à Eugénie) Vous m'avez fait mal…
+Eugénie       : Excusez-moi…
+Max           : (au téléphone) Je sais, je suis à découvert ! Quand bien même vous me le répéteriez vingt fois…
+Eugénie       : (à Daria) Qu'est-ce que vous cherchez ?
+Daria         : Le désinfectant.
+Max           : (au téléphone) J'ai un double appel.
+Eugénie       : (à Daria) Laissez, je m'en occupe.
+Max           : (au téléphone) Oui, c'est moi. Quoi ? Une saisie ? À cette heure-ci ?
+Daria         : (alors qu'Eugénie lui appose un coton) Ouf ! ça brûle !
+Eugénie       : (faussement indifférente) C'est très bien ! Les microbes meurent…
+Max           : (au téléphone) Attendez, ne prenez pas l'argenterie, elle n'est pas à moi ! C'est un… allô ? allô ? (Entre Saint-Benoist.)
+Saint-Benoist : Ah, Max ! Quand je vous vois, comme ça, si bienheureux, je vous envie.
+Max           : (la mine défaite) Ah oui ?
+Saint-Benoist : En cas de coup dur, vous avez votre méthode : objectif par objectif… (À Daria :) Même chose pour vous, Dada. Quand j'aperçois votre mine réjouie, ça me console.
+Daria         : (grimaçant sous la douleur) C'est vrai ?
+Saint-Benoist : En cas de pépin, vous avez votre méthode : l'hypnose. Ah… que c'est réconfortant de vous voir si bien dans vos vies. (Daria et Max font des têtes de déterrés.) Mais moi, voyez, je ne suis pas convaincu par l'hypnose. (Daria s'évanouit presque alors que Max reçoit comme un coup de fouet.) Ni par le coaching par objectif. (Max s'étrangle alors que Daria revient à la vie.)
+Eugénie       : (acide) D'ailleurs ni l'un ni l'autre n'ont réussi à faire sortir Fred !
+Saint-Benoist : Très juste… Alors que chacun d'eux s'était targué de réaliser cet exploit.
+Saint-Benoist : C'est pour ça que l'idée de Zora ne me dit rien…
+Eugénie       : Quelle idée ?
+Saint-Benoist : À propos d'hypnose.
+Daria         : Qu'a-t-elle dit ?
+Saint-Benoist : Eh bien elle m'a dit, à peu près… « si l'hypnose ça marche si bien que ça, allez hypnotiser Daria et persuadez-la qu'elle va bien. »
+Max           : Intéressant…
+Eugénie       : Ah oui…
+Daria         : Attendez…
+Max           : Ça vaut le coup d'être tenté.
+Saint-Benoist : Vous croyez ?
+Daria         : N'importe qui ne peut pas s'improviser hypnotiseur comme ça…
+Eugénie       : Essayez, Édouard…
+Saint-Benoist : Si vous voulez…
+Daria         : Je ne suis pas prête…
+Saint-Benoist : Arrêtez de bouger…
+Eugénie       : Je la tiens…
+Daria         : Lâchez-moi !
+Saint-Benoist : (proche de Daria, la regardant dans les yeux) Regardez-moi dans les yeux, Dada, vous n'écoutez que moi, Dada, et ma voix entre en vous, Dada…
+Daria         : (se débattant) C'est ridicule !
+Eugénie       : (à Max) Aide-moi !
+Max           : (empoignant à son tour Daria) Chère collègue, montrez-vous plus coopérative !
+Daria         : (ne se contenant plus) Oh toi, je te retiens…
+Max           : (la maintenant plus fermement encore) Oh la conne !
+Saint-Benoist : (soufflant son haleine dans le nez de Daria) Tu vas bien, Dada, bien Dada, bien Dada, bien, Dada…
+Daria         : (hurlant) À l'aide ! Au secours !
+Saint-Benoist : (en transe) Bien Dada…
+Daria         : (hurlant) Aidez-moi !
+Saint-Benoist : (d'une voix de gorge) Bien Dada…
+Daria         : (hurlant) Aidez-moi, je vous en supplie… (Fred entre et tout s'arrête.)
+Fred          : (après un silence) Vous êtes de grands malades…
+Eugénie       : (penaude) Nous faisions juste une petite expérience…
+Daria         : (se relevant) Je ne suis pas un cerveau juste bon à être conditionné ! Je suis libre de décider moi-même d'aller bien, en pleine conscience !
+Max           : Chère collègue, un coach doit croire à ses propres méthodes ! C'est la base.
+Daria         : (montrant Saint-Benoist) Ce n'est pas ma faute si ce gugusse a tout assimilé de travers !
+Saint-Benoist : (à Eugénie) Comment elle m'a appelé ?
+Max           : (à Eugénie) C'est toi qui lui as tout appris ! Un coach digne de ce nom ne fuit pas devant ses responsabilités et assume ses actes.
+Daria         : Je suis un coach digne de ce nom. En tout cas sûrement plus digne que toi.
+Max           : Ah ouais ? (Désignant Fred :) Alors fais-le sortir, si t'es si fine.
+Fred          : C'est quoi, ce délire ?
+Daria         : (en face de Fred et très près de lui) Fred, vous ne voyez plus que moi et vous n'entendez plus que le son de ma voix. Ma voix vous berce, ma voix vous guide, ma voix vous porte. Quand je claquerai des doigts, vous tomberez dans un sommeil profond. (Elle s'exécute et Fred ferme les yeux.) Vous dormez à présent et rien ne peut vous réveiller. Ma voix vous commande et vous m'obéissez sans opposer de résistance. Vous allez maintenant vous diriger vers la porte de sortie. (Lentement, Fred marche vers la porte.)
+Saint-Benoist : (murmurant) Ça marche… (Soudain Fred s'arrête.) Qu'est-ce qu'il fait ? (Il se retourne lentement vers les autres.) C'est curieux… (Fred lève les mains vers eux.) Il veut nous dire quelque chose… (Soudain, il relève ses deux majeurs.) Oh !
+Fred          : (rouvrant les yeux) Et vous y avez cru ?
+Eugénie       : Tu n'es qu'un clown ! (Elle sort.)
+Daria         : (déçue, à Fred) Vous ne vous êtes même pas un petit peu endormi ?
+Max           : (à Fred) Venez Fred, on va prendre l'air.
+Fred          : Désolé, ça ne prend pas.
+Max           : Vous allez voir, le temps est très doux pour la saison…
+Fred          : Je suis plutôt frileux…
+Max           : Allez… allez… (Discrètement, il lui propose un billet.) Pour me faire plaisir…
+Fred          : J'ai l'impression que t'es encore plus malade que les autres, toi…
+Max           : (chuchotant) Y a des nouvelles putes, sur la nationale…
+Fred          : Vas-y. Je crois qu'elles cherchent un maquereau.
+Daria         : (ravie) Échec, cher confrère.
+Max           : Mais comment voulez-vous que j'y arrive, avec lui ? (Il a montré Fred.)
+Fred          : Je crois que je saisis pas bien…
+Max           : Si je fais de l'or au milieu d'un tas de crotte, j'aurai toujours les pieds dans la merde !
+Fred          : Tu pourrais expliquer ta métaphore ?
+Saint-Benoist : (à Max) Vous avez tout de même promis à Eugénie de le sauver.
+Fred          : Me sauver ?
+Max           : Moi ? Je m'en lave les mains ! Vos états d'âme, vos problèmes, vos crises, je m'en lave les mains, vous comprenez ? (Zora entre comme une furie.)
+Zora          : Venez, vite ! Eugénie a mis les poupées au feu !
+###20h
+Fred          : (Ken et Barbie sont assis sur deux chaises, trempé-e-s. Zora et Fred les essuient.) Elles ont eu chaud.
+Zora          : Tu as été courageux.
+Fred          : Bah…
+Zora          : Moi, je n'aurais pas osé… mettre mes mains au feu comme ça…
+Fred          : J'ai eu un sursaut… Les voir dans les flammes, ça… ça m'a fait quelque chose.
+Zora          : (après s'être penchée pour écouter à la bouche de Ken) En tout cas, Ken te dit merci.
+Fred          : (avec du second degré) Je n'ai fait que mon devoir, ma petite dame.
+Zora          : (même jeu que précédemment) Hein ? (Pour elle-même :) Mais oui, c'est vrai… (À Ken :) T'as l'œil, toi !
+Fred          : Quoi ?
+Zora          : Il me disait un truc marrant. Depuis hier nos deux profs de bonheur essaient de te faire sortir.
+Fred          : M'en parle pas...
+Zora          : Finalement, il suffisait d'un feu…
+Fred          : (prenant conscience de quelque chose) C'est vrai… Je suis sorti… Alléluia !
+Zora          : Sorti… façon de parler… Tu es resté dans les limites du jardin, mais c'est un début… (Entre Eugénie. S'en suit un silence.)
+Fred          : Tu vois… Ta tentative de meurtre a échoué.
+Eugénie       : (réprimant un rire) Ma tentative de meurtre…
+Fred          : C'est la guerre que tu veux ?
+Eugénie       : Fred…
+Fred          : Tu vas l'avoir.
+Eugénie       : (à Zora) C'est vous avec votre… (Elle montre Ken.) Si vous n'aviez pas…
+Fred          : (la coupant) Ne t'en prends pas à elle.
+Eugénie       : Bien… Je ne voulais pas, mais puisque tu me forces… Je suis ici chez moi…
+Fred          : Il faut qu'on soit impressionnés ?
+Eugénie       : Peut-être… peut-être parce que ça signifie que je peux dire ce que je souhaite ou ce que je refuse quant à cet espace qui est le mien…
+Fred          : Un cours de droit ? (Zora sort discrètement.)
+Eugénie       : Or, dans cet espace qui est le mien… je ne veux pas, je ne supporte pas de voir… de voir ça… (Elle a montré les lovedolls.) Vous pouvez… vous avez le droit d'aimer ça et de… hum… mais vous ne pouvez pas… vous n'avez pas le droit de m'en imposer la vue si je ne le souhaite pas…
+Fred          : (au garde-à-vous) Cheffe, oui cheffe ! (Entrent Daria, Saint-Benoist et Max.)
+Daria         : (montrant Fred) Ecce Homo !
+Fred          : (à part) Oh non, pas elle…
+Daria         : Fred, j'aimerais faire une expérience.
+Fred          : Moi aussi.
+Saint-Benoist : (à Max) Et vous Max, vous n'y allez pas ?
+Daria         : (à Fred) C'est vrai ?
+Max           : (à Saint-Benoist) Bof…
+Fred          : (à Daria) L'expérience de votre absence.
+Saint-Benoist : (à Max) Ah oui, j'oubliais, vous vous en…
+Daria         : (à Fred) C'est pas très gentil.
+Saint-Benoist : (à Max) Si elle arrive à quelque chose avec lui, je suis prêt à lui filer deux cents de l'heure. (Max est saisi par ce chiffre.) Elle ou un autre…
+Daria         : (à Fred) Tout à l'heure, vous m'avez fait une farce…
+Max           : (s'avançant soudain, à Fred) Et vous avez eu raison. Qui peut croire en l'hypnose…
+Daria         : J'étais en train de parler, là…
+Max           : Je sais. (À Fred :) Fred, je vous ai observé quand vous avez tiré ces poupées du feu.
+Fred          : (souriant) Des poupées…
+Daria         : (à Max) Ça te prend souvent de t'immiscer dans les conversations ?
+Max           : Ta gueule. (À Fred :) Je voulais dire : Barbie et Ken.
+Daria         : (à Max) Je crois que je suis en train de perdre mes nerfs…
+Max           : Eh ben va les chercher. Tu vois là-bas ? Va chercher. (À Fred :) Fred, faisons un test simple. Qu'est-ce qui vous manque, là, tout de suite ? Répondez sans réfléchir.
+Fred          : Une bière.
+Max           : (décontenancé par cette réponse) Eh bien c'est… c'est un début…
+Fred          : Y en a plus.
+Max           : (saisissant la balle au bond) Et si nous allions en chercher ? Il y a bien une supérette ouverte, à cette heure si…
+Fred          : À Grandville.
+Max           : (alors que Daria, Saint-Benoist et Eugénie suivent attentivement sa performance) Eh bien, allons à Grandville ! (Fred soupire.) Oui, je sais, vous vous dites : on est dimanche de Pâques, il fait nuit, Grandville n'est pas tout près, est-ce qu'on va trouver quelque chose d'ouvert, mais pensez à votre satisfaction lorsque vous aurez votre bière entre les mains. (Fred regarde Max, intéressé.) Visualisez-vous bien avec la bière. (Fred sourit.) Vous voyez, Fred : l'important, dans la vie, c'est de se fixer un horizon. Pour certains, c'est la sérénité intérieure, pour vous, c'est une bière. Maintenant, comment faire pour atteindre votre horizon ? Il est probable que si vous pensiez à toute la route qu'il y a à parcourir, vous seriez démoralisé. Alors pensez objectif par objectif. (Il sort une feuille.) J'ai élaboré un petit document très simple pour aider mes coachés. (Passant la feuille à Fred :) Il suffit d'inscrire ici son horizon et le premier objectif à réaliser pour… (Fred déchire le papier.)
+Fred          : Je viens de me fixer un nouvel horizon.
+Max           : Formidable ! De quoi s'agit-il ?
+Fred          : Vous faire passer l'envie de m'emmerder.
+Daria         : (à Saint-Benoist) On dirait que mon cher confrère n'est pas encore très au point… (Max fait un signe d'impuissance et s'éloigne.)
+Daria         : (venant près de Fred) À nous deux !
+Fred          : (à part) Pitié…
+Daria         : (prenant Fred énergiquement) Regardez-moi, Fred…
+Fred          : Vous m'avez déjà fait le coup…
+Daria         : (maintenant son emprise sur Fred) Ne me quittez pas des yeux, vous n'entendez plus que le son de ma voix. Écoutez-moi bien Fred, Barbie a quelque chose à vous dire, je vais compter jusqu'à trois et vous allez vous endormir, un, le sommeil s'installe dans votre corps, deux, votre esprit coupe le contact avec le monde, trois, vous dormez ! (Un silence. Fred est debout, immobile, les yeux fermés.) Ça marche…
+Max           : Tu parles…
+Daria         : Cette fois-ci ça marche, je le sens. (À Fred :) Fred, j'ai un message de la part de Barbie : j'aimerais un nouveau pantalon, le mien est si usé… Va m'en chercher un, s'il te plaît. Va, Fred, va ! (Soudain, Fred se met à marcher.)
+Eugénie       : Il marche !
+Saint-Benoist : C'est étonnant… (Cependant, si Fred marche, il fait en réalité du surplace.)
+Max           : Attendez… Vous avez vu ? Il marche peut-être, mais il n'avance pas des masses…
+Daria         : Il résiste…
+Max           : C'est un peu une métaphore de la méthode par hypnose. Beaucoup de gesticulations pour peu d'effets…
+Daria         : Non mais vous vous rendez-compte du sujet que je dois traiter ? Un chômeur, un incapable, un minable…
+Eugénie       : N'insultez pas mon frère…
+Daria         : Un décérébré qui joue encore à la poupée…
+Saint-Benoist : (avec éclat) Taisez-vous ! (Un silence.) Réveillez-le.
+Daria         : Fred, vous allez maintenant sortir de ce sommeil aussi facilement que vous y êtes entré. Je vais compter jusqu'à trois. Un, deux, trois, réveillez-vous.
+Fred          : (ouvrant les yeux) Quoi ? Qu'est-ce que j'ai ? … (À Eugénie :) Tu les as laissés me ? … ça va ? Vous vous êtes bien amusés avec votre petite marionnette ? (Il sort.)
+Saint-Benoist : (gentiment, à Eugénie) Et si nous préparions le dîner ? Je vous offre mon aide. (Zora rentre vivement.)
+Zora          : Venez vite ! Fred est en train de jeter au feu des pans entiers de bibliothèque !
+Eugénie       : Mes livres ! (Daria ne peut réprimer un sourire.)
+###21h
+Daria         : (Tous et toutes sont à table. L'ambiance est tendue. On mastique en silence. Ken et Barbie sont également assis à table, une assiette posée devant eux. Zora observe très attentivement ce qui se dit et se fait.) (avec hésitation) Est-ce que je… hum… je pourrais avoir du pain ? (Sans un mot, Eugénie lui jette une tranche de pain à la tête.) Merci…
+Eugénie       : Ma Pléiade de Flaubert, brûlée ; mon théâtre complet de Racine, brûlé ; les mémoires de…
+Fred          : (la coupant et feignant de s'adresser à Barbie) Comment ? (Un silence.) D'accord. (Aux autres :) Si on pouvait parler d'autre chose : Barbie se fait chier.
+Eugénie       : (à part) Charmant… (À Fred :) Et quel sujet de conversation intéresserait tes…
+Fred          : (la coupant et feignant de s'adresser à Ken) C'est vrai, tu as raison. (Aux autres :) Ken aimerait que la personne qui a essayé de le tuer ne prenne plus la parole.
+Eugénie       : Le tuer ? Maintenant, ça suffit ! La mesure est comble, la coupe est pleine ! J'en ai plus qu'assez de ce petit jeu qui…
+Fred          : (la coupant et feignant de s'adresser à Barbie) Je suis complètement de ton avis. (Aux autres :) Barbie me disait qu'il y a des lois contre ça. Vous vouliez tous me faire sortir ? Vous avez gagné. Je vais sortir. Dès demain, j'irai porter plainte pour dégradation du bien d'autrui.
+Max           : (bas, à Eugénie) Je n'ai aucun conseil à te donner, mais si…
+Eugénie       : (bas) Alors ferme ta bouche hermétiquement.
+Daria         : (sortant un pendule et commençant à le balancer, à Fred) Vous êtes sensible aux objets d'art ? (Sans un mot, Fred prend le pendule. Il se lève et va le jeter dans le jardin.)
+Max           : (se levant et poussant Fred) On va faire un petit tour ?
+Fred          : Me touche pas, toi.
+Max           : (continuant sa poussée) Rien qu'un petit tour.
+Fred          : Dégage ! (Il met Max à terre. Alors que Max se relève :) En fait, t'en as rien à cirer des autres. Le « bien-être » des gens, leur « réussite » - et ça veut dire quoi ? réussir ? – tu t'en fous complètement. La seule chose qui t'intéresse c'est ta sale petite gueule. (Daria rit en silence.)
+Max           : T'es en colère. Je comprends. Avant, j'étais comme toi, en colère. Et puis j'ai connu la méthode par objectifs…
+Fred          : (à part) Pitié…
+Max           : Et là, j'ai arrêté de me tromper…
+Fred          : T'as arrêté de te tromper ? Me fais pas rire. Depuis que t'es arrivé, t'arrêtes pas de te planter ! Vouloir me faire sortir à tout prix… pour prouver quoi ? Et à qui ? Tu fais connerie sur connerie, mais à part ça, t'as arrêté de te planter ? Pauvre mec…
+Max           : Moi ? Connerie sur connerie ? Mais non ! Mais pas du tout !
+Fred          : Ah ouais ? Eh ben cite-moi une chose, une seule chose que t'as bien faite depuis que t'es là !
+Max           : Une chose que j'ai bien faite ? C'est simple… (Il cherche.) J'ai que l'embarras du choix… (Il cherche encore.) J'en ai fait tellement, des choses bien, depuis vendredi soir que… je sais pas par où commencer en fait… euh… les bolognaises ! Les bolognaises qu'on a faites avec Eugénie !
+Eugénie       : Elles étaient cramées.
+Max           : (minorant) Cramées…
+Eugénie       : (insistant) Cramées ! Je t'avais demandé de surveiller la cuisson, mais tu avais quelque chose de plus urgent à faire, manifestement…
+Max           : C'est vrai, j'ai eu un appel et j'ai dû… Mais, j'ai fait d'autres choses bien, depuis vendredi.
+Fred          : Quoi ?
+Max           : (cherchant) Plein !
+Fred          : Vas-y.
+Max           : (cherchant) Oui, oui… j'ai… hier, j'ai mis la table. Et… elle était hyper bien mise.
+Eugénie       : Tu parles ! Il manquait un couvert sur deux, j'ai dû repasser derrière toi…
+Max           : (s'énervant) Si je comprends bien, je ne fais que de la merde ?
+Fred          : On peut dire ça comme ça !
+Max           : (montrant Daria) C'est sa faute, à l'autre, elle vous a braqués !
+Daria         : Moi ? J'ai braqué quelqu'un ?
+Max           : (à Saint-Benoist) D'ailleurs, Édouard, vous feriez bien de vous méfier d'elle. J'ai pris mes renseignements, c'est une vraie pique-assiette, un parasite qui pompe tous ceux qui se laissent embobiner.
+Daria         : Qu'est-ce que tu racontes ?
+Max           : (à Édouard) Appelez Freshgreen, appelez Kaiser, et dites leur juste Daria. Vous verrez le souvenir qu'ils ont des formations dispensées par la demoiselle.
+Daria         : Des envieux auront répandu leur fiel…
+Max           : (à Édouard) Une belle arnaqueuse !
+Daria         : Mensonges !
+Max           : (à Édouard) Elle envoie des ondes négatives. Si elle n'avait pas été là, je serais arrivé à quelque chose avec Fred.
+Daria         : Ça m'étonnerait que quelqu'un arrive à quelque chose avec lui…
+Fred          : Traite-moi de débile.
+Daria         : Vous n'êtes pas débile, mais… vous n'y arrivez pas !
+Fred          : Je n'y arrive pas.
+Daria         : Oui, c'est ça, vous n'y arrivez pas.
+Fred          : Je n'arrive pas à quoi ?
+Daria         : (après un silence) À tout.
+Fred          : Carrément…
+Eugénie       : (après un silence) Bon. Je pense qu'il est temps que tu ailles dormir.
+Fred          : Tu n'es pas ma mère.
+Eugénie       : Eh bien prouve-le-moi et grandis un peu.
+Fred          : Tu espères me faire grandir en me traitant comme un bébé ?
+Eugénie       : Je ne sais toujours pas si tu es un ado ou un adulte.
+Fred          : Tu m'insultes.
+Eugénie       : Tu es un adulte ? En ce cas parle-moi, dis-moi ce dont tu as besoin. (Fred ouvre la bouche, va pour parler, mais aucun son ne sort.) C'est pas gagné…
+Fred          : Va te faire foutre. (Il sort.)
+Eugénie       : Je l'infantilise ! Vous l'entendez ? Non, je ne l'infantilise pas. Simplement, il est à ma charge et je porte ma croix, c'est tout. Je ne l'infantilise pas, je fais attention à lui, c'est différent. Quand je lui fais un goûter, c'est parce que je m'inquiète pour sa santé : il ne mange rien ! Je ne l'infantilise pas. Quand je mets son linge au sale, c'est parce que je sais qu'il n'y pense pas. (Après réflexion :) Et si… et si je lui proposais une glace à la vanille ? Il les adore… (Tombant sur un tas de livres en cendres.) Comment a-t-il pu faire ça ? Il sait que j'y tiens plus que tout…
+Zora          : Vous aviez mis Barbie à brûler.
+Eugénie       : Oui, c'est vrai. J'ai été stupide… (Elle regarde un des livres brûlés. Elle le prend et en tire une carte postale.) Oh… ce qu'elle est vieille, cette carte ! C'est drôle, elle n'a pas brûlé. Une carte de Fred. Une carte pour moi…
+Zora          : On dirait une carte d'enfant.
+Eugénie       : C'est une carte d'enfant. Il était parti en classe de neige et il m'avait écrit. (Elle lit :) « Bonjour Nini, ici on s'amuse bien, je fais plein de ski. Mais le soir, tu me manques. J'ai hâte de te retrouver et que tu me chantes une berceuse et que tu mettes un gros baiser qui claque sur mon front. Ton Fred qui t'aime. » (Elle est émue.) Il ne dirait plus ça aujourd'hui… (Elle se cache le visage.)
+Saint-Benoist : Allons, Eugénie…
+Eugénie       : (peinant à contenir ses sanglots) Excusez-moi, Édouard… Je vous invite en weekend et je vous fais subir un psychodrame familial…
+Saint-Benoist : Vous vous aimez. Mais en ce moment, c'est… c'est pas simple.
+Eugénie       : (peinant à contenir ses sanglots) Je ne sais pas si on arrivera à recoller les morceaux.
+Saint-Benoist : Mais si, vous y arriverez. Cette carte en est la preuve.
+Eugénie       : (séchant ses larmes) Qu'est-ce qu'elle prouve, cette carte ?
+Zora          : Elle prouve qu'entre vous il y a quelque chose… quelque chose d'unique.
+Eugénie       : Peut-être…
+Saint-Benoist : Pas peut-être. C'est sûr. (Un temps.) Eugénie, vous connaissez Étretat ? (Eugénie sourit tandis que Daria fulmine. Zora paraît rassurée.)
+##Lundi
+###3h
+Max           : (La pièce est plongée dans l'obscurité. Zora dort dans le canapé. Soudain, Daria entre dans la pièce lentement, seulement éclairée par la lumière de son téléphone. Zora la voit et, sans un bruit, sort. Daria cherche quelque chose. Soudain, elle trouve. Elle prend un sachet, l'ouvre et y saupoudre quelque chose. Soudain, Max entre, lui aussi à la lueur de son portable. Daria se fige.) Ah… Zora avait raison… Elle m'avait bien dit qu'elle avait entendu du bruit… Tu fais quoi, là ?
+Daria         : Ah… salut… je… hum… je ne dormais pas alors… j'ai quitté l'hôtel et je suis allée faire un petit footing qui m'a entraînée jusqu'ici…
+Max           : Je parlais de tes manigances avec mon blé khorasan.
+Daria         : Ton quoi ?
+Max           : (désignant le sachet que Daria avait ouvert) Mon blé khorasan, ça, là…
+Daria         : Ça ?
+Max           : Fais pas l'innocente. Tout le monde sait que je prends ça au petit-déjeuner… (Il s'approche d'elle.)
+Daria         : Eh bien, pour tout te dire, j'avais un petit creux, alors je cherchais ce que je pouvais…
+Max           : (prenant le sachet) Qu'est-ce que t'as foutu dedans ?
+Daria         : Moi ?
+Max           : (examinant le sachet) Il y a comme une poudre blanche… (Regardant Daria :) Tu caches quoi, là ?
+Daria         : Rien…
+Max           : (tournant autour de Daria qui fait tout pour rester face à lui) Si, je vois bien que t'essaies de cacher quelque chose…
+Daria         : (essayant de lui échapper) Écoute, ce n'est pas ce que tu crois…
+Max           : (idem) Montre-moi ça…
+Daria         : (idem) Je vais t'expliquer…
+Max           : (idem) Donne-moi ça ! (Il lui arrache ce qu'elle voulait cacher.) De la mort-aux-rats ?
+Daria         : (penaude) Reste calme.
+Max           : Que je reste calme ? Tu veux que je reste calme quand je te trouve en train de mettre de la mort-aux-rats dans mes céréales ? Les céréales de mon petit-déjeuner ? Que tout le monde trouve dégueulasses et que seul moi peux supporter ? Et tu voudrais que je reste calme !
+Daria         : Je ne sais pas ce qui m'a pris…
+Max           : Ben voyons… Tu veux me faire croire à une pulsion, peut-être ? Non, non, tout était calculé… Et tu veux que je te dise pourquoi ? T'es une malade, une grande malade !
+Daria         : Aide-moi…
+Max           : Oh oui je vais t'aider… je vais t'aider à ne plus nuire à personne, connasse !
+Daria         : Je ne te permets pas de me… (Elle s'interrompt car Max a empoigné un grand couteau à viande.) Qu'est-ce que tu as l'intention de faire ?
+Max           : (avançant vers Daria avec son couteau) Je vais faire œuvre de purification…
+Daria         : (reculant) Attention, je vais crier… (Soudain, on entend un bruit à côté. Max et Daria se figent.)
+Eugénie       : (off) Zut !
+Max           : (saisissant Daria) Viens ! (Ils se cachent dans un recoin très étroit. Eugénie entre et allume la lumière. Elle regarde autour d'elle. Elle avance vers le sachet de blé. Max, caché avec Daria, tousse.) (Eugénie s'arrête.)
+Eugénie       : Y a quelqu'un ? (Silence.) Si c'est une blague, elle est stupide. (Silence. Elle prend le sachet et l'examine.) Mais qu'est-ce que ? … (Elle regarde encore autour d'elle. Puis elle avance encore et tombe sur Max et Daria, accroupis dans un coin.) Ah c'est vous !
+Max           : (sans quitter sa posture) Oui…
+Eugénie       : (avec intention) Je vois que vous vous êtes réconciliés, tous les deux…
+Max           : Hein ? (Se levant :) Ah mais non, mais qu'est-ce que tu vas imaginer !
+Daria         : (se levant elle aussi) Je ne faisais que passer…
+Eugénie       : (ironique) Bien sûr… J'y crois très fort… En pleine nuit… À trois heures du matin…
+Max           : Eugénie, arrête tes enfantillages…
+Eugénie       : Tu m'as assez vanté le caractère aphrodisiaque de ton blé… (Regardant le sachet.) D'ailleurs, je me demande si je ne vais pas essayer. (Elle prend une poignée de blé et l'approche de sa bouche.)
+Max           : Non ! (Eugénie s'arrête.)
+Daria         : Non ! (Eugénie s'arrête.)
+Max           : Surtout, ne fais pas ça…
+Eugénie       : Pourquoi ?
+Max           : (regardant Daria) Et bien parce que… parce que le blé khorasan, c'est très… très… enfin, peu de gens le supportent… quand on n'est pas habitué, cela peut provoquer des troubles digestifs, alors je ne te conseille vraiment pas de…
+Eugénie       : (reposant la poignée de blé, déçue) Bon.
+Max           : (jetant le sachet de blé) D'ailleurs ça, poubelle !
+Eugénie       : Pourquoi tu fais ça ?
+Max           : Ça pourrait causer du tort… (Prenant les mains d'Eugénie.) Et toi, lave-toi les mains !
+Eugénie       : (résistant) Elles sont propres…
+Max           : (lui frottant les mains avec une éponge humide) On frotte bien… voilà… comme ça… Et on essuie…
+Eugénie       : (interloquée) Vous êtes bizarres, tous les deux… (Entrent Saint-Benoist et Zora.)
+Saint-Benoist : Ah ! Daria ! Dieu merci, vous êtes là ! J'ai entendu du bruit dans votre chambre. Ensuite j'ai toqué, mais ça ne répondait pas. Je me suis inquiété et puis j'ai pensé… J'ai eu raison…
+Eugénie       : Édouard, je vous propose de laisser nos deux tourtereaux…
+Saint-Benoist : Nos deux tourtereaux ? Ah bon ? (Il regarde en direction de Daria et Max.)
+Zora          : Sont-ils pas mignons ? …
+Daria         : (désireuse de donner le change) Oui… (Elle met la main sur l'épaule de Max, qui en est contrarié mais sourit tout de même.)
+Saint-Benoist : (souriant) On ne va pas vous déranger plus longtemps… (Entre Fred.)
+Fred          : (surpris) Il y a foule, ici… En un sens, tant mieux… (À Max et Daria :) J'ai du nouveau sur vous. (À Zora :) T'avais raison. (À Max et Daria :) Vous vous êtes bien foutus de nous.
+Max           : Qu'est-ce que c'est que cette agression ?
+Fred          : C'est pas une agression, c'est une mise au point, ducon.
+Max           : (esquissant une sortie) Je refuse de supporter…
+Fred          : (le rattrapant) Hop hop hop… Tu restes là toi. On va commencer par toi. Tu nous as bien dit que t'avais suivi ta formation de coach au… (Il lit un papier.) « Campus MacRoss. » C'est exact ?
+Max           : Oui…
+Fred          : « Envie d'un diplôme mais pas le temps de suivre une formation ? Le Campus MacRoss est fait pour vous. En vous contentant d'une ou deux demi-journée de cours, vous obtiendrez facilement votre diplôme certifié, moyennant 300 à 500 euros ».
+Max           : Mais qu'est-ce que c'est que ça ?
+Fred          : Une petite enquête réalisée par trois bons journalistes. Je vous la recommande tous…
+Max           : Ce sont des mensonges, des mensonges éhontés…
+Fred          : Et toi ? T'as payé combien pour nous faire croire que t'étais coach certifié ?
+Max           : Mais… mais j'ai payé une somme tout à fait raisonnable pour la qualité de la formation…
+Fred          : Une formation de quoi ? Deux après-midis ? (À Daria :) Quant à toi, tu nous as bien dit que tu sortais de l'Institut Wolf Messing ?
+Daria         : Exact.
+Fred          : (lisant) « Une vaste blague, puisque j'y ai enseigné six ans alors que mon seul diplôme était mon brevet des collèges. » Témoignage d'un ancien professeur. (À Daria :) Et toi ? T'as raqué combien pour ton diplôme ? (Un silence se fait.) Vous me donnez envie de gerber. Je vais prendre l'air. (Il sort.)
+Eugénie       : (après un silence) Qu'est-ce qu'il a dit ?
+Saint-Benoist : Il a dit qu'il allait… qu'il allait… Mais… Mais il est sorti !
+Eugénie       : Oui, il est sorti !
+Max           : C'est grâce à moi !
+Daria         : Non, c'est grâce à moi !
+Max           : Non, à moi !
+Daria         : Non, à moi !
+Max           : Moi !
+Daria         : Moi !
+Zora          : (qui a suivi Fred du regard) On se calme. Il n'est pas sorti.
+Daria         : Quoi ?
+Max           : Quoi ?
+Zora          : Il est sorti dehors, mais pas hors des limites de la maison. Il est monté dans une cabane, en haut d'un grand arbre.
+Eugénie       : Ça fait longtemps qu'il n'y a pas été.
+Max           : C'est pas possible… (Il sort, suivi de Daria.)
+Saint-Benoist : (à Eugénie) Je ne sais pas quoi dire… Je me sens un peu… comme le dindon d'une farce…
+Eugénie       : Et moi ? Que devrais-je dire ? (Max rentre.)
+Saint-Benoist : Vous, c'est un peu différent. Je ne connaissais pas Daria avant avant-hier. Mais Max, c'est votre ami.
+Eugénie       : Mon ami, mon ami…
+Saint-Benoist : Vous doutez ?
+Eugénie       : Il me met une pression insoutenable, c'est une sorte de … de nazi du bien-être. (Elle se retourne et aperçoit Max.) Ah… tu étais là ? … (Elle sort, gênée, suivie de Saint-Benoist.)
+Max           : Elle m'a tué… Elle a rien compris…
+Zora          : C'est toi qui t'es planté.
+Max           : J'ai fait tout ce qu'il fallait…
+Zora          : Mais tu t'es planté.
+Max           : Si j'ai besoin de quelqu'un pour me remonter le moral, promis, je t'appellerai pas…
+Zora          : C'est pas grave, de se planter. D'ailleurs tu fais que ça.
+Max           : Vas-y, enfonce-moi.
+Zora          : C'est pour ça qu'on t'aime. Tu croyais passer ta vie dans les RH ? Tu t'es planté ! Tu as eu envie de changer. Et tu as appris. Tu pensais que le Campus MacRoss, c'était le top ? Tu t'es planté. Un ramassis d'imposteurs. Et tu as appris. Chacune de tes erreurs est un nouveau livre de ta bibliothèque intérieure. (Eugénie rentre à toute vitesse.)
+Eugénie       : Fred est tombé de la cabane ! Il a perdu connaissance !
+###20h
+Fred          : (Tout le monde est à table, y compris Ken et Barbie. L'ambiance est très chaleureuse.) (un bandage autour de la tête, à Daria) Sans toi, je ne sais pas comment j'aurais fait.
+Daria         : Je ne sais pas ce que vaut mon diplôme d'hypno-thérapeute, mais je crois que mon diplôme de secouriste n'a pas été usurpé. Attends. (Elle se lève et ajuste le bandage de Fred tandis que les autres chantent des chansons. Max, qui observait la scène, s'approche de Daria et lui propose un verre. Mais elle ne le prend pas.)
+Max           : Je l'ai pas empoisonné, tu sais. (Silence.) Tu me crois pas ? (Silence. Il boit une gorgée du verre qu'il proposait à Daria. Il attend un peu.) Tu vois ? (Il lui tend de nouveau le verre, qu'elle accepte, cette fois. Ils trinquent et boivent en silence. Puis, Max met sa main l'épaule de Daria et retourne à sa place.)
+Saint-Benoist : (au téléphone) Mais enfin, vous ne pouvez pas me faire ça ! J'ai fondé cette boîte ! (Silence.) Quoi ? Cet article des statuts ne vous autorise pas à me… (Silence.) Minoritaire ? (Silence.) 8% ? (Silence.) Vous êtes des ordures. Je passerai prendre mes affaires demain. (Il raccroche. Sa mine est défaite.)
+Eugénie       : (se levant) Je lève mon verre à Daria, qui a sauvé mon frère !
+Eugénie       : À Daria !
+Fred          : À Daria !
+Max           : À Daria !
+Saint-Benoist : À Daria !
+Daria         : À Daria !
+Zora          : À Daria !
+Eugénie       : (à Saint-Benoist) Tout va bien, Édouard ?
+Saint-Benoist : (souriant) Mais oui, tout va bien ! (Soudain, il éclate en sanglots.) Excusez-moi, un peu de fatigue…
+Fred          : (rendant son pendule à Daria) Je crois que c'est à toi.
+Daria         : Je pensais que tu l'avais jeté.
+Fred          : J'ai failli.
+Max           : (donnant un mouchoir à Édouard) Allez Édouard, vous en faites pas… Vous savez… avec la méthode par objectifs…
+Eugénie       : Non, Max, tu vas pas recommencer…
+Max           : Attends. (À Saint-Benoist :) Avec la méthode par objectif, le problème, et je suis bien placé pour vous en parler, c'est qu'on voit plus que l'objectif. Et le chemin par lequel on y va… (Il fait un geste :) Pfuit ! On le voit plus. Pourtant, c'est bien ça, l'endroit où on passe le plus de temps : le chemin. Alors voyez Édouard… Je sais pas ce que vous avez appris (Il désigne le téléphone de Saint-Benoist.) Mais… en tout cas, je crois qu'on a eu de la chance de tous se retrouver pour ce week-end de Pâques. Non ? (Il regarde les autres, chacun occupé à une conversation, et Édouard les regarde aussi.)
+Saint-Benoist : Oui, vous avez raison.
+Max           : Tu sais, je crois que tu peux me dire tu.
+Saint-Benoist : T'as raison, Max.
+Zora          : (voyant passer Eugénie avec un mug) C'est quoi ?
+Eugénie       : Un chocolat pour Fred.
+Zora          : Il t'en a demandé un ?
+Eugénie       : Non. (Silence.) Mais j'ai pensé… Il est tout de même resté couché dans le jardin un quart d'heure, sur la pelouse froide, alors je me disais… (Elle n'achève pas.)
+Zora          : Je crois qu'il est en grande conversation avec Daria. Ils ont l'air paisibles.
+Eugénie       : (les regardant) C'est vrai…
+Zora          : Bois-le.
+Eugénie       : Quoi ?
+Zora          : Le chocolat.
+Eugénie       : (avec réprobation) C'était pour Fred…
+Zora          : Ce serait dommage de le laisser perdre, avec toutes les bonnes choses que tu y as mises… cacao, lait entier, crème fraîche, sucre, cannelle… (Sans un mot, Eugénie boit goulûment.)
+Eugénie       : Ça fait du bien…
+Zora          : C'est bon de s'offrir ça, de temps en temps…
+Eugénie       : (souriant) Oui… (À Max :) J'ai l'impression de te retrouver…
+Max           : Tu m'avais perdu ?
+Eugénie       : Peut-être… (Elle trinque avec lui.)
+Max           : Qu'est-ce que tu bois ?
+Eugénie       : Chocolat.
+Fred          : (à Zora) Je ne sais pas comment lui dire…
+Zora          : Commence par « Eugénie ? »…
+Fred          : (à Eugénie) Eugénie ? …
+Eugénie       : Oui ?
+Fred          : (bas, à Zora) Et après ?
+Zora          : (bas, à Fred) J'aimerais te dire quelque chose.
+Fred          : (haut, à Eugénie) J'aimerais te dire quelque chose.
+Eugénie       : Je t'écoute.
+Fred          : (bas, à Zora) Et après ?
+Zora          : (bas, à Fred) Après, tu te débrouilles. (Elle s'éloigne.)
+Fred          : (bas, à Zora) Non, attends…
+Eugénie       : Qu'est-ce que tu voulais me dire ?
+Fred          : Eh bien je… j'ai… tu te souviens, quand on était ? … je… je… je…
+Eugénie       : Respire.
+Fred          : Quoi ?
+Eugénie       : Respire.
+Fred          : Ouais. (Il s'exécute.) Ça fait du bien. C'est con parce que, respirer, on fait ça naturellement, sans y penser, mais quand on y pense et qu'on le fait, ça fait du bien.
+Eugénie       : Je crois que j'ai compris.
+Fred          : Quoi ?
+Eugénie       : Ce que tu voulais me dire.
+Fred          : Ah bon ?
+Eugénie       : Que parfois, on oublie un peu de laisser les gens respirer.
+Fred          : (après un silence) C'est un peu ça, ouais…
+Eugénie       : (sortant une carte postale et la montrant à Fred) Tu te souviens ?
+Fred          : (souriant) Oui. (Un silence.) Je crois… je crois que je pourrais encore t'écrire ça aujourd'hui. (Eugénie prend Fred dans ses bras. Puis, Fred desserre l'étreinte.) Attends, je ne sais pas pourquoi maintenant, mais il est temps que je fasse quelque chose… (Il sort.)
+Max           : (au téléphone) Encore vous ? Mais vous harcelez les clients nuit et jour dans cette banque… (Un silence.) Oui, mais je m'en fous. (Un silence.) Je m'en fous, je vous dis. « Je m'en fous », qu'est-ce que ça veut dire ? Ça veut dire « I don't care ». Vous comprenez, ça ? Alors foutez-moi la paix ! (Il raccroche.)
+Saint-Benoist : (montant sur une chaise, un peu gris) Mes amis, je suis ruiné !
+Max           : (montant également sur une chaise) Moi aussi !
+Saint-Benoist : (levant son verre) Ça se fête ! (Ils boivent cul sec.)
+Max           : Édouard je vous propose d'aller chercher un pont qui pourra nous accueillir vous et moi… (Fred passe soudain avec des morceaux de papier peint.)
+Daria         : Qu'est-ce qu'il fait ?
+Eugénie       : C'est le papier peint de sa chambre… (Fred repasse.)
+Eugénie       : Tu enlèves tout ?
+Fred          : Tout ! J'ai envie de grands changements ! (Il disparaît de nouveau. Zora paraît satisfaite et sort.)
+Eugénie       : Je me demande si je ne suis pas en train de rêver…
+Daria         : Pourquoi ?
+Eugénie       : Ça fait des années que je lui demande de changer ce vieux papier peint, et il choisit le soir du lundi de Pâques pour… (Fred réapparaît avec de nouveaux morceaux de papier peint.)
+Fred          : J'ai l'impression d'être revenu à la vie ! (Il disparaît de nouveau.)
+Eugénie       : Tout ça, c'est un peu grâce à Zora.
+Daria         : Oui. D'ailleurs où est-elle ?
+Eugénie       : Je ne sais pas. (Fred apparaît avec d'autres papiers.)
+Eugénie       : Tu n'as pas vu Zora ?
+Fred          : Non.
+Eugénie       : (appelant) Zora ? (Elle sort.)
+Saint-Benoist : Si je comprends bien, cette Zora, personne ne la connaissait avant samedi ?
+Max           : Non. J'ai essayé de la faire parler d'elle, mais… à chaque fois, elle faisait revenir la conversation sur moi… (Eugénie rentre.)
+Eugénie       : Elle est partie.
+Max           : Elle est peut-être juste allée faire un tour.
+Eugénie       : Non, elle est partie. Elle a pris toutes ses affaires.
+###23h
+Eugénie       : (Tous sauf Zora. Chacun s'active et semble chercher quelque chose.) Tout de même… partir comme ça, sans un mot, ça ne se fait pas…
+Fred          : Il y a des gens qui n'aiment pas dire au revoir.
+Eugénie       : Je l'ai recueillie, hébergée, nourrie pendant trois jours !
+Daria         : Regardez bien. Elle a peut-être laissé un détail qui pourrait nous aider…
+Fred          : C'est quoi, son nom de famille ?
+Eugénie       : J'en sais rien…
+Saint-Benoist : Et elle est arrivée comme ça ? Ex abrupto ?
+Eugénie       : Oui… elle a comme surgi… le visage tout noir…
+Saint-Benoist : Le visage tout noir ?
+Eugénie       : Une histoire d'accident… Elle avait eu un accident de voiture… à ce qu'elle disait…
+Saint-Benoist : Ah ?
+Fred          : C'est une piste, ça…
+Eugénie       : Attendez… ça me revient maintenant… elle m'a dit que sa voiture avait été remorquée jusqu'au garage Rochart ! (Elle prend son téléphone.)
+Fred          : Qu'est-ce que tu fais ?
+Eugénie       : Je téléphone à Rochart…
+Fred          : On est le lundi de Pâques et il est vingt-trois heures !
+Eugénie       : Avec tout l'argent qu'il me prend, il peut bien me faire ça… (Silence.) Ça sonne… (Silence.) Il en met du temps…
+Fred          : Il dort…
+Eugénie       : (au téléphone) Allô M. Rochart ? Mme Dubreuil, au téléphone. Désolée de vous déranger si tard… Dites-moi, est-ce que… par hasard… une cliente serait venue récupérer sa voiture chez vous ? (Silence.) Il y a une heure ou deux. (Silence.) Vous êtes fermé depuis samedi ? (Silence.) Et si quelqu'un était venu pour récupérer sa voiture il y a une heure, vous l'auriez reçu à coup de chevrotine ? Bien… Mais… vous avez remorqué quelqu'un, samedi ? (Silence.) Un accident, près de chez nous (Silence.) Une femme, brune, taille moyenne ? (Silence.) Rien ? (Silence.) Vous êtes sûr ? Prénommée Zora ? (Silence.) Bon. Merci M. Rochart. Désolée pour le dérangement. (Elle raccroche.) La dernière fois que Rochart a remorqué quelqu'un, c'était il y a quinze jours. Il faut faire une recherche dans l'annuaire !
+Max           : Tu veux faire quoi ? Rechercher toutes les Zora du pays ?
+Eugénie       : Je suis en train de me demander si… Est-ce qu'elle a vraiment existé ? Est-ce qu'on n'est pas victime d'une hallucination collective ?
+Saint-Benoist : (gentiment réprobateur) Eugénie…
+Fred          : Est-ce qu'on n'est pas tous des hallucinations collectives ? Ou des puzzles ?
+Eugénie       : Je veux dire : on avait des problèmes, tous et… elle est arrivée et maintenant… tout n'est pas arrangé, bien sûr, mais, malgré tout, je… (Elle n'achève pas.)
+Fred          : Malgré tout ?
+Eugénie       : Je ne sais pas.
+Fred          : On ne l'a vue que trois jours. On ne sait pas tout sur elle. Comme ton boucher ne sait pas tout sur toi, ou tes collègues, ou tes amis.
+Eugénie       : Peut-être qu'elle a été contrariée par quelque chose. Sûrement… (À Max :) C'est toi ? Tu lui as dit quelque chose, quelque chose qui l'a blessée ?
+Max           : Mais non !
+Eugénie       : (à Daria) Alors c'est toi ? Tu as voulu lui prouver que… que tu étais supérieure à elle ?
+Daria         : J'ai pu la trouver agaçante, au début, mais par la suite, il m'a semblé que… qu'elle comprenait beaucoup de choses…
+Eugénie       : Évidemment, qu'elle comprenait beaucoup de choses…
+Saint-Benoist : Elle est arrivée au bon moment…
+Eugénie       : Mais oui, c'est peut-être ça…
+Saint-Benoist : Quoi ?
+Eugénie       : Elle est arrivée quand tout était en train de s'écrouler… Alors… si tout s'écroule de nouveau… elle reviendra sûrement… (Un silence.) Mettons le feu à la maison !
+Fred          : Hein ?
+Eugénie       : Comme ça, elle sera de retour ! Pour tout réparer, encore !
+Max           : Ce weekend a été riche en émotions… on ferait mieux d'aller se reposer…
+Eugénie       : (sanglotant, dans les bras de Fred) Pourquoi ? Pourquoi ? (Elle pleure encore, puis elle s'arrête.) Moi qui pensais avoir trouvé une amie…
+Max           : On a tous trouvé une amie. Et maintenant, elle est partie. Elle a ses raisons.
+Eugénie       : (séchant ses larmes) Oui.
+Saint-Benoist : Elle est peut-être allée porter la bonne nouvelle.
+Eugénie       : Laquelle ?
+Daria         : « Fred est revenu ».
+Eugénie       : (souriant) Peut-être.
+Fred          : Même si elle n'est plus là, elle est encore un peu avec nous.
+Saint-Benoist : Dans nos souvenirs.
+Fred          : Et à table.
+Daria         : C'est-à-dire ?
+Fred          : Ken.
+Saint-Benoist : Mais oui… elle a laissé sa poupée…
+Eugénie       : (à Fred) Tu crois qu'elle reviendra la chercher ?
+Fred          : Sûrement, Eugénie, sûrement.
+Eugénie       : Elle pourra revenir quand elle veut. (Aux autres :) D'ailleurs, vous aussi, vous pourrez revenir quand vous voulez.
+Fred          : Et si on allait la chercher ? (Devant le silence que provoque sa question :) Elle marche à pied, elle ne doit pas être bien loin. On peut la retrouver vite. (Il amorce une sortie.)
+Daria         : Attends ! (Il s'arrête.) Je viens avec toi. (Ils sortent. On entend le bruit d'une voiture qui s'éloigne.)
+Eugénie       : Il a pris ma voiture, et il est parti. Mon frère, qui n'avait pas franchi les limites de la grille depuis… il est tout simplement parti. (À Saint-Benoist :) Moi qui espérais m'en servir pour venir vous visiter à Étretat…
+Saint-Benoist : Je crois que je vais être obligé de vendre… À propos, vous pensez que vous pourriez m'héberger ? Un jour ou deux ?
+Eugénie       : Édouard, mon canapé vous tend les bras !
+Max           : Et moi ? Qu'est-ce que je vais faire ?
+Eugénie       : Je crois qu'ils cherchent un vendeur à mi-temps, à l'épicerie du village.
+Max           : Pourquoi pas ? Je pourrais proposer des cours sur la meilleure façon de gérer son budget ? D'abord des sessions de deux heures, puis des…
+Eugénie       : Max !...
+Saint-Benoist : Max !...
+Max           : Oui, vous avez raison… avant de coacher les autres, je ferais mieux d'apprendre à me coacher moi-même… Un job à la petite épicerie… Je peux toujours dormir au-dessus du garage ?
+Eugénie       : Promettez-moi d'être là l'année prochaine.
+Saint-Benoist : L'année prochaine ?
+Max           : Pourquoi l'année prochaine ?
+Eugénie       : Je tiens à ce qu'on le passe tous ensemble.
+Fred          : Qu'on passe quoi tous ensemble ?
+Eugénie       : Le prochain weekend de Pâques.`;
+    </script>
+
+    <div class="header">
+        <h1 id="play-title"></h1>
+        <button class="fullscreen-btn" id="fullscreen-btn" title="Plein écran">⛶</button>
+    </div>
+
+    <div class="tabs">
+        <button class="tab" data-tab="read">Lire</button>
+        <button class="tab" data-tab="learn">Apprendre</button>
+        <button class="tab" data-tab="settings">Paramètres</button>
+    </div>
+
+    <div class="content">
+        <!-- Read Tab -->
+        <div class="tab-content" id="read-tab">
+            <div id="read-content"></div>
+        </div>
+
+        <!-- Learn Tab -->
+        <div class="tab-content" id="learn-tab">
+            <div class="learn-scene-header" onclick="openNavigation('learn')">
+                <span id="learn-current-scene">Acte 1, Scène 1</span>
+                <span id="line-counter" style="margin-left: auto; margin-right: 8px;">0 / 0</span>
+                <span class="arrow-icon">▼</span>
+            </div>
+            <div class="learn-content-area" id="learn-content"></div>
+            <div class="learn-controls">
+                <div class="button-group">
+                    <button class="btn-back" onclick="restartScene()">⏮ Début</button>
+                    <button class="btn-next" onclick="nextLine()">Suivant ▶</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings-tab">
+            <div class="settings-content">
+                <div class="settings-group">
+                    <label class="settings-label" for="character-select">Mon personnage</label>
+                    <select id="character-select">
+                        <option value="">-- Choisissez votre personnage --</option>
+                    </select>
+                </div>
+                <div class="settings-group">
+                    <label class="settings-label">Taille du texte</label>
+                    <div class="text-size-buttons">
+                        <button class="text-size-btn" data-size="small">Petit</button>
+                        <button class="text-size-btn active" data-size="normal">Normal</button>
+                        <button class="text-size-btn" data-size="large">Grand</button>
+                    </div>
+                </div>
+                <div class="settings-group">
+                    <label class="settings-label">Nombre de répliques</label>
+                    <div class="stats-wrap" id="stats-table"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Modal -->
+    <div class="modal" id="navigation-modal" onclick="closeNavigation(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">Navigation</div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        // Parse the play text
+        function parsePlayText(text) {
+            const lines = text.split('\n');
+            const playData = {
+                title: '',
+                acts: []
+            };
+
+            let currentAct = null;
+            let currentScene = null;
+
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line) return;
+
+                // Title (# Title)
+                if (line.startsWith('#') && !line.startsWith('##')) {
+                    playData.title = line.substring(1).trim();
+                }
+                // Act (## Act X)
+                else if (line.startsWith('##') && !line.startsWith('###')) {
+                    currentAct = {
+                        title: line.substring(2).trim(),
+                        scenes: []
+                    };
+                    playData.acts.push(currentAct);
+                    currentScene = null;
+                }
+                // Scene (### Scene X)
+                else if (line.startsWith('###')) {
+                    if (currentAct) {
+                        currentScene = {
+                            title: line.substring(3).trim(),
+                            dialogues: []
+                        };
+                        currentAct.scenes.push(currentScene);
+                    }
+                }
+                // Dialogue (Character : Text)
+                else if (line.includes(':')) {
+                    const colonIndex = line.indexOf(':');
+                    const character = line.substring(0, colonIndex).trim();
+                    const text = line.substring(colonIndex + 1).trim();
+                    
+                    if (currentScene && character && text) {
+                        currentScene.dialogues.push({
+                            character: character,
+                            text: text
+                        });
+                    }
+                }
+            });
+
+            return playData;
+        }
+
+        // Parse the play data
+        const playData = parsePlayText(rawPlayText);
+
+        // Update page title
+        document.title = playData.title || 'Pièce de théâtre';
+
+        // State management
+        let currentTab = 'read';
+        let selectedCharacter = '';
+        let learnState = {
+            actIndex: 0,
+            sceneIndex: 0,
+            lineIndex: 0
+        };
+        let readState = {
+            actIndex: 0,
+            sceneIndex: 0
+        };
+
+        // Storage management functions (localStorage works with file://)
+        function setStorage(name, value) {
+            try {
+                localStorage.setItem(name, value);
+            } catch (e) {
+                console.error('Error saving to localStorage:', e);
+            }
+        }
+
+        function getStorage(name) {
+            try {
+                return localStorage.getItem(name);
+            } catch (e) {
+                console.error('Error reading from localStorage:', e);
+                return null;
+            }
+        }
+
+        // Extract unique characters
+        function getCharacters() {
+            const characters = new Set();
+            playData.acts.forEach(act => {
+                act.scenes.forEach(scene => {
+                    scene.dialogues.forEach(dialogue => {
+                        characters.add(dialogue.character);
+                    });
+                });
+            });
+            return Array.from(characters).sort();
+        }
+
+        // Generate a consistent color for each character
+        const characterColors = {};
+        
+        // Color palettes for light and dark modes
+        const colorPalettesLight = [
+            '#c0392b', // dark red
+            '#2980b9', // dark blue
+            '#27ae60', // dark green
+            '#d68910', // dark orange
+            '#8e44ad', // dark purple
+            '#16a085', // dark turquoise
+            '#d35400', // dark carrot
+            '#2c3e50', // very dark blue
+            '#117a65', // very dark green
+            '#922b21', // very dark red
+            '#6c3483', // dark wisteria
+            '#1e8449', // dark nephritis
+        ];
+
+        const colorPalettesDark = [
+            '#ff6b6b', // bright red
+            '#74b9ff', // bright blue
+            '#55efc4', // bright green
+            '#ffd93d', // bright yellow
+            '#dda0dd', // bright plum
+            '#6bcf7f', // bright mint
+            '#ffa07a', // bright salmon
+            '#87ceeb', // sky blue
+            '#98d8c8', // light teal
+            '#ff9999', // light coral
+            '#c39bd3', // light purple
+            '#90ee90', // light green
+        ];
+
+        function isDarkMode() {
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+
+        function getCharacterColor(character) {
+            if (!characterColors[character]) {
+                const colorPalette = isDarkMode() ? colorPalettesDark : colorPalettesLight;
+                const characters = Object.keys(characterColors);
+                const colorIndex = characters.length % colorPalette.length;
+                characterColors[character] = colorPalette[colorIndex];
+            }
+            return characterColors[character];
+        }
+
+        // Listen for theme changes and update colors
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                // Reset character colors to apply new palette
+                Object.keys(characterColors).forEach(key => delete characterColors[key]);
+                renderStats();
+                
+                // Re-render current tab
+                if (currentTab === 'read') {
+                    renderReadTab();
+                } else if (currentTab === 'learn') {
+                    renderLearnTab();
+                }
+            });
+        }
+
+        // Render the line count table (scenes x characters, with totals)
+        function renderStats() {
+            const container = document.getElementById('stats-table');
+            const totals = {};
+            const rows = [];
+            playData.acts.forEach(act => {
+                act.scenes.forEach(scene => {
+                    const counts = {};
+                    scene.dialogues.forEach(dialogue => {
+                        counts[dialogue.character] = (counts[dialogue.character] || 0) + 1;
+                        totals[dialogue.character] = (totals[dialogue.character] || 0) + 1;
+                    });
+                    const label = act.scenes.length > 1 ? `${act.title}, ${scene.title}` : act.title;
+                    rows.push({ label, counts, total: scene.dialogues.length });
+                });
+            });
+            const characters = Object.keys(totals).sort((a, b) => totals[b] - totals[a] || a.localeCompare(b));
+            const grandTotal = rows.reduce((sum, row) => sum + row.total, 0);
+
+            const table = document.createElement('table');
+            table.className = 'stats-table';
+            const addCell = (tr, tag, text, className) => {
+                const cell = document.createElement(tag);
+                cell.textContent = text;
+                if (className) cell.className = className;
+                tr.appendChild(cell);
+                return cell;
+            };
+            const mine = character => character === selectedCharacter ? 'mine' : '';
+
+            const head = table.createTHead().insertRow();
+            addCell(head, 'th', 'Scène');
+            characters.forEach(character => {
+                addCell(head, 'th', character, mine(character)).style.color = getCharacterColor(character);
+            });
+            addCell(head, 'th', 'Total');
+
+            const body = table.createTBody();
+            rows.forEach(row => {
+                const tr = body.insertRow();
+                addCell(tr, 'td', row.label);
+                characters.forEach(character => {
+                    const count = row.counts[character] || 0;
+                    addCell(tr, 'td', count || '–', [mine(character), count ? '' : 'zero'].join(' ').trim());
+                });
+                addCell(tr, 'td', row.total, 'stats-total-col');
+            });
+
+            const totalRow = body.insertRow();
+            totalRow.className = 'stats-total';
+            addCell(totalRow, 'td', 'Total');
+            characters.forEach(character => addCell(totalRow, 'td', totals[character], mine(character)));
+            addCell(totalRow, 'td', grandTotal);
+
+            container.innerHTML = '';
+            container.appendChild(table);
+        }
+
+        // Update page title with character if selected
+        function updateTitle() {
+            const baseTitle = playData.title;
+            const displayTitle = selectedCharacter ? `${baseTitle} - ${selectedCharacter}` : baseTitle;
+            document.getElementById('play-title').textContent = displayTitle;
+        }
+
+        // Initialize the app
+        function init() {
+            // Load settings first
+            loadSettings();
+            
+            // Setup UI
+            populateCharacterSelect();
+            updateTitle();
+            renderStats();
+            setupTabs();
+            
+            // Restore saved tab or default to 'read'
+            const savedTab = getStorage('currentTab') || 'read';
+            switchTab(savedTab);
+        }
+
+        // Populate character dropdown
+        function populateCharacterSelect() {
+            const select = document.getElementById('character-select');
+            const characters = getCharacters();
+            characters.forEach(char => {
+                const option = document.createElement('option');
+                option.value = char;
+                option.textContent = char;
+                select.appendChild(option);
+            });
+
+            select.addEventListener('change', (e) => {
+                selectedCharacter = e.target.value;
+                saveSettings();
+                updateTitle();
+                renderStats();
+                
+                // Re-render current tab
+                if (currentTab === 'read') {
+                    renderReadTab();
+                } else if (currentTab === 'learn') {
+                    renderLearnTab();
+                }
+            });
+            
+            // Text size buttons
+            document.querySelectorAll('.text-size-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const size = this.dataset.size;
+                    applyTextSize(size);
+                    setStorage('textSize', size);
+                });
+            });
+
+            // Fullscreen button
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            if (fullscreenBtn) {
+                fullscreenBtn.addEventListener('click', toggleFullscreen);
+            }
+        }
+
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
+                // Enter fullscreen
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                } else if (elem.mozRequestFullScreen) {
+                    elem.mozRequestFullScreen();
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                }
+            } else {
+                // Exit fullscreen
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        // Setup tab navigation
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+        }
+
+        // Switch between tabs
+        function switchTab(tabName) {
+            currentTab = tabName;
+            setStorage('currentTab', tabName);
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-tab') === tabName) {
+                    tab.classList.add('active');
+                }
+            });
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+
+            // Render specific tab content if needed
+            if (tabName === 'learn') {
+                renderLearnTab();
+            } else if (tabName === 'read') {
+                renderReadTab();
+            }
+        }
+
+        // Render Read Tab
+        function renderReadTab() {
+            const container = document.getElementById('read-content');
+            container.innerHTML = '';
+
+            playData.acts.forEach((act, actIndex) => {
+                act.scenes.forEach((scene, sceneIndex) => {
+                    const sceneTitle = document.createElement('div');
+                    sceneTitle.className = 'learn-scene-header';
+                    
+                    const titleSpan = document.createElement('span');
+                    titleSpan.textContent = `${act.title}, ${scene.title}`;
+                    
+                    const arrowSpan = document.createElement('span');
+                    arrowSpan.className = 'arrow-icon';
+                    arrowSpan.textContent = '▼';
+                    
+                    sceneTitle.appendChild(titleSpan);
+                    sceneTitle.appendChild(arrowSpan);
+                    sceneTitle.onclick = () => {
+                        readState.actIndex = actIndex;
+                        readState.sceneIndex = sceneIndex;
+                        setStorage('readState', readState);
+                        openNavigation('read');
+                    };
+                    
+                    container.appendChild(sceneTitle);
+
+                    const sceneBlock = document.createElement('div');
+                    sceneBlock.className = 'scene-block';
+
+                    scene.dialogues.forEach(dialogue => {
+                        const dialogueDiv = document.createElement('div');
+                        dialogueDiv.className = 'dialogue';
+                        
+                        if (selectedCharacter && dialogue.character === selectedCharacter) {
+                            dialogueDiv.classList.add('highlight');
+                        }
+
+                        const charSpan = document.createElement('span');
+                        charSpan.className = 'dialogue-character';
+                        charSpan.textContent = dialogue.character;
+                        charSpan.style.color = getCharacterColor(dialogue.character);
+
+                        const textSpan = document.createElement('span');
+                        textSpan.className = 'dialogue-text';
+                        textSpan.textContent = dialogue.text;
+
+                        dialogueDiv.appendChild(charSpan);
+                        dialogueDiv.appendChild(textSpan);
+                        sceneBlock.appendChild(dialogueDiv);
+                    });
+
+                    container.appendChild(sceneBlock);
+                });
+            });
+            
+            // Validate readState indices
+            if (readState.actIndex >= playData.acts.length) {
+                readState.actIndex = 0;
+            }
+            if (readState.sceneIndex >= playData.acts[readState.actIndex].scenes.length) {
+                readState.sceneIndex = 0;
+            }
+            
+            // Scroll to the saved scene position
+            setTimeout(() => {
+                const sceneBlocks = document.querySelectorAll('#read-content .scene-block');
+                let totalSceneIndex = 0;
+                for (let i = 0; i < readState.actIndex; i++) {
+                    totalSceneIndex += playData.acts[i].scenes.length;
+                }
+                totalSceneIndex += readState.sceneIndex;
+                
+                if (sceneBlocks[totalSceneIndex]) {
+                    sceneBlocks[totalSceneIndex].scrollIntoView({ behavior: 'auto', block: 'start' });
+                }
+            }, 0);
+        }
+
+        // Render Learn Tab
+        function renderLearnTab(clearContent = true) {
+            const content = document.getElementById('learn-content');
+            if (clearContent) {
+                content.innerHTML = '';
+            }
+
+            // Check if no character is selected
+            if (!selectedCharacter) {
+                content.innerHTML = '<div style="padding: 40px 20px; text-align: center;"><p style="color: var(--text-secondary); font-size: 18px; margin-bottom: 16px;">Aucun personnage sélectionné</p><p style="color: var(--text-muted); font-size: 14px;">Veuillez sélectionner un personnage dans l\'onglet Paramètres pour commencer l\'apprentissage.</p></div>';
+                document.getElementById('line-counter').textContent = '0 / 0';
+                const nextButton = document.querySelector('.btn-next');
+                const backButton = document.querySelector('.btn-back');
+                if (nextButton) nextButton.disabled = true;
+                if (backButton) backButton.disabled = true;
+                return;
+            }
+
+            // Validate learnState indices
+            if (learnState.actIndex >= playData.acts.length) {
+                learnState.actIndex = 0;
+            }
+            if (learnState.sceneIndex >= playData.acts[learnState.actIndex].scenes.length) {
+                learnState.sceneIndex = 0;
+            }
+
+            // Get current scene
+            const act = playData.acts[learnState.actIndex];
+            const scene = act.scenes[learnState.sceneIndex];
+
+            // Update scene header
+            document.getElementById('learn-current-scene').textContent = 
+                `${act.title}, ${scene.title}`;
+
+            const lines = scene.dialogues;
+
+            if (lines.length === 0) {
+                content.innerHTML = '<p style="color: #95a5a6; text-align: center;">Aucune réplique dans cette scène.</p>';
+                document.getElementById('line-counter').textContent = '0 / 0';
+                return;
+            }
+
+            // Find character's lines and their indices
+            const characterLines = [];
+            lines.forEach((dialogue, index) => {
+                if (dialogue.character === selectedCharacter) {
+                    characterLines.push(index);
+                }
+            });
+
+            if (characterLines.length === 0) {
+                content.innerHTML = '<p style="color: #95a5a6; text-align: center;">Aucune réplique pour ce personnage dans cette scène.</p>';
+                document.getElementById('line-counter').textContent = '0 / 0';
+                return;
+            }
+
+            // Update counter based on character's lines
+            document.getElementById('line-counter').textContent = 
+                `${learnState.lineIndex} / ${characterLines.length}`;
+
+            // When clearContent is true (initial load or restart), show all dialogues up to current state
+            // When clearContent is false (appending), show only the new dialogues
+            let startIndex, endIndex;
+            
+            if (clearContent) {
+                // Show all dialogues from start up to current lineIndex
+                startIndex = 0;
+                if (learnState.lineIndex === 0) {
+                    endIndex = characterLines[0];
+                } else {
+                    const currentCharLineIndex = Math.min(learnState.lineIndex - 1, characterLines.length - 1);
+                    endIndex = learnState.lineIndex < characterLines.length 
+                        ? characterLines[learnState.lineIndex] 
+                        : lines.length;
+                }
+            } else {
+                // Append mode: show only new dialogues
+                if (learnState.lineIndex === 0) {
+                    startIndex = 0;
+                    endIndex = characterLines[0];
+                } else {
+                    const currentCharLineIndex = Math.min(learnState.lineIndex - 1, characterLines.length - 1);
+                    startIndex = characterLines[currentCharLineIndex];
+                    endIndex = learnState.lineIndex < characterLines.length 
+                        ? characterLines[learnState.lineIndex] 
+                        : lines.length;
+                }
+            }
+
+            // Display the dialogues in the range
+            for (let i = startIndex; i < endIndex; i++) {
+                const dialogue = lines[i];
+                const dialogueDiv = document.createElement('div');
+                dialogueDiv.className = 'dialogue';
+                
+                // Highlight selected character's lines
+                if (dialogue.character === selectedCharacter) {
+                    dialogueDiv.classList.add('my-character');
+                }
+
+                const charSpan = document.createElement('span');
+                charSpan.className = 'dialogue-character';
+                charSpan.textContent = dialogue.character;
+                charSpan.style.color = getCharacterColor(dialogue.character);
+
+                const textSpan = document.createElement('span');
+                textSpan.className = 'dialogue-text';
+                textSpan.textContent = dialogue.text;
+
+                dialogueDiv.appendChild(charSpan);
+                dialogueDiv.appendChild(textSpan);
+                content.appendChild(dialogueDiv);
+            }
+            
+            // Update button state
+            const nextButton = document.querySelector('.btn-next');
+            const backButton = document.querySelector('.btn-back');
+            if (nextButton) {
+                nextButton.disabled = learnState.lineIndex >= characterLines.length;
+            }
+            if (backButton) {
+                backButton.disabled = learnState.lineIndex === 0;
+            }
+        }
+
+        // Next line in Learn mode
+        function nextLine() {
+            const act = playData.acts[learnState.actIndex];
+            const scene = act.scenes[learnState.sceneIndex];
+            const lines = scene.dialogues;
+
+            // If no character selected, advance one line at a time
+            if (!selectedCharacter) {
+                if (learnState.lineIndex < lines.length - 1) {
+                    learnState.lineIndex++;
+                    saveSettings();
+                    renderLearnTab();
+                }
+                return;
+            }
+
+            // Find character's lines
+            const characterLines = [];
+            lines.forEach((dialogue, index) => {
+                if (dialogue.character === selectedCharacter) {
+                    characterLines.push(index);
+                }
+            });
+
+            // Advance to next step
+            if (learnState.lineIndex < characterLines.length) {
+                const oldLineIndex = learnState.lineIndex;
+                learnState.lineIndex++;
+                saveSettings();
+                renderLearnTab(false); // Don't clear content, just append
+                
+                // Scroll to the first newly added dialogue
+                setTimeout(() => {
+                    const content = document.getElementById('learn-content');
+                    const newDialogues = content.querySelectorAll('.dialogue');
+                    
+                    // Calculate the index of the first new dialogue
+                    let firstNewIndex = 0;
+                    if (oldLineIndex === 0) {
+                        // On first click, scroll to the character's first line
+                        firstNewIndex = characterLines[0];
+                    } else {
+                        const prevCharLineIndex = oldLineIndex - 1;
+                        const prevEndIndex = oldLineIndex < characterLines.length 
+                            ? characterLines[oldLineIndex] 
+                            : lines.length;
+                        firstNewIndex = prevEndIndex;
+                    }
+                    
+                    if (newDialogues[firstNewIndex]) {
+                        newDialogues[firstNewIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 50);
+            }
+        }
+
+        // Restart scene in Learn mode
+        function restartScene() {
+            learnState.lineIndex = 0;
+            saveSettings();
+            renderLearnTab(true); // Clear content and restart
+        }
+
+        // Open navigation modal
+        function openNavigation(source) {
+            const modal = document.getElementById('navigation-modal');
+            const modalBody = document.getElementById('modal-body');
+            modalBody.innerHTML = '';
+
+            playData.acts.forEach((act, actIndex) => {
+                const actItem = document.createElement('div');
+                actItem.className = 'nav-item nav-act';
+                actItem.textContent = act.title;
+                actItem.onclick = () => navigateToScene(actIndex, 0, source);
+                modalBody.appendChild(actItem);
+
+                act.scenes.forEach((scene, sceneIndex) => {
+                    const sceneItem = document.createElement('div');
+                    sceneItem.className = 'nav-item nav-scene';
+                    sceneItem.textContent = scene.title;
+                    sceneItem.onclick = () => navigateToScene(actIndex, sceneIndex, source);
+
+                    if (source === 'learn' && actIndex === learnState.actIndex && sceneIndex === learnState.sceneIndex) {
+                        sceneItem.classList.add('current');
+                    }
+
+                    modalBody.appendChild(sceneItem);
+                });
+            });
+
+            modal.classList.add('active');
+        }
+
+        // Close navigation modal
+        function closeNavigation(event) {
+            if (event.target.id === 'navigation-modal') {
+                document.getElementById('navigation-modal').classList.remove('active');
+            }
+        }
+
+        // Navigate to a specific scene
+        function navigateToScene(actIndex, sceneIndex, source) {
+            if (source === 'learn') {
+                learnState.actIndex = actIndex;
+                learnState.sceneIndex = sceneIndex;
+                learnState.lineIndex = 0;
+                saveSettings();
+                renderLearnTab();
+            } else if (source === 'read') {
+                readState.actIndex = actIndex;
+                readState.sceneIndex = sceneIndex;
+                saveSettings();
+                
+                // Scroll to the scene block
+                const sceneBlocks = document.querySelectorAll('#read-content .scene-block');
+                let totalSceneIndex = 0;
+                for (let i = 0; i < actIndex; i++) {
+                    totalSceneIndex += playData.acts[i].scenes.length;
+                }
+                totalSceneIndex += sceneIndex;
+                
+                if (sceneBlocks[totalSceneIndex]) {
+                    sceneBlocks[totalSceneIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
+            closeNavigation({ target: { id: 'navigation-modal' } });
+        }
+
+        // Save settings to localStorage
+        function saveSettings() {
+            setStorage('selectedCharacter', selectedCharacter);
+            setStorage('readState', JSON.stringify(readState));
+            setStorage('learnState', JSON.stringify(learnState));
+        }
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const savedCharacter = getStorage('selectedCharacter');
+            if (savedCharacter) {
+                selectedCharacter = savedCharacter;
+                const select = document.getElementById('character-select');
+                if (select) {
+                    select.value = savedCharacter;
+                }
+            }
+
+            const savedReadState = getStorage('readState');
+            if (savedReadState) {
+                try {
+                    readState = JSON.parse(savedReadState);
+                } catch (e) {
+                    console.error('Error parsing readState:', e);
+                }
+            }
+
+            const savedLearnState = getStorage('learnState');
+            if (savedLearnState) {
+                try {
+                    learnState = JSON.parse(savedLearnState);
+                } catch (e) {
+                    console.error('Error parsing learnState:', e);
+                }
+            }
+            
+            // Load and apply text size
+            const textSize = getStorage('textSize') || 'normal';
+            applyTextSize(textSize);
+        }
+        
+        // Apply text size to body
+        function applyTextSize(size) {
+            document.body.classList.remove('text-small', 'text-normal', 'text-large');
+            document.body.classList.add(`text-${size}`);
+            
+            // Update button states
+            document.querySelectorAll('.text-size-btn').forEach(btn => {
+                if (btn.dataset.size === size) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // Initialize the app when DOM is ready
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
