@@ -2,220 +2,230 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Théâtre: Textes de la troupe les jeudis en folie</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#f7f5f1" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#131211" media="(prefers-color-scheme: dark)">
+    <title>Les jeudis en folie</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-primary: #f5f5f5;
-            --bg-secondary: white;
-            --bg-header: #34495e;
-            --text-primary: #333;
-            --text-muted: #666;
-            --accent-1: #c0392b;
-            --accent-2: #2980b9;
-            --accent-3: #27ae60;
-            --accent-4: #8e44ad;
-            --accent-5: #d68910;
-            --accent-6: #16a085;
-            --shadow: rgba(0,0,0,0.08);
-            --shadow-hover: rgba(0,0,0,0.16);
+            --bg: #f7f5f1;
+            --surface: #ffffff;
+            --surface-2: #efebe4;
+            --border: #dcd5c9;
+            --ink: #1c1a17;
+            --muted: #655f56;
+            --accent: #b3261e;
+            --shadow: 0 1px 2px rgba(28, 26, 23, 0.06), 0 4px 16px rgba(28, 26, 23, 0.06);
+            --shadow-hover: 0 2px 4px rgba(28, 26, 23, 0.08), 0 12px 32px rgba(28, 26, 23, 0.12);
+            --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --serif: 'Literata', Georgia, 'Times New Roman', serif;
+            --c1: #b3261e; --c2: #1f5fbf; --c3: #1a7f37; --c4: #7c3aed; --c5: #c2410c; --c6: #0e7490;
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg-primary: #0d0d0d;
-                --bg-secondary: #2a2a2a;
-                --bg-header: #0d0d0d;
-                --text-primary: #ffffff;
-                --text-muted: #cccccc;
-                --accent-1: #ff6b6b;
-                --accent-2: #74b9ff;
-                --accent-3: #55efc4;
-                --accent-4: #dda0dd;
-                --accent-5: #ffd93d;
-                --accent-6: #4dd0e1;
-                --shadow: rgba(0,0,0,0.4);
-                --shadow-hover: rgba(0,0,0,0.6);
+                --bg: #131211;
+                --surface: #1d1c1a;
+                --surface-2: #282624;
+                --border: #34312d;
+                --ink: #f3f0ea;
+                --muted: #9d978d;
+                --accent: #ff8a78;
+                --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.25);
+                --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.4), 0 12px 32px rgba(0, 0, 0, 0.45);
+                --c1: #ff8a78; --c2: #79b8ff; --c3: #56d364; --c4: #c4a5ff; --c5: #fdba74; --c6: #67e8f9;
             }
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--ink);
             min-height: 100dvh;
-            display: flex;
-            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .header {
-            background-color: var(--bg-header);
-            color: white;
-            padding: 20px 16px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 22px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .plays {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 20px;
-            padding: 24px 16px;
-            width: 100%;
-            max-width: 520px;
+        .wrap {
+            max-width: 40rem;
             margin: 0 auto;
+            padding: max(48px, env(safe-area-inset-top)) 16px 48px;
         }
 
-        .play-btn {
+        header { text-align: center; margin-bottom: 36px; }
+
+        .mask { font-size: 40px; }
+
+        .kicker {
+            margin-top: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        h1 {
+            font-family: var(--serif);
+            font-size: clamp(30px, 8vw, 42px);
+            font-weight: 600;
+            line-height: 1.15;
+            margin-top: 8px;
+        }
+
+        .intro { margin-top: 10px; color: var(--muted); font-size: 15px; }
+
+        .year {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 32px 0 12px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+        }
+
+        .year::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+        .plays { display: flex; flex-direction: column; gap: 12px; }
+
+        .play {
             display: flex;
             align-items: center;
             gap: 16px;
-            padding: 24px 20px;
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
+            padding: 18px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            color: inherit;
             text-decoration: none;
-            border-radius: 14px;
-            border-left: 6px solid var(--accent);
-            box-shadow: 0 2px 8px var(--shadow);
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
         }
 
-        .play-btn:hover,
-        .play-btn:focus-visible {
+        .play:hover, .play:focus-visible {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px var(--shadow-hover);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--c);
             outline: none;
         }
 
-        .play-btn:active {
-            transform: translateY(0);
-        }
-
-        .play-btn.one { --accent: var(--accent-1); }
-        .play-btn.two { --accent: var(--accent-2); }
-        .play-btn.three { --accent: var(--accent-3); }
-        .play-btn.four { --accent: var(--accent-4); }
-        .play-btn.five { --accent: var(--accent-5); }
-        .play-btn.six { --accent: var(--accent-6); }
+        .play:active { transform: none; }
 
         .play-icon {
             flex-shrink: 0;
             width: 52px;
             height: 52px;
-            border-radius: 50%;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 26px;
-            background-color: var(--accent);
-            color: white;
+            background: color-mix(in srgb, var(--c) 14%, transparent);
         }
+
+        .play-text { flex: 1; min-width: 0; }
 
         .play-title {
-            font-size: 20px;
+            font-family: var(--serif);
+            font-size: 19px;
             font-weight: 600;
-            line-height: 1.3;
+            line-height: 1.25;
         }
 
-        .play-author {
-            display: block;
-            font-size: 15px;
-            font-style: italic;
-            color: var(--text-muted);
-            margin-top: 2px;
+        .play-author { margin-top: 3px; font-size: 14px; color: var(--muted); }
+
+        .play svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            fill: none;
+            stroke: var(--c);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: transform 0.15s ease;
         }
 
-        .play-sub {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
+        .play:hover svg { transform: translateX(3px); }
 
-        .arrow {
-            margin-left: auto;
-            font-size: 22px;
-            color: var(--accent);
-        }
+        .c1 { --c: var(--c1); } .c2 { --c: var(--c2); } .c3 { --c: var(--c3); }
+        .c4 { --c: var(--c4); } .c5 { --c: var(--c5); } .c6 { --c: var(--c6); }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🎭 Théâtre: Textes de la troupe les jeudis en folie</h1>
+    <div class="wrap">
+        <header>
+            <div class="mask">🎭</div>
+            <div class="kicker">Troupe de théâtre</div>
+            <h1>Les jeudis en folie</h1>
+            <p class="intro">Choisissez une pièce pour lire et apprendre votre texte.</p>
+        </header>
+
+        <div class="year">2026</div>
+        <main class="plays">
+            <a class="play c2" href="2026-lucla.html">
+                <span class="play-icon">🏠</span>
+                <span class="play-text">
+                    <span class="play-title">Les uns chez les autres</span>
+                    <span class="play-author" style="display:block">d'Alan Ayckbourn</span>
+                </span>
+                <svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
+            </a>
+
+            <a class="play c3" href="2026-agcdp.html">
+                <span class="play-icon">🍳</span>
+                <span class="play-text">
+                    <span class="play-title">À grands coups de poêle !</span>
+                    <span class="play-author" style="display:block">de Vivien Lheraux</span>
+                </span>
+                <svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
+            </a>
+
+            <a class="play c4" href="2026-atlc.html">
+                <span class="play-icon">🎯</span>
+                <span class="play-text">
+                    <span class="play-title">À tous les coups !</span>
+                    <span class="play-author" style="display:block">de Vivien Lheraux</span>
+                </span>
+                <svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
+            </a>
+
+            <a class="play c5" href="2026-cmo.html">
+                <span class="play-icon">💪</span>
+                <span class="play-text">
+                    <span class="play-title">Coach me oui !!!</span>
+                    <span class="play-author" style="display:block">d'Isabella Motte</span>
+                </span>
+                <svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
+            </a>
+
+            <a class="play c6" href="2026-uwedp.html">
+                <span class="play-icon">🐣</span>
+                <span class="play-text">
+                    <span class="play-title">Un week-end de Pâques</span>
+                    <span class="play-author" style="display:block">d'Antoine Rivoire et Jérôme Cartier</span>
+                </span>
+                <svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
+            </a>
+        </main>
+
+        <div class="year">2025</div>
+        <div class="plays">
+            <a class="play c1" href="2025-aqhom.html">
+                <span class="play-icon">🕰️</span>
+                <span class="play-text">
+                    <span class="play-title">À quelle heure on ment ?</span>
+                    <span class="play-author" style="display:block">de Vivien Lheraux</span>
+                </span>
+                <svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
+            </a>
+        </div>
     </div>
-
-    <main class="plays">
-        <a class="play-btn one" href="2025-aqhom.html">
-            <span class="play-icon">🕰️</span>
-            <span>
-                <span class="play-title">2025: À quelle heure on ment ?</span>
-                <span class="play-author">de Vivien Lheraux</span>
-                <span class="play-sub" style="display:block">Lire et apprendre le texte</span>
-            </span>
-            <span class="arrow">›</span>
-        </a>
-
-        <a class="play-btn two" href="2026-lucla.html">
-            <span class="play-icon">🏠</span>
-            <span>
-                <span class="play-title">2026: Les uns chez les autres</span>
-                <span class="play-author">de Alan Ayckbourn</span>
-                <span class="play-sub" style="display:block">Lire et apprendre le texte</span>
-            </span>
-            <span class="arrow">›</span>
-        </a>
-
-        <a class="play-btn three" href="2026-agcdp.html">
-            <span class="play-icon">🍳</span>
-            <span>
-                <span class="play-title">2026: À grands coups de poêle !</span>
-                <span class="play-author">de Vivien Lheraux</span>
-                <span class="play-sub" style="display:block">Lire et apprendre le texte</span>
-            </span>
-            <span class="arrow">›</span>
-        </a>
-
-        <a class="play-btn four" href="2026-atlc.html">
-            <span class="play-icon">🎯</span>
-            <span>
-                <span class="play-title">2026: À tous les coups !</span>
-                <span class="play-author">de Vivien Lheraux</span>
-                <span class="play-sub" style="display:block">Lire et apprendre le texte</span>
-            </span>
-            <span class="arrow">›</span>
-        </a>
-
-        <a class="play-btn five" href="2026-cmo.html">
-            <span class="play-icon">💪</span>
-            <span>
-                <span class="play-title">2026: Coach me oui !!!</span>
-                <span class="play-author">de Isabella Motte</span>
-                <span class="play-sub" style="display:block">Lire et apprendre le texte</span>
-            </span>
-            <span class="arrow">›</span>
-        </a>
-        <a class="play-btn six" href="2026-uwedp.html">
-            <span class="play-icon">🐣</span>
-            <span>
-                <span class="play-title">2026: Un week-end de Pâques</span>
-                <span class="play-author">d'Antoine Rivoire et Jérôme Cartier</span>
-                <span class="play-sub" style="display:block">Lire et apprendre le texte</span>
-            </span>
-            <span class="arrow">›</span>
-        </a>
-    </main>
 </body>
 </html>

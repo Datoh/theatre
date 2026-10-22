@@ -2,577 +2,759 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#f7f5f1" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#131211" media="(prefers-color-scheme: dark)">
     <title>Pièce de théâtre</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-primary: #f5f5f5;
-            --bg-secondary: white;
-            --bg-header: #34495e;
-            --text-primary: #333;
-            --text-secondary: #555;
-            --text-muted: #666;
-            --text-light: #7f8c8d;
-            --border-color: #ddd;
-            --border-light: #ecf0f1;
-            --highlight-bg: #d6ebf7;
-            --highlight-border: #3498db;
-            --shadow-light: rgba(0,0,0,0.05);
-            --shadow-medium: rgba(0,0,0,0.08);
-            --shadow-dark: rgba(0,0,0,0.1);
-            --modal-overlay: rgba(0,0,0,0.5);
+            --bg: #f7f5f1;
+            --surface: #ffffff;
+            --surface-2: #efebe4;
+            --border: #dcd5c9;
+            --ink: #1c1a17;
+            --ink-2: #3f3b35;
+            --muted: #655f56;
+            --faint: #b3ab9f;
+            --didascalie: #3b5b78;
+            --accent: #b3261e;
+            --accent-ink: #ffffff;
+            --accent-soft: #fbe9e6;
+            --mine-bg: #e4e8ee;
+            --mine-bar: #4a5d75;
+            --mine-border: #cbd3de;
+            --mine-ink: #33445a;
+            --overlay: rgba(28, 26, 23, 0.45);
+            --shadow: 0 1px 2px rgba(28, 26, 23, 0.06), 0 4px 16px rgba(28, 26, 23, 0.06);
+            --shadow-lg: 0 12px 40px rgba(28, 26, 23, 0.18);
+            --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --serif: 'Literata', Georgia, 'Times New Roman', serif;
+            --fs: 17px;
+            --radius: 16px;
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg-primary: #0d0d0d;
-                --bg-secondary: #3d3d3d;
-                --bg-header: #0d0d0d;
-                --text-primary: #ffffff;
-                --text-secondary: #f5f5f5;
-                --text-muted: #e0e0e0;
-                --text-light: #cccccc;
-                --border-color: #555555;
-                --border-light: #4a4a4a;
-                --highlight-bg: #2a5d8a;
-                --highlight-border: #a8daff;
-                --shadow-light: rgba(0,0,0,0.3);
-                --shadow-medium: rgba(0,0,0,0.4);
-                --shadow-dark: rgba(0,0,0,0.5);
-                --modal-overlay: rgba(0,0,0,0.7);
+                --bg: #131211;
+                --surface: #1d1c1a;
+                --surface-2: #282624;
+                --border: #34312d;
+                --ink: #f3f0ea;
+                --ink-2: #e6e1d9;
+                --muted: #9d978d;
+                --faint: #5f5a53;
+                --didascalie: #9dbbd6;
+                --accent: #ff8a78;
+                --accent-ink: #2a0d09;
+                --accent-soft: #3a211d;
+                --mine-bg: #22272f;
+                --mine-bar: #9fb3cc;
+                --mine-border: #3a424e;
+                --mine-ink: #bccbe0;
+                --overlay: rgba(0, 0, 0, 0.6);
+                --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.25);
+                --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
             }
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* Highlight colour of the selected character's lines */
+        [data-hl="peche"] {
+            --mine-bg: #fbe6d8;
+            --mine-bar: #c0653a;
+            --mine-border: #f1cdb6;
+            --mine-ink: #8a3f1c;
         }
+        [data-hl="sauge"] {
+            --mine-bg: #e3efe1;
+            --mine-bar: #3f7a4a;
+            --mine-border: #c5ddc1;
+            --mine-ink: #2f5e38;
+        }
+        [data-hl="lavande"] {
+            --mine-bg: #ebe7f7;
+            --mine-bar: #6a55c2;
+            --mine-border: #d4ccef;
+            --mine-ink: #4b3a9a;
+        }
+        [data-hl="jaune"] {
+            --mine-bg: #fcecb3;
+            --mine-bar: #a67c00;
+            --mine-border: #f0d77a;
+            --mine-ink: #6b5200;
+        }
+        [data-hl="gris"] {
+            --mine-bg: #e9e4da;
+            --mine-bar: #1c1a17;
+            --mine-border: #d8d1c4;
+            --mine-ink: #1c1a17;
+        }
+        [data-hl="rose"] {
+            --mine-bg: #fbe4ec;
+            --mine-bar: #c2477a;
+            --mine-border: #f2c6d6;
+            --mine-ink: #8f2453;
+        }
+        [data-hl="ciel"] {
+            --mine-bg: #e2edfa;
+            --mine-bar: #3b74c4;
+            --mine-border: #c3d7f1;
+            --mine-ink: #1f4f8f;
+        }
+        [data-hl="menthe"] {
+            --mine-bg: #dcf1ee;
+            --mine-bar: #2a8a80;
+            --mine-border: #b8e0da;
+            --mine-ink: #1c615a;
+        }
+        [data-hl="anis"] {
+            --mine-bg: #ecf3d2;
+            --mine-bar: #6f8a1a;
+            --mine-border: #d7e4a8;
+            --mine-ink: #4b5e0f;
+        }
+        [data-hl="ardoise"] {
+            --mine-bg: #e4e8ee;
+            --mine-bar: #4a5d75;
+            --mine-border: #cbd3de;
+            --mine-ink: #33445a;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            [data-hl="peche"] {
+                --mine-bg: #33241c;
+                --mine-bar: #f0a070;
+                --mine-border: #5a3d2e;
+                --mine-ink: #f6b48d;
+            }
+            [data-hl="sauge"] {
+                --mine-bg: #1f2c21;
+                --mine-bar: #7fbf8a;
+                --mine-border: #33473a;
+                --mine-ink: #9fd3a8;
+            }
+            [data-hl="lavande"] {
+                --mine-bg: #262234;
+                --mine-bar: #a99af0;
+                --mine-border: #3e3758;
+                --mine-ink: #c3b8ff;
+            }
+            [data-hl="jaune"] {
+                --mine-bg: #3d3420;
+                --mine-bar: #e0b53e;
+                --mine-border: #5c4c26;
+                --mine-ink: #e3c35a;
+            }
+            [data-hl="gris"] {
+                --mine-bg: #2c2a27;
+                --mine-bar: #f3f0ea;
+                --mine-border: #45413b;
+                --mine-ink: #f3f0ea;
+            }
+            [data-hl="rose"] {
+                --mine-bg: #35202a;
+                --mine-bar: #f08fb5;
+                --mine-border: #5a3646;
+                --mine-ink: #f7a8c8;
+            }
+            [data-hl="ciel"] {
+                --mine-bg: #1c2635;
+                --mine-bar: #7fb0f0;
+                --mine-border: #33445c;
+                --mine-ink: #a8ccff;
+            }
+            [data-hl="menthe"] {
+                --mine-bg: #18302d;
+                --mine-bar: #6fd1c4;
+                --mine-border: #2c4d48;
+                --mine-ink: #95e3d8;
+            }
+            [data-hl="anis"] {
+                --mine-bg: #283019;
+                --mine-bar: #b5d55a;
+                --mine-border: #444f2a;
+                --mine-ink: #cbe57d;
+            }
+            [data-hl="ardoise"] {
+                --mine-bg: #22272f;
+                --mine-bar: #9fb3cc;
+                --mine-border: #3a424e;
+                --mine-ink: #bccbe0;
+            }
+        }
+
+        body.text-small { --fs: 15px; }
+        body.text-normal { --fs: 17px; }
+        body.text-large { --fs: 20px; }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body { height: 100%; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100vh;
-            height: 100dvh; /* Dynamic viewport height for mobile */
-            overflow: hidden;
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--ink);
+            height: 100dvh;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Header */
-        .header {
-            background-color: var(--bg-header);
-            color: white;
-            padding: 12px 16px;
-            text-align: center;
-            box-shadow: 0 2px 4px var(--shadow-dark);
-            z-index: 100;
-            order: 1;
+        button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+        button:disabled { cursor: not-allowed; }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
+        svg { width: 20px; height: 20px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        /* App bar */
+        .appbar {
             flex-shrink: 0;
-            min-height: 50px;
-            position: relative;
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 12px;
+            padding: 10px 12px 10px 16px;
+            padding-top: max(10px, env(safe-area-inset-top));
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            z-index: 20;
         }
 
-        .header h1 {
+        .appbar-title { flex: 1; min-width: 0; }
+
+        .appbar h1 {
+            font-family: var(--serif);
             font-size: 18px;
             font-weight: 600;
-            flex: 1;
+            line-height: 1.25;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .fullscreen-btn {
-            position: absolute;
-            right: 12px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 4px 8px;
-            display: flex;
+        .appbar-sub {
+            font-size: 12.5px;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .role-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            max-width: 42vw;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: var(--surface-2);
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .role-chip span:last-child { overflow: hidden; text-overflow: ellipsis; }
+        .role-chip.empty { color: var(--muted); font-weight: 500; }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--c, var(--muted));
+            flex-shrink: 0;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.2s;
+            color: var(--ink-2);
+            transition: background-color 0.15s;
         }
 
-        .fullscreen-btn:hover {
-            opacity: 0.7;
+        .icon-btn:hover { background: var(--surface-2); }
+
+        /* Views */
+        .views { flex: 1; min-height: 0; position: relative; }
+
+        .view {
+            display: none;
+            position: absolute;
+            inset: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            animation: fadeIn 0.2s ease;
         }
 
-        .fullscreen-btn:active {
-            opacity: 0.5;
+        .view.active { display: block; }
+        #learn-tab.active { display: flex; flex-direction: column; overflow: hidden; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .page {
+            width: 100%;
+            max-width: 46rem;
+            margin: 0 auto;
+            padding: 0 16px 40px;
         }
 
-        /* Tab Navigation */
-        .tabs {
+        /* Play info */
+        .cover { padding: 24px 18px; text-align: center; }
+
+        .cover-kicker {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .card.cover h2 {
+            font-family: var(--serif);
+            font-size: clamp(24px, 6vw, 32px);
+            font-weight: 600;
+            line-height: 1.15;
+            margin: 10px 0 8px;
+        }
+
+        .cover-author { font-family: var(--serif); font-style: italic; color: var(--muted); font-size: 17px; }
+
+        .cover-meta {
             display: flex;
-            background-color: #d5d5d5;
-            border-top: 2px solid var(--border-color);
-            box-shadow: 0 -4px 8px var(--shadow-light);
-            order: 3;
-            z-index: 999;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 18px;
+        }
+
+        .pill {
+            padding: 5px 12px;
+            border-radius: 999px;
+            background: var(--surface-2);
+            font-size: 13px;
+            color: var(--ink-2);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Acts and scenes */
+        .act-title {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 36px 0 4px;
+            font-family: var(--serif);
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .act-title:first-child { margin-top: 20px; }
+
+        .act-title::before, .act-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+        .scene-bar {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            padding: 10px 0 8px;
+            background: linear-gradient(var(--bg) 75%, transparent);
+        }
+
+        .scene-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px 10px 18px;
+            border-radius: 999px;
+            background: var(--ink);
+            color: var(--bg);
+            box-shadow: var(--shadow);
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            max-width: 100%;
+        }
+
+        .scene-btn span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .scene-bar { margin: 0 -4px; }
+        .scene-bar .scene-btn { display: flex; width: 100%; justify-content: space-between; border-radius: 14px; }
+        .scene-btn svg { width: 16px; height: 16px; opacity: 0.7; }
+
+        .scene { scroll-margin-top: 0; }
+        .scene + .scene { margin-top: 28px; }
+
+        /* Lines */
+        .line {
+            padding: 12px 16px;
+            margin: 2px -4px;
+            border-radius: 14px;
+            scroll-margin-top: 12px;
+        }
+
+        .line + .line { margin-top: 4px; }
+
+        .who {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            font-size: max(11px, calc(var(--fs) * 0.7));
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--c);
+        }
+
+        .say {
+            font-family: var(--serif);
+            font-size: var(--fs);
+            line-height: 1.65;
+            color: var(--ink-2);
+            overflow-wrap: break-word;
+        }
+
+        .didascalie {
+            font-family: var(--sans);
+            font-size: 0.88em;
+            font-style: italic;
+            letter-spacing: 0.01em;
+            color: var(--didascalie);
+        }
+
+        .line.mine { background: var(--mine-bg); box-shadow: inset 5px 0 0 var(--mine-bar), inset 0 0 0 1px var(--mine-border); }
+        .line.mine .say { color: var(--ink); }
+
+        .line.reveal { animation: reveal 0.35s ease; }
+
+        @keyframes reveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+        /* Learn */
+        .learn-head {
             flex-shrink: 0;
-            min-height: 60px;
-            height: 60px;
+            padding: 10px 16px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .learn-head-inner { max-width: 46rem; margin: 0 auto; }
+
+        .learn-head-row { display: flex; align-items: center; gap: 12px; }
+        .learn-head .scene-btn { box-shadow: none; flex-shrink: 1; min-width: 0; }
+
+        .counter {
+            margin-left: auto;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--muted);
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        .progress { height: 4px; margin-top: 12px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+        .progress > div { height: 100%; width: 0; border-radius: inherit; background: var(--accent); transition: width 0.3s ease; }
+
+        .learn-scroll { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .learn-scroll .page { padding-top: 12px; }
+
+        .cue {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            width: 100%;
+            margin-top: 8px;
+            padding: 16px;
+            border-radius: 14px;
+            border: 2px dashed var(--mine-bar);
+            background: var(--mine-bg);
+            text-align: left;
+            scroll-margin-bottom: 16px;
+        }
+
+        .cue-title { font-weight: 700; color: var(--mine-ink); font-size: 15px; }
+        .cue-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+        .cue svg { margin-left: auto; color: var(--mine-ink); }
+
+        .learn-controls {
+            flex-shrink: 0;
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+            background: var(--bg);
+        }
+
+        .learn-controls-inner { display: flex; gap: 10px; max-width: 46rem; margin: 0 auto; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 52px;
+            padding: 0 20px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.1s, background-color 0.15s, opacity 0.15s;
+        }
+
+        .btn:active:not(:disabled) { transform: scale(0.98); }
+        .btn:disabled { opacity: 0.4; }
+        .btn-primary { flex: 1; background: var(--accent); color: var(--accent-ink); }
+        .btn-secondary { background: var(--surface-2); color: var(--ink); }
+        .btn-small { min-height: 44px; font-size: 15px; }
+
+        /* Empty and done states */
+        .state {
+            margin: 40px auto;
+            max-width: 26rem;
+            padding: 28px 24px;
+            text-align: center;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .state-icon { font-size: 34px; margin-bottom: 10px; }
+        .state h3 { font-family: var(--serif); font-size: 21px; font-weight: 600; margin-bottom: 6px; }
+        .state p { color: var(--muted); font-size: 15px; line-height: 1.5; }
+        .state-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 18px; }
+        .state-actions .btn-primary { flex: 0 1 auto; }
+
+        /* Settings */
+        .settings { padding-top: 20px; display: flex; flex-direction: column; gap: 16px; }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 18px;
+        }
+
+        .card h2 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+        .card-hint { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.15s, border-color 0.15s;
+        }
+
+        .chip small { font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
+        .chip:hover { border-color: var(--muted); }
+        .chip.active { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+        .chip.active small { color: inherit; opacity: 0.7; }
+
+        .segmented { display: flex; padding: 4px; gap: 4px; border-radius: 14px; background: var(--surface-2); }
+
+        .text-size-btn {
+            flex: 1;
+            min-height: 44px;
+            border-radius: 10px;
+            font-family: var(--serif);
+            font-weight: 600;
+            color: var(--muted);
+            transition: background-color 0.15s, color 0.15s;
+        }
+
+        .text-size-btn[data-size="small"] { font-size: 14px; }
+        .text-size-btn[data-size="normal"] { font-size: 17px; }
+        .text-size-btn[data-size="large"] { font-size: 21px; }
+        .text-size-btn.active { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+
+        .size-preview { margin-top: 14px; padding: 0 4px; }
+
+        .swatch {
+            width: 18px;
+            height: 18px;
+            border-radius: 6px;
+            background: var(--mine-bg);
+            box-shadow: inset 4px 0 0 var(--mine-bar), inset 0 0 0 1px var(--mine-border);
+            flex-shrink: 0;
+        }
+
+        /* Stats table */
+        .stats-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -18px -18px; border-top: 1px solid var(--border); border-radius: 0 0 calc(var(--radius) - 1px) calc(var(--radius) - 1px); }
+
+        .stats-table { border-collapse: collapse; width: 100%; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+
+        .stats-table th, .stats-table td {
+            padding: 9px 12px;
+            text-align: right;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stats-table th:first-child, .stats-table td:first-child {
+            text-align: left;
+            position: sticky;
+            left: 0;
+            background: var(--surface);
+            padding-left: 18px;
+        }
+
+        .stats-table thead th { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+        .stats-table td { color: var(--ink-2); }
+        .stats-table td.zero { color: var(--faint); }
+        .stats-table tr.act-start td { border-top: 2px solid var(--muted); }
+
+        .stats-table .act-head td {
+            padding-top: 14px;
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            border-bottom: none;
+        }
+
+        .stats-table .scene-row td:first-child { padding-left: 30px; }
+        .stats-table .act-single td:first-child { font-weight: 600; color: var(--ink); }
+        .stats-table .act-total td, .stats-table .act-total td:first-child { font-weight: 700; color: var(--ink); background: var(--bg); }
+        .stats-table .act-total td.mine { background: var(--mine-bg); }
+        .stats-table .stats-total td, .stats-table .stats-total-col { font-weight: 700; color: var(--ink); }
+        .stats-table .stats-total td { border-bottom: none; background: var(--surface-2); }
+        .stats-table .stats-total td:first-child { background: var(--surface-2); }
+        .stats-table .mine { background: var(--mine-bg); }
+
+        /* Tab bar */
+        .tabbar {
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            padding: 6px 8px;
+            padding-bottom: max(6px, env(safe-area-inset-bottom));
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            z-index: 20;
         }
 
         .tab {
             flex: 1;
-            padding: 16px 0;
-            text-align: center;
-            background-color: #e8e8e8;
-            border: none;
-            color: #555;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            min-height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .tab.active {
-            background-color: #3498db;
-            color: white;
-            font-weight: 600;
-        }
-        
-        @media (prefers-color-scheme: dark) {
-            .tabs {
-                background-color: #2c3e50;
-            }
-            
-            .tab {
-                background-color: #3d3d3d;
-                color: #95a5a6;
-            }
-        }
-
-        /* Content Area */
-        .content {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            background-color: var(--bg-primary);
-            -webkit-overflow-scrolling: touch;
-            order: 2;
-            min-height: 0;
-        }
-
-        .tab-content {
-            display: none;
-            padding: 16px;
-            animation: fadeIn 0.3s;
-        }
-
-        #read-tab,
-        #learn-tab {
-            padding: 0;
-        }
-        
-        #learn-tab.active {
+            max-width: 160px;
             display: flex;
             flex-direction: column;
-            height: 100%;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Settings Tab */
-        .settings-content {
-            background-color: var(--bg-secondary);
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 8px var(--shadow-dark);
-        }
-
-        .settings-group {
-            margin-bottom: 24px;
-        }
-
-        .settings-group:last-child {
-            margin-bottom: 0;
-        }
-
-        .settings-label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 600;
-            color: var(--text-primary);
-            font-size: 16px;
-        }
-
-        .text-size-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .text-size-btn {
-            flex: 1;
-            padding: 10px;
-            font-size: 14px;
-            border: 2px solid var(--border-color);
-            border-radius: 6px;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .text-size-btn:hover {
-            border-color: #3498db;
-        }
-
-        .text-size-btn.active {
-            background-color: #3498db;
-            border-color: #3498db;
-            color: white;
-        }
-
-        /* Text size variations */
-        body.text-small {
-            font-size: 14px;
-        }
-
-        body.text-small .dialogue-text {
-            font-size: 14px;
-        }
-
-        body.text-small .dialogue-character {
-            font-size: 12px;
-        }
-
-        body.text-normal {
-            font-size: 16px;
-        }
-
-        body.text-normal .dialogue-text {
-            font-size: 16px;
-        }
-
-        body.text-normal .dialogue-character {
-            font-size: 14px;
-        }
-
-        body.text-large {
-            font-size: 18px;
-        }
-
-        body.text-large .dialogue-text {
-            font-size: 18px;
-        }
-
-        body.text-large .dialogue-character {
-            font-size: 16px;
-        }
-
-        select {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border: 2px solid var(--border-color);
-            border-radius: 6px;
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
-            cursor: pointer;
-        }
-
-        select:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-
-        /* Line count table */
-        .stats-wrap {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-        }
-
-        .stats-table {
-            border-collapse: collapse;
-            width: 100%;
-            font-size: 14px;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .stats-table th,
-        .stats-table td {
-            padding: 8px 10px;
-            border-bottom: 1px solid var(--border-light);
-            text-align: right;
-            white-space: nowrap;
-        }
-
-        .stats-table th:first-child,
-        .stats-table td:first-child {
-            text-align: left;
-            position: sticky;
-            left: 0;
-            background-color: var(--bg-secondary);
-        }
-
-        .stats-table thead th {
-            font-weight: 600;
-            color: var(--text-primary);
-            border-top: 2px solid var(--text-light);
-            border-bottom: 2px solid var(--text-light);
-        }
-
-        .stats-table td {
-            color: var(--text-secondary);
-        }
-
-        .stats-table td.zero {
-            color: var(--text-light);
-        }
-
-        .stats-table .stats-total td,
-        .stats-table .stats-total-col {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .stats-table .stats-total td {
-            border-top: 2px solid var(--text-light);
-            border-bottom: 2px solid var(--text-light);
-        }
-
-        .stats-table tr.act-start td {
-            border-top: 2px solid var(--text-light);
-        }
-
-        .stats-table .mine {
-            background-color: var(--highlight-bg);
-        }
-
-        /* Read Tab */
-        .scene-block {
-            background-color: transparent;
-            border-radius: 8px;
-            padding: 0 16px 16px 16px;
-            margin-bottom: 16px;
-        }
-
-        .dialogue {
-            margin-bottom: 12px;
-            line-height: 1.6;
-            background-color: var(--bg-secondary);
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-light);
-        }
-
-        .dialogue-character {
-            font-weight: 600;
-            display: block;
-            margin-bottom: 6px;
-            font-size: 14px;
-        }
-
-        .dialogue-text {
-            color: var(--text-secondary);
-        }
-
-        .dialogue.highlight {
-            background-color: var(--highlight-bg);
-            border: 2px solid var(--highlight-border);
-        }
-
-        /* Learn Tab */
-        .learn-controls {
-            background-color: var(--bg-secondary);
-            padding: 12px 16px;
-            border-top: 1px solid var(--border-color);
-            box-shadow: 0 -2px 4px var(--shadow-dark);
-            flex-shrink: 0;
-        }
-
-        .learn-scene-header {
-            background-color: #3498db;
-            color: white;
-            padding: 12px 16px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 4px;
+            padding: 6px 0 4px;
+            font-size: 12px;
             font-weight: 600;
-            box-shadow: 0 2px 4px var(--shadow-dark);
-            flex-shrink: 0;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            margin-bottom: 12px;
+            color: var(--muted);
+            transition: color 0.15s;
         }
 
-        .learn-scene-header:active {
-            background-color: #2980b9;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        button {
-            padding: 12px;
-            font-size: 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-
-        .btn-back {
-            background-color: #3498db;
-            color: white;
-            flex: 1;
-        }
-
-        .btn-back:active {
-            background-color: #2980b9;
-        }
-
-        .btn-next {
-            background-color: #3498db;
-            color: white;
-            flex: 2;
-        }
-
-        .btn-next:active {
-            background-color: #2980b9;
-        }
-
-        .btn-back:disabled,
-        .btn-next:disabled {
-            background-color: var(--border-light);
-            color: #95a5a6;
-            cursor: not-allowed;
-        }
-
-        .learn-content-area {
-            background-color: transparent;
-            padding: 16px;
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .dialogue.my-character {
-            background-color: var(--highlight-bg);
-            border: 2px solid var(--highlight-border);
-        }
-
-        /* Navigation Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: var(--modal-overlay);
-            z-index: 1000;
-            animation: fadeIn 0.2s;
-        }
-
-        .modal.active {
+        .tab-icon {
+            width: 56px;
+            height: 30px;
+            border-radius: 999px;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        .modal-content {
-            background-color: var(--bg-secondary);
-            width: 90%;
-            max-width: 400px;
-            max-height: 70vh;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            animation: slideUp 0.3s;
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-header {
-            background-color: var(--bg-header);
-            color: white;
-            padding: 16px;
-            font-weight: 600;
-            font-size: 18px;
-        }
-
-        .modal-body {
-            overflow-y: auto;
-            max-height: calc(70vh - 60px);
-        }
-
-        .nav-item {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--border-light);
-            cursor: pointer;
             transition: background-color 0.2s;
         }
 
-        .nav-item:active {
-            background-color: var(--border-light);
+        .tab.active { color: var(--ink); }
+        .tab.active .tab-icon { background: var(--accent-soft); color: var(--accent); }
+
+        /* Navigation sheet */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: var(--overlay);
+            align-items: flex-end;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
         }
 
-        .nav-item.current {
-            background-color: #e8f4f8;
-            border-left: 4px solid #3498db;
+        .modal.active { display: flex; }
+
+        .modal-content {
+            width: 100%;
+            max-width: 32rem;
+            max-height: 80dvh;
+            display: flex;
+            flex-direction: column;
+            background: var(--surface);
+            border-radius: 22px 22px 0 0;
+            box-shadow: var(--shadow-lg);
+            padding-bottom: env(safe-area-inset-bottom);
+            animation: slideUp 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        @media (prefers-color-scheme: dark) {
-            .nav-item.current {
-                background-color: #1e3a4a;
-            }
+        @media (min-width: 640px) {
+            .modal { align-items: center; }
+            .modal-content { border-radius: 22px; max-height: 70vh; }
         }
+
+        @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 12px 8px 20px;
+            font-family: var(--serif);
+            font-size: 19px;
+            font-weight: 600;
+        }
+
+        .modal-body { overflow-y: auto; padding: 0 8px 12px; }
 
         .nav-act {
-            font-weight: 600;
-            color: var(--text-primary);
-            font-size: 16px;
+            padding: 16px 12px 6px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
         }
 
         .nav-scene {
-            color: var(--text-light);
-            padding-left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 15px;
+            text-align: left;
+            transition: background-color 0.15s;
         }
 
-        .arrow-icon {
-            float: right;
-            color: #95a5a6;
+        .nav-scene:hover { background: var(--surface-2); }
+        .nav-scene.current { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+        .nav-count {
+            margin-left: auto;
+            min-width: 28px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: var(--surface-2);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            text-align: center;
+            font-variant-numeric: tabular-nums;
         }
+
+        .nav-scene.current .nav-count { background: var(--surface); color: var(--accent); }
     </style>
 </head>
 <body>
@@ -926,122 +1108,175 @@ Matou  : OK, en forme Lili ! Bye ! Bye !
 Lili   : Tu permets, je finis mes frites, pas toi ? À la semaine prochaine !`;
     </script>
 
-    <div class="header">
-        <h1 id="play-title"></h1>
-        <button class="fullscreen-btn" id="fullscreen-btn" title="Plein écran">⛶</button>
-    </div>
-
-    <div class="tabs">
-        <button class="tab" data-tab="read">Lire</button>
-        <button class="tab" data-tab="learn">Apprendre</button>
-        <button class="tab" data-tab="settings">Paramètres</button>
-    </div>
-
-    <div class="content">
-        <!-- Read Tab -->
-        <div class="tab-content" id="read-tab">
-            <div id="read-content"></div>
+    <header class="appbar">
+        <div class="appbar-title">
+            <h1 id="play-title"></h1>
+            <div class="appbar-sub" id="play-author"></div>
         </div>
+        <button class="role-chip" id="role-chip" title="Changer de personnage"></button>
+        <button class="icon-btn" id="fullscreen-btn" title="Plein écran" aria-label="Plein écran">
+            <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+        </button>
+    </header>
+
+    <main class="views">
+        <!-- Read Tab -->
+        <section class="view" id="read-tab">
+            <div class="page" id="read-content"></div>
+        </section>
 
         <!-- Learn Tab -->
-        <div class="tab-content" id="learn-tab">
-            <div class="learn-scene-header" onclick="openNavigation('learn')">
-                <span id="learn-current-scene">Acte 1, Scène 1</span>
-                <span id="line-counter" style="margin-left: auto; margin-right: 8px;">0 / 0</span>
-                <span class="arrow-icon">▼</span>
-            </div>
-            <div class="learn-content-area" id="learn-content"></div>
-            <div class="learn-controls">
-                <div class="button-group">
-                    <button class="btn-back" onclick="restartScene()">⏮ Début</button>
-                    <button class="btn-next" onclick="nextLine()">Suivant ▶</button>
+        <section class="view" id="learn-tab">
+            <div class="learn-head">
+                <div class="learn-head-inner">
+                    <div class="learn-head-row">
+                        <button class="scene-btn" onclick="openNavigation('learn')">
+                            <span id="learn-current-scene"></span>
+                            <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
+                        <span class="counter" id="line-counter">0 / 0</span>
+                    </div>
+                    <div class="progress"><div id="learn-progress"></div></div>
                 </div>
             </div>
-        </div>
+            <div class="learn-scroll" id="learn-scroll">
+                <div class="page" id="learn-content"></div>
+            </div>
+            <div class="learn-controls">
+                <div class="learn-controls-inner">
+                    <button class="btn btn-secondary btn-back" onclick="restartScene()" title="Recommencer la scène" aria-label="Recommencer la scène">
+                        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+                    </button>
+                    <button class="btn btn-primary btn-next" onclick="nextLine()">
+                        Réplique suivante
+                        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                    </button>
+                </div>
+            </div>
+        </section>
 
         <!-- Settings Tab -->
-        <div class="tab-content" id="settings-tab">
-            <div class="settings-content">
-                <div class="settings-group">
-                    <label class="settings-label" for="character-select">Mon personnage</label>
-                    <select id="character-select">
-                        <option value="">-- Choisissez votre personnage --</option>
-                    </select>
+        <section class="view" id="settings-tab">
+            <div class="page settings">
+                <div class="card cover" id="play-info"></div>
+                <div class="card">
+                    <h2>Mon personnage</h2>
+                    <p class="card-hint">Vos répliques seront surlignées, et le mode Apprendre les masquera une à une.</p>
+                    <div class="chips" id="character-chips"></div>
                 </div>
-                <div class="settings-group">
-                    <label class="settings-label">Taille du texte</label>
-                    <div class="text-size-buttons">
-                        <button class="text-size-btn" data-size="small">Petit</button>
-                        <button class="text-size-btn active" data-size="normal">Normal</button>
-                        <button class="text-size-btn" data-size="large">Grand</button>
+                <div class="card">
+                    <h2>Taille du texte</h2>
+                    <p class="card-hint">S'applique à la lecture et à l'apprentissage.</p>
+                    <div class="segmented">
+                        <button class="text-size-btn" data-size="small">A</button>
+                        <button class="text-size-btn" data-size="normal">A</button>
+                        <button class="text-size-btn" data-size="large">A</button>
+                    </div>
+                    <p class="say size-preview">Ah ! <em class="didascalie">il se lève</em> Vous voilà enfin…</p>
+                </div>
+                <div class="card">
+                    <h2>Couleur de surlignage</h2>
+                    <p class="card-hint">Couleur de fond de vos répliques.</p>
+                    <div class="chips">
+                        <button class="chip hl-btn" data-hl="ardoise"><span class="swatch"></span>Ardoise</button>
+                        <button class="chip hl-btn" data-hl="peche"><span class="swatch"></span>Pêche douce</button>
+                        <button class="chip hl-btn" data-hl="sauge"><span class="swatch"></span>Vert sauge</button>
+                        <button class="chip hl-btn" data-hl="lavande"><span class="swatch"></span>Lavande</button>
+                        <button class="chip hl-btn" data-hl="jaune"><span class="swatch"></span>Jaune</button>
+                        <button class="chip hl-btn" data-hl="gris"><span class="swatch"></span>Gris chaud</button>
+                        <button class="chip hl-btn" data-hl="rose"><span class="swatch"></span>Rose poudré</button>
+                        <button class="chip hl-btn" data-hl="ciel"><span class="swatch"></span>Bleu ciel</button>
+                        <button class="chip hl-btn" data-hl="menthe"><span class="swatch"></span>Menthe</button>
+                        <button class="chip hl-btn" data-hl="anis"><span class="swatch"></span>Anis</button>
                     </div>
                 </div>
-                <div class="settings-group">
-                    <label class="settings-label">Nombre de répliques</label>
+                <div class="card">
+                    <h2>Nombre de répliques</h2>
+                    <p class="card-hint">Par scène et par personnage.</p>
                     <div class="stats-wrap" id="stats-table"></div>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
-    <!-- Navigation Modal -->
+    <nav class="tabbar">
+        <button class="tab" data-tab="read">
+            <span class="tab-icon"><svg viewBox="0 0 24 24"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></span>
+            Lire
+        </button>
+        <button class="tab" data-tab="learn">
+            <span class="tab-icon"><svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5"/></svg></span>
+            Apprendre
+        </button>
+        <button class="tab" data-tab="settings">
+            <span class="tab-icon"><svg viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span>
+            Réglages
+        </button>
+    </nav>
+
+    <!-- Navigation sheet -->
     <div class="modal" id="navigation-modal" onclick="closeNavigation(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">Navigation</div>
+            <div class="modal-header">
+                Aller à…
+                <button class="icon-btn" onclick="closeNavigation()" aria-label="Fermer">
+                    <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
             <div class="modal-body" id="modal-body"></div>
         </div>
     </div>
 
     <script>
-        // Parse the play text
-        function parsePlayText(text) {
-            const lines = text.split('\n');
-            const playData = {
-                title: '',
-                acts: []
-            };
+        // Render dialogue text, showing stage directions (between parentheses) in italic without the parentheses
+        function renderDialogueText(container, text) {
+            const regex = /\(([^)]*)\)/g;
+            let lastIndex = 0;
+            let match;
+            while ((match = regex.exec(text)) !== null) {
+                if (match.index > lastIndex) {
+                    container.appendChild(document.createTextNode(text.substring(lastIndex, match.index)));
+                }
+                const em = document.createElement('em');
+                em.className = 'didascalie';
+                em.textContent = match[1];
+                container.appendChild(em);
+                lastIndex = regex.lastIndex;
+            }
+            if (lastIndex < text.length) {
+                container.appendChild(document.createTextNode(text.substring(lastIndex)));
+            }
+        }
 
+        // Parse the play text (@Author, #Title, ##Act, ###Scene, Character : Text)
+        function parsePlayText(text) {
+            const playData = { title: '', author: '', acts: [] };
             let currentAct = null;
             let currentScene = null;
 
-            lines.forEach(line => {
+            text.split('\n').forEach(line => {
                 line = line.trim();
                 if (!line) return;
 
-                // Title (# Title)
-                if (line.startsWith('#') && !line.startsWith('##')) {
-                    playData.title = line.substring(1).trim();
-                }
-                // Act (## Act X)
-                else if (line.startsWith('##') && !line.startsWith('###')) {
-                    currentAct = {
-                        title: line.substring(2).trim(),
-                        scenes: []
-                    };
-                    playData.acts.push(currentAct);
-                    currentScene = null;
-                }
-                // Scene (### Scene X)
-                else if (line.startsWith('###')) {
+                if (line.startsWith('@')) {
+                    playData.author = line.substring(1).trim();
+                } else if (line.startsWith('###')) {
                     if (currentAct) {
-                        currentScene = {
-                            title: line.substring(3).trim(),
-                            dialogues: []
-                        };
+                        currentScene = { title: line.substring(3).trim(), dialogues: [] };
                         currentAct.scenes.push(currentScene);
                     }
-                }
-                // Dialogue (Character : Text)
-                else if (line.includes(':')) {
+                } else if (line.startsWith('##')) {
+                    currentAct = { title: line.substring(2).trim(), scenes: [] };
+                    playData.acts.push(currentAct);
+                    currentScene = null;
+                } else if (line.startsWith('#')) {
+                    playData.title = line.substring(1).trim();
+                } else if (line.includes(':')) {
                     const colonIndex = line.indexOf(':');
                     const character = line.substring(0, colonIndex).trim();
                     const text = line.substring(colonIndex + 1).trim();
-                    
                     if (currentScene && character && text) {
-                        currentScene.dialogues.push({
-                            character: character,
-                            text: text
-                        });
+                        currentScene.dialogues.push({ character, text });
                     }
                 }
             });
@@ -1049,145 +1284,396 @@ Lili   : Tu permets, je finis mes frites, pas toi ? À la semaine prochaine !`;
             return playData;
         }
 
-        // Parse the play data
         const playData = parsePlayText(rawPlayText);
-
-        // Update page title
         document.title = playData.title || 'Pièce de théâtre';
 
-        // State management
+        // Flat list of scenes, used for navigation
+        const allScenes = [];
+        playData.acts.forEach((act, actIndex) => {
+            act.scenes.forEach((scene, sceneIndex) => {
+                allScenes.push({ act, scene, actIndex, sceneIndex, label: `${act.title} · ${scene.title}` });
+            });
+        });
+
+        // State
         let currentTab = 'read';
         let selectedCharacter = '';
-        let learnState = {
-            actIndex: 0,
-            sceneIndex: 0,
-            lineIndex: 0
-        };
-        let readState = {
-            actIndex: 0,
-            sceneIndex: 0
-        };
+        let learnState = { actIndex: 0, sceneIndex: 0, lineIndex: 0 };
+        let readState = { actIndex: 0, sceneIndex: 0 };
+        let sceneObserver = null;
 
-        // Storage management functions (localStorage works with file://)
+        // Storage (localStorage works with file://)
         function setStorage(name, value) {
-            try {
-                localStorage.setItem(name, value);
-            } catch (e) {
-                console.error('Error saving to localStorage:', e);
-            }
+            try { localStorage.setItem(name, value); } catch (e) { /* storage unavailable */ }
         }
 
         function getStorage(name) {
-            try {
-                return localStorage.getItem(name);
-            } catch (e) {
-                console.error('Error reading from localStorage:', e);
-                return null;
-            }
+            try { return localStorage.getItem(name); } catch (e) { return null; }
         }
 
-        // Extract unique characters
-        function getCharacters() {
-            const characters = new Set();
-            playData.acts.forEach(act => {
-                act.scenes.forEach(scene => {
-                    scene.dialogues.forEach(dialogue => {
-                        characters.add(dialogue.character);
-                    });
-                });
-            });
-            return Array.from(characters).sort();
-        }
+        // Characters and line counts
+        const lineTotals = {};
+        allScenes.forEach(({ scene }) => {
+            scene.dialogues.forEach(d => { lineTotals[d.character] = (lineTotals[d.character] || 0) + 1; });
+        });
+        const characters = Object.keys(lineTotals).sort((a, b) => a.localeCompare(b));
 
-        // Generate a consistent color for each character
-        const characterColors = {};
-        
-        // Color palettes for light and dark modes
-        const colorPalettesLight = [
-            '#c0392b', // dark red
-            '#2980b9', // dark blue
-            '#27ae60', // dark green
-            '#d68910', // dark orange
-            '#8e44ad', // dark purple
-            '#16a085', // dark turquoise
-            '#d35400', // dark carrot
-            '#2c3e50', // very dark blue
-            '#117a65', // very dark green
-            '#922b21', // very dark red
-            '#6c3483', // dark wisteria
-            '#1e8449', // dark nephritis
-        ];
-
-        const colorPalettesDark = [
-            '#ff6b6b', // bright red
-            '#74b9ff', // bright blue
-            '#55efc4', // bright green
-            '#ffd93d', // bright yellow
-            '#dda0dd', // bright plum
-            '#6bcf7f', // bright mint
-            '#ffa07a', // bright salmon
-            '#87ceeb', // sky blue
-            '#98d8c8', // light teal
-            '#ff9999', // light coral
-            '#c39bd3', // light purple
-            '#90ee90', // light green
-        ];
+        const colorPalettesLight = ['#b3261e', '#1f5fbf', '#16692e', '#7a4d00', '#6b2fd0', '#0b5f78', '#a3360a', '#4338ca', '#03664a', '#be185d', '#5b21b6', '#3d640b'];
+        const colorPalettesDark = ['#ff8a78', '#79b8ff', '#56d364', '#e3b341', '#c4a5ff', '#67e8f9', '#fdba74', '#a5b4fc', '#6ee7b7', '#f9a8d4', '#d8b4fe', '#bef264'];
 
         function isDarkMode() {
             return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         }
 
         function getCharacterColor(character) {
-            if (!characterColors[character]) {
-                const colorPalette = isDarkMode() ? colorPalettesDark : colorPalettesLight;
-                const characters = Object.keys(characterColors);
-                const colorIndex = characters.length % colorPalette.length;
-                characterColors[character] = colorPalette[colorIndex];
-            }
-            return characterColors[character];
+            const palette = isDarkMode() ? colorPalettesDark : colorPalettesLight;
+            const index = Math.max(0, characters.indexOf(character));
+            return palette[index % palette.length];
         }
 
-        // Listen for theme changes and update colors
-        if (window.matchMedia) {
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                // Reset character colors to apply new palette
-                Object.keys(characterColors).forEach(key => delete characterColors[key]);
-                renderStats();
-                
-                // Re-render current tab
-                if (currentTab === 'read') {
-                    renderReadTab();
-                } else if (currentTab === 'learn') {
-                    renderLearnTab();
+        function myLineIndices(scene) {
+            const indices = [];
+            scene.dialogues.forEach((d, i) => { if (d.character === selectedCharacter) indices.push(i); });
+            return indices;
+        }
+
+        function plural(n, word) {
+            return `${n} ${word}${n > 1 ? 's' : ''}`;
+        }
+
+        // DOM helpers
+        function el(tag, className, text) {
+            const node = document.createElement(tag);
+            if (className) node.className = className;
+            if (text !== undefined) node.textContent = text;
+            return node;
+        }
+
+        const chevronSvg = '<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>';
+        const arrowSvg = '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+
+        function createLine(dialogue) {
+            const line = el('div', 'line');
+            line.style.setProperty('--c', getCharacterColor(dialogue.character));
+            if (selectedCharacter && dialogue.character === selectedCharacter) line.classList.add('mine');
+
+            const who = el('div', 'who');
+            who.appendChild(el('span', 'dot'));
+            who.appendChild(el('span', '', dialogue.character));
+
+            const say = el('p', 'say');
+            renderDialogueText(say, dialogue.text);
+
+            line.appendChild(who);
+            line.appendChild(say);
+            return line;
+        }
+
+        function createState(icon, title, message, actions = []) {
+            const box = el('div', 'state');
+            box.appendChild(el('div', 'state-icon', icon));
+            box.appendChild(el('h3', '', title));
+            box.appendChild(el('p', '', message));
+            if (actions.length) {
+                const row = el('div', 'state-actions');
+                actions.forEach(({ label, primary, onClick }) => {
+                    const btn = el('button', `btn btn-small ${primary ? 'btn-primary' : 'btn-secondary'}`, label);
+                    btn.onclick = onClick;
+                    row.appendChild(btn);
+                });
+                box.appendChild(row);
+            }
+            return box;
+        }
+
+        function clampState(state) {
+            if (!playData.acts[state.actIndex]) state.actIndex = 0;
+            if (!playData.acts[state.actIndex].scenes[state.sceneIndex]) state.sceneIndex = 0;
+        }
+
+        // Header
+        function updateHeader() {
+            document.getElementById('play-title').textContent = playData.title || 'Pièce de théâtre';
+            document.getElementById('play-author').textContent = playData.author ? `de ${playData.author}` : '';
+
+            const chip = document.getElementById('role-chip');
+            chip.innerHTML = '';
+            chip.classList.toggle('empty', !selectedCharacter);
+            const dot = el('span', 'dot');
+            if (selectedCharacter) dot.style.setProperty('--c', getCharacterColor(selectedCharacter));
+            chip.appendChild(dot);
+            chip.appendChild(el('span', '', selectedCharacter || 'Mon rôle'));
+        }
+
+        // Read tab
+        function renderReadTab() {
+            const container = document.getElementById('read-content');
+            container.innerHTML = '';
+            if (sceneObserver) sceneObserver.disconnect();
+
+            if (!allScenes.length) {
+                container.appendChild(createState('📜', 'Aucun texte', 'Cette pièce ne contient pas encore de scène.'));
+                return;
+            }
+
+            const view = document.getElementById('read-tab');
+            sceneObserver = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        readState.actIndex = Number(entry.target.dataset.act);
+                        readState.sceneIndex = Number(entry.target.dataset.scene);
+                        saveSettings();
+                    }
+                });
+            }, { root: view, rootMargin: '0px 0px -85% 0px' });
+
+            playData.acts.forEach((act, actIndex) => {
+                container.appendChild(el('h2', 'act-title', act.title));
+
+                act.scenes.forEach((scene, sceneIndex) => {
+                    const section = el('section', 'scene');
+                    section.dataset.act = actIndex;
+                    section.dataset.scene = sceneIndex;
+
+                    const bar = el('div', 'scene-bar');
+                    const btn = el('button', 'scene-btn');
+                    btn.appendChild(el('span', '', `${act.title} · ${scene.title}`));
+                    btn.insertAdjacentHTML('beforeend', chevronSvg);
+                    btn.onclick = () => openNavigation('read');
+                    bar.appendChild(btn);
+                    section.appendChild(bar);
+
+                    scene.dialogues.forEach(dialogue => section.appendChild(createLine(dialogue)));
+                    container.appendChild(section);
+                    sceneObserver.observe(section);
+                });
+            });
+
+            clampState(readState);
+            const target = container.querySelector(`.scene[data-act="${readState.actIndex}"][data-scene="${readState.sceneIndex}"]`);
+            if (target && (readState.actIndex || readState.sceneIndex)) {
+                requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+            }
+        }
+
+        // Learn tab
+        function setLearnControls(done, total, canNext) {
+            document.getElementById('line-counter').textContent = total ? `${done} / ${total}` : '';
+            document.getElementById('learn-progress').style.width = total ? `${(done / total) * 100}%` : '0';
+            document.querySelector('.btn-next').disabled = !canNext;
+            document.querySelector('.btn-back').disabled = done === 0;
+        }
+
+        function nextSceneEntry() {
+            const index = allScenes.findIndex(s => s.actIndex === learnState.actIndex && s.sceneIndex === learnState.sceneIndex);
+            return allScenes[index + 1] || null;
+        }
+
+        function goToNextScene() {
+            const next = nextSceneEntry();
+            if (next) navigateToScene(next.actIndex, next.sceneIndex, 'learn');
+        }
+
+        // scrollTarget: index of the line to scroll to, 'top', or 'end' (default)
+        function renderLearnTab(scrollTarget = 'end') {
+            const content = document.getElementById('learn-content');
+            const scroller = document.getElementById('learn-scroll');
+            content.innerHTML = '';
+
+            if (!allScenes.length) {
+                document.getElementById('learn-current-scene').textContent = 'Aucune scène';
+                content.appendChild(createState('📜', 'Aucun texte', 'Cette pièce ne contient pas encore de scène.'));
+                setLearnControls(0, 0, false);
+                return;
+            }
+
+            clampState(learnState);
+            const act = playData.acts[learnState.actIndex];
+            const scene = act.scenes[learnState.sceneIndex];
+            document.getElementById('learn-current-scene').textContent = `${act.title} · ${scene.title}`;
+
+            if (!selectedCharacter) {
+                content.appendChild(createState('🎭', 'Quel rôle apprenez-vous ?',
+                    'Choisissez votre personnage : ses répliques seront cachées et vous les révélerez une à une.',
+                    [{ label: 'Choisir mon personnage', primary: true, onClick: () => switchTab('settings') }]));
+                setLearnControls(0, 0, false);
+                return;
+            }
+
+            const lines = scene.dialogues;
+            const mine = myLineIndices(scene);
+            const next = nextSceneEntry();
+
+            if (!mine.length) {
+                const actions = next ? [{ label: 'Scène suivante', primary: true, onClick: goToNextScene }] : [];
+                actions.push({ label: 'Choisir une scène', onClick: () => openNavigation('learn') });
+                content.appendChild(createState('🤫', 'Pas de réplique ici', `${selectedCharacter} ne parle pas dans cette scène.`, actions));
+                setLearnControls(0, 0, false);
+                return;
+            }
+
+            const done = Math.min(learnState.lineIndex, mine.length);
+            const end = done < mine.length ? mine[done] : lines.length;
+
+            for (let i = 0; i < end; i++) {
+                content.appendChild(createLine(lines[i]));
+            }
+
+            if (done < mine.length) {
+                const cue = el('button', 'cue');
+                cue.style.setProperty('--c', getCharacterColor(selectedCharacter));
+                const text = el('div');
+                text.appendChild(el('div', 'cue-title', `À vous, ${selectedCharacter} !`));
+                text.appendChild(el('div', 'cue-sub', `Réplique ${done + 1} sur ${mine.length} · touchez pour la révéler`));
+                cue.appendChild(text);
+                cue.insertAdjacentHTML('beforeend', arrowSvg);
+                cue.onclick = nextLine;
+                content.appendChild(cue);
+            } else {
+                const actions = [{ label: 'Recommencer', onClick: restartScene }];
+                if (next) actions.unshift({ label: 'Scène suivante', primary: true, onClick: goToNextScene });
+                content.appendChild(createState('👏', 'Scène terminée !', `Vous avez revu vos ${plural(mine.length, 'réplique')} de cette scène.`, actions));
+            }
+
+            setLearnControls(done, mine.length, done < mine.length);
+
+            requestAnimationFrame(() => {
+                if (scrollTarget === 'top') {
+                    scroller.scrollTop = 0;
+                } else if (typeof scrollTarget === 'number' && content.children[scrollTarget]) {
+                    const target = content.children[scrollTarget];
+                    target.classList.add('reveal');
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    scroller.scrollTop = scroller.scrollHeight;
                 }
             });
         }
 
-        // Render the line count table (scenes x characters, with totals)
-        function renderStats() {
-            const container = document.getElementById('stats-table');
-            const totals = {};
-            const rows = [];
+        function nextLine() {
+            if (!selectedCharacter || !allScenes.length) return;
+            const scene = playData.acts[learnState.actIndex].scenes[learnState.sceneIndex];
+            const mine = myLineIndices(scene);
+            if (learnState.lineIndex >= mine.length) return;
+
+            const revealed = mine[learnState.lineIndex];
+            learnState.lineIndex++;
+            saveSettings();
+            renderLearnTab(revealed);
+        }
+
+        function restartScene() {
+            learnState.lineIndex = 0;
+            saveSettings();
+            renderLearnTab('top');
+        }
+
+        // Navigation sheet
+        function openNavigation(source) {
+            const modalBody = document.getElementById('modal-body');
+            modalBody.innerHTML = '';
+            const state = source === 'learn' ? learnState : readState;
+            let currentItem = null;
+
             playData.acts.forEach((act, actIndex) => {
-                act.scenes.forEach(scene => {
-                    const counts = {};
-                    scene.dialogues.forEach(dialogue => {
-                        counts[dialogue.character] = (counts[dialogue.character] || 0) + 1;
-                        totals[dialogue.character] = (totals[dialogue.character] || 0) + 1;
-                    });
-                    const label = act.scenes.length > 1 ? `${act.title}, ${scene.title}` : act.title;
-                    rows.push({ label, counts, total: scene.dialogues.length, actIndex });
+                modalBody.appendChild(el('div', 'nav-act', act.title));
+                act.scenes.forEach((scene, sceneIndex) => {
+                    const item = el('button', 'nav-scene');
+                    item.appendChild(el('span', '', scene.title));
+                    if (selectedCharacter) {
+                        const count = myLineIndices(scene).length;
+                        item.appendChild(el('span', 'nav-count', count || '–'));
+                    }
+                    if (actIndex === state.actIndex && sceneIndex === state.sceneIndex) {
+                        item.classList.add('current');
+                        currentItem = item;
+                    }
+                    item.onclick = () => navigateToScene(actIndex, sceneIndex, source);
+                    modalBody.appendChild(item);
                 });
             });
-            const characters = Object.keys(totals).sort((a, b) => totals[b] - totals[a] || a.localeCompare(b));
-            const grandTotal = rows.reduce((sum, row) => sum + row.total, 0);
 
-            const table = document.createElement('table');
-            table.className = 'stats-table';
+            document.getElementById('navigation-modal').classList.add('active');
+            if (currentItem) currentItem.scrollIntoView({ block: 'center' });
+        }
+
+        function closeNavigation(event) {
+            if (!event || event.target.id === 'navigation-modal') {
+                document.getElementById('navigation-modal').classList.remove('active');
+            }
+        }
+
+        function navigateToScene(actIndex, sceneIndex, source) {
+            if (source === 'learn') {
+                learnState = { actIndex, sceneIndex, lineIndex: 0 };
+                saveSettings();
+                renderLearnTab('end');
+            } else {
+                readState = { actIndex, sceneIndex };
+                saveSettings();
+                const target = document.querySelector(`#read-content .scene[data-act="${actIndex}"][data-scene="${sceneIndex}"]`);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            closeNavigation();
+        }
+
+        // Settings tab
+        function renderPlayInfo() {
+            const cover = document.getElementById('play-info');
+            cover.innerHTML = '';
+            cover.appendChild(el('div', 'cover-kicker', 'La pièce'));
+            cover.appendChild(el('h2', '', playData.title || 'Pièce de théâtre'));
+            if (playData.author) cover.appendChild(el('div', 'cover-author', `de ${playData.author}`));
+            const meta = el('div', 'cover-meta');
+            meta.appendChild(el('span', 'pill', plural(playData.acts.length, 'acte')));
+            meta.appendChild(el('span', 'pill', plural(allScenes.length, 'scène')));
+            meta.appendChild(el('span', 'pill', plural(characters.length, 'personnage')));
+            cover.appendChild(meta);
+        }
+
+        function renderCharacterChips() {
+            const container = document.getElementById('character-chips');
+            container.innerHTML = '';
+            const options = [''].concat(characters);
+            options.forEach(character => {
+                const chip = el('button', 'chip');
+                chip.classList.toggle('active', character === selectedCharacter);
+                if (character) {
+                    const dot = el('span', 'dot');
+                    dot.style.setProperty('--c', getCharacterColor(character));
+                    chip.appendChild(dot);
+                    chip.appendChild(el('span', '', character));
+                    chip.appendChild(el('small', '', lineTotals[character]));
+                } else {
+                    chip.appendChild(el('span', '', 'Aucun'));
+                }
+                chip.onclick = () => selectCharacter(character);
+                container.appendChild(chip);
+            });
+        }
+
+        function selectCharacter(character) {
+            selectedCharacter = character;
+            learnState.lineIndex = 0;
+            saveSettings();
+            renderAll();
+        }
+
+        // Line count table (scenes x characters, with act subtotals and totals)
+        function countLines(dialogues) {
+            const counts = {};
+            dialogues.forEach(d => { counts[d.character] = (counts[d.character] || 0) + 1; });
+            return counts;
+        }
+
+        function renderStats() {
+            const container = document.getElementById('stats-table');
+            const columns = characters.slice().sort((a, b) => lineTotals[b] - lineTotals[a] || a.localeCompare(b));
+            const grandTotal = allScenes.reduce((sum, { scene }) => sum + scene.dialogues.length, 0);
+
+            const table = el('table', 'stats-table');
             const addCell = (tr, tag, text, className) => {
-                const cell = document.createElement(tag);
-                cell.textContent = text;
-                if (className) cell.className = className;
+                const cell = el(tag, className || '', text);
                 tr.appendChild(cell);
                 return cell;
             };
@@ -1195,555 +1681,176 @@ Lili   : Tu permets, je finis mes frites, pas toi ? À la semaine prochaine !`;
 
             const head = table.createTHead().insertRow();
             addCell(head, 'th', 'Scène');
-            characters.forEach(character => {
+            columns.forEach(character => {
                 addCell(head, 'th', character, mine(character)).style.color = getCharacterColor(character);
             });
             addCell(head, 'th', 'Total');
 
             const body = table.createTBody();
-            rows.forEach((row, index) => {
+            const addRow = (label, counts, total, className) => {
                 const tr = body.insertRow();
-                if (index > 0 && row.actIndex !== rows[index - 1].actIndex) {
-                    tr.className = 'act-start';
-                }
-                addCell(tr, 'td', row.label);
-                characters.forEach(character => {
-                    const count = row.counts[character] || 0;
+                if (className) tr.className = className;
+                addCell(tr, 'td', label);
+                columns.forEach(character => {
+                    const count = counts[character] || 0;
                     addCell(tr, 'td', count || '–', [mine(character), count ? '' : 'zero'].join(' ').trim());
                 });
-                addCell(tr, 'td', row.total, 'stats-total-col');
+                addCell(tr, 'td', total, 'stats-total-col');
+                return tr;
+            };
+
+            playData.acts.forEach((act, actIndex) => {
+                const separator = actIndex > 0 ? 'act-start' : '';
+                const actLines = [].concat(...act.scenes.map(scene => scene.dialogues));
+
+                // An act with a single scene is shown as one row
+                if (act.scenes.length === 1) {
+                    addRow(act.title, countLines(actLines), actLines.length, `${separator} act-single`);
+                    return;
+                }
+
+                const headRow = body.insertRow();
+                headRow.className = `${separator} act-head`;
+                const headCell = addCell(headRow, 'td', act.title);
+                headCell.colSpan = columns.length + 2;
+
+                act.scenes.forEach(scene => {
+                    addRow(scene.title, countLines(scene.dialogues), scene.dialogues.length, 'scene-row');
+                });
+
+                if (playData.acts.length > 1) {
+                    addRow(`Total ${act.title}`, countLines(actLines), actLines.length, 'act-total');
+                }
             });
 
             const totalRow = body.insertRow();
             totalRow.className = 'stats-total';
             addCell(totalRow, 'td', 'Total');
-            characters.forEach(character => addCell(totalRow, 'td', totals[character], mine(character)));
+            columns.forEach(character => addCell(totalRow, 'td', lineTotals[character], mine(character)));
             addCell(totalRow, 'td', grandTotal);
 
             container.innerHTML = '';
             container.appendChild(table);
         }
 
-        // Update page title with character if selected
-        function updateTitle() {
-            const baseTitle = playData.title;
-            const displayTitle = selectedCharacter ? `${baseTitle} - ${selectedCharacter}` : baseTitle;
-            document.getElementById('play-title').textContent = displayTitle;
-        }
-
-        // Initialize the app
-        function init() {
-            // Load settings first
-            loadSettings();
-            
-            // Setup UI
-            populateCharacterSelect();
-            updateTitle();
-            renderStats();
-            setupTabs();
-            
-            // Restore saved tab or default to 'read'
-            const savedTab = getStorage('currentTab') || 'read';
-            switchTab(savedTab);
-        }
-
-        // Populate character dropdown
-        function populateCharacterSelect() {
-            const select = document.getElementById('character-select');
-            const characters = getCharacters();
-            characters.forEach(char => {
-                const option = document.createElement('option');
-                option.value = char;
-                option.textContent = char;
-                select.appendChild(option);
-            });
-
-            select.addEventListener('change', (e) => {
-                selectedCharacter = e.target.value;
-                saveSettings();
-                updateTitle();
-                renderStats();
-                
-                // Re-render current tab
-                if (currentTab === 'read') {
-                    renderReadTab();
-                } else if (currentTab === 'learn') {
-                    renderLearnTab();
-                }
-            });
-            
-            // Text size buttons
-            document.querySelectorAll('.text-size-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const size = this.dataset.size;
-                    applyTextSize(size);
-                    setStorage('textSize', size);
-                });
-            });
-
-            // Fullscreen button
-            const fullscreenBtn = document.getElementById('fullscreen-btn');
-            if (fullscreenBtn) {
-                fullscreenBtn.addEventListener('click', toggleFullscreen);
-            }
-        }
-
-        // Toggle fullscreen
-        function toggleFullscreen() {
-            if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
-                // Enter fullscreen
-                const elem = document.documentElement;
-                if (elem.requestFullscreen) {
-                    elem.requestFullscreen();
-                } else if (elem.webkitRequestFullscreen) {
-                    elem.webkitRequestFullscreen();
-                } else if (elem.mozRequestFullScreen) {
-                    elem.mozRequestFullScreen();
-                } else if (elem.msRequestFullscreen) {
-                    elem.msRequestFullscreen();
-                }
-            } else {
-                // Exit fullscreen
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
-                } else if (document.mozCancelFullScreen) {
-                    document.mozCancelFullScreen();
-                } else if (document.msExitFullscreen) {
-                    document.msExitFullscreen();
-                }
-            }
-        }
-
-        // Setup tab navigation
-        function setupTabs() {
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabName = tab.getAttribute('data-tab');
-                    switchTab(tabName);
-                });
-            });
-        }
-
-        // Switch between tabs
+        // Tabs
         function switchTab(tabName) {
+            if (!document.getElementById(`${tabName}-tab`)) tabName = 'read';
             currentTab = tabName;
             setStorage('currentTab', tabName);
-            
-            // Update tab buttons
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-                if (tab.getAttribute('data-tab') === tabName) {
-                    tab.classList.add('active');
-                }
-            });
 
-            // Update tab content
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabName);
             });
+            document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
             document.getElementById(`${tabName}-tab`).classList.add('active');
 
-            // Render specific tab content if needed
-            if (tabName === 'learn') {
-                renderLearnTab();
-            } else if (tabName === 'read') {
-                renderReadTab();
-            }
+            if (tabName === 'learn') renderLearnTab();
+            else if (tabName === 'read') renderReadTab();
         }
 
-        // Render Read Tab
-        function renderReadTab() {
-            const container = document.getElementById('read-content');
-            container.innerHTML = '';
-
-            playData.acts.forEach((act, actIndex) => {
-                act.scenes.forEach((scene, sceneIndex) => {
-                    const sceneTitle = document.createElement('div');
-                    sceneTitle.className = 'learn-scene-header';
-                    
-                    const titleSpan = document.createElement('span');
-                    titleSpan.textContent = `${act.title}, ${scene.title}`;
-                    
-                    const arrowSpan = document.createElement('span');
-                    arrowSpan.className = 'arrow-icon';
-                    arrowSpan.textContent = '▼';
-                    
-                    sceneTitle.appendChild(titleSpan);
-                    sceneTitle.appendChild(arrowSpan);
-                    sceneTitle.onclick = () => {
-                        readState.actIndex = actIndex;
-                        readState.sceneIndex = sceneIndex;
-                        setStorage('readState', readState);
-                        openNavigation('read');
-                    };
-                    
-                    container.appendChild(sceneTitle);
-
-                    const sceneBlock = document.createElement('div');
-                    sceneBlock.className = 'scene-block';
-
-                    scene.dialogues.forEach(dialogue => {
-                        const dialogueDiv = document.createElement('div');
-                        dialogueDiv.className = 'dialogue';
-                        
-                        if (selectedCharacter && dialogue.character === selectedCharacter) {
-                            dialogueDiv.classList.add('highlight');
-                        }
-
-                        const charSpan = document.createElement('span');
-                        charSpan.className = 'dialogue-character';
-                        charSpan.textContent = dialogue.character;
-                        charSpan.style.color = getCharacterColor(dialogue.character);
-
-                        const textSpan = document.createElement('span');
-                        textSpan.className = 'dialogue-text';
-                        textSpan.textContent = dialogue.text;
-
-                        dialogueDiv.appendChild(charSpan);
-                        dialogueDiv.appendChild(textSpan);
-                        sceneBlock.appendChild(dialogueDiv);
-                    });
-
-                    container.appendChild(sceneBlock);
-                });
-            });
-            
-            // Validate readState indices
-            if (readState.actIndex >= playData.acts.length) {
-                readState.actIndex = 0;
-            }
-            if (readState.sceneIndex >= playData.acts[readState.actIndex].scenes.length) {
-                readState.sceneIndex = 0;
-            }
-            
-            // Scroll to the saved scene position
-            setTimeout(() => {
-                const sceneBlocks = document.querySelectorAll('#read-content .scene-block');
-                let totalSceneIndex = 0;
-                for (let i = 0; i < readState.actIndex; i++) {
-                    totalSceneIndex += playData.acts[i].scenes.length;
-                }
-                totalSceneIndex += readState.sceneIndex;
-                
-                if (sceneBlocks[totalSceneIndex]) {
-                    sceneBlocks[totalSceneIndex].scrollIntoView({ behavior: 'auto', block: 'start' });
-                }
-            }, 0);
+        function renderAll() {
+            updateHeader();
+            renderPlayInfo();
+            renderCharacterChips();
+            renderStats();
+            if (currentTab === 'read') renderReadTab();
+            else if (currentTab === 'learn') renderLearnTab();
         }
 
-        // Render Learn Tab
-        function renderLearnTab(clearContent = true) {
-            const content = document.getElementById('learn-content');
-            if (clearContent) {
-                content.innerHTML = '';
-            }
-
-            // Check if no character is selected
-            if (!selectedCharacter) {
-                content.innerHTML = '<div style="padding: 40px 20px; text-align: center;"><p style="color: var(--text-secondary); font-size: 18px; margin-bottom: 16px;">Aucun personnage sélectionné</p><p style="color: var(--text-muted); font-size: 14px;">Veuillez sélectionner un personnage dans l\'onglet Paramètres pour commencer l\'apprentissage.</p></div>';
-                document.getElementById('line-counter').textContent = '0 / 0';
-                const nextButton = document.querySelector('.btn-next');
-                const backButton = document.querySelector('.btn-back');
-                if (nextButton) nextButton.disabled = true;
-                if (backButton) backButton.disabled = true;
-                return;
-            }
-
-            // Validate learnState indices
-            if (learnState.actIndex >= playData.acts.length) {
-                learnState.actIndex = 0;
-            }
-            if (learnState.sceneIndex >= playData.acts[learnState.actIndex].scenes.length) {
-                learnState.sceneIndex = 0;
-            }
-
-            // Get current scene
-            const act = playData.acts[learnState.actIndex];
-            const scene = act.scenes[learnState.sceneIndex];
-
-            // Update scene header
-            document.getElementById('learn-current-scene').textContent = 
-                `${act.title}, ${scene.title}`;
-
-            const lines = scene.dialogues;
-
-            if (lines.length === 0) {
-                content.innerHTML = '<p style="color: #95a5a6; text-align: center;">Aucune réplique dans cette scène.</p>';
-                document.getElementById('line-counter').textContent = '0 / 0';
-                return;
-            }
-
-            // Find character's lines and their indices
-            const characterLines = [];
-            lines.forEach((dialogue, index) => {
-                if (dialogue.character === selectedCharacter) {
-                    characterLines.push(index);
-                }
-            });
-
-            if (characterLines.length === 0) {
-                content.innerHTML = '<p style="color: #95a5a6; text-align: center;">Aucune réplique pour ce personnage dans cette scène.</p>';
-                document.getElementById('line-counter').textContent = '0 / 0';
-                return;
-            }
-
-            // Update counter based on character's lines
-            document.getElementById('line-counter').textContent = 
-                `${learnState.lineIndex} / ${characterLines.length}`;
-
-            // When clearContent is true (initial load or restart), show all dialogues up to current state
-            // When clearContent is false (appending), show only the new dialogues
-            let startIndex, endIndex;
-            
-            if (clearContent) {
-                // Show all dialogues from start up to current lineIndex
-                startIndex = 0;
-                if (learnState.lineIndex === 0) {
-                    endIndex = characterLines[0];
-                } else {
-                    const currentCharLineIndex = Math.min(learnState.lineIndex - 1, characterLines.length - 1);
-                    endIndex = learnState.lineIndex < characterLines.length 
-                        ? characterLines[learnState.lineIndex] 
-                        : lines.length;
-                }
+        // Fullscreen
+        function toggleFullscreen() {
+            const doc = document;
+            const elem = doc.documentElement;
+            if (!doc.fullscreenElement && !doc.webkitFullscreenElement) {
+                (elem.requestFullscreen || elem.webkitRequestFullscreen || function () {}).call(elem);
             } else {
-                // Append mode: show only new dialogues
-                if (learnState.lineIndex === 0) {
-                    startIndex = 0;
-                    endIndex = characterLines[0];
-                } else {
-                    const currentCharLineIndex = Math.min(learnState.lineIndex - 1, characterLines.length - 1);
-                    startIndex = characterLines[currentCharLineIndex];
-                    endIndex = learnState.lineIndex < characterLines.length 
-                        ? characterLines[learnState.lineIndex] 
-                        : lines.length;
-                }
-            }
-
-            // Display the dialogues in the range
-            for (let i = startIndex; i < endIndex; i++) {
-                const dialogue = lines[i];
-                const dialogueDiv = document.createElement('div');
-                dialogueDiv.className = 'dialogue';
-                
-                // Highlight selected character's lines
-                if (dialogue.character === selectedCharacter) {
-                    dialogueDiv.classList.add('my-character');
-                }
-
-                const charSpan = document.createElement('span');
-                charSpan.className = 'dialogue-character';
-                charSpan.textContent = dialogue.character;
-                charSpan.style.color = getCharacterColor(dialogue.character);
-
-                const textSpan = document.createElement('span');
-                textSpan.className = 'dialogue-text';
-                textSpan.textContent = dialogue.text;
-
-                dialogueDiv.appendChild(charSpan);
-                dialogueDiv.appendChild(textSpan);
-                content.appendChild(dialogueDiv);
-            }
-            
-            // Update button state
-            const nextButton = document.querySelector('.btn-next');
-            const backButton = document.querySelector('.btn-back');
-            if (nextButton) {
-                nextButton.disabled = learnState.lineIndex >= characterLines.length;
-            }
-            if (backButton) {
-                backButton.disabled = learnState.lineIndex === 0;
+                (doc.exitFullscreen || doc.webkitExitFullscreen || function () {}).call(doc);
             }
         }
 
-        // Next line in Learn mode
-        function nextLine() {
-            const act = playData.acts[learnState.actIndex];
-            const scene = act.scenes[learnState.sceneIndex];
-            const lines = scene.dialogues;
-
-            // If no character selected, advance one line at a time
-            if (!selectedCharacter) {
-                if (learnState.lineIndex < lines.length - 1) {
-                    learnState.lineIndex++;
-                    saveSettings();
-                    renderLearnTab();
-                }
-                return;
-            }
-
-            // Find character's lines
-            const characterLines = [];
-            lines.forEach((dialogue, index) => {
-                if (dialogue.character === selectedCharacter) {
-                    characterLines.push(index);
-                }
-            });
-
-            // Advance to next step
-            if (learnState.lineIndex < characterLines.length) {
-                const oldLineIndex = learnState.lineIndex;
-                learnState.lineIndex++;
-                saveSettings();
-                renderLearnTab(false); // Don't clear content, just append
-                
-                // Scroll to the first newly added dialogue
-                setTimeout(() => {
-                    const content = document.getElementById('learn-content');
-                    const newDialogues = content.querySelectorAll('.dialogue');
-                    
-                    // Calculate the index of the first new dialogue
-                    let firstNewIndex = 0;
-                    if (oldLineIndex === 0) {
-                        // On first click, scroll to the character's first line
-                        firstNewIndex = characterLines[0];
-                    } else {
-                        const prevCharLineIndex = oldLineIndex - 1;
-                        const prevEndIndex = oldLineIndex < characterLines.length 
-                            ? characterLines[oldLineIndex] 
-                            : lines.length;
-                        firstNewIndex = prevEndIndex;
-                    }
-                    
-                    if (newDialogues[firstNewIndex]) {
-                        newDialogues[firstNewIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                }, 50);
-            }
-        }
-
-        // Restart scene in Learn mode
-        function restartScene() {
-            learnState.lineIndex = 0;
-            saveSettings();
-            renderLearnTab(true); // Clear content and restart
-        }
-
-        // Open navigation modal
-        function openNavigation(source) {
-            const modal = document.getElementById('navigation-modal');
-            const modalBody = document.getElementById('modal-body');
-            modalBody.innerHTML = '';
-
-            playData.acts.forEach((act, actIndex) => {
-                const actItem = document.createElement('div');
-                actItem.className = 'nav-item nav-act';
-                actItem.textContent = act.title;
-                actItem.onclick = () => navigateToScene(actIndex, 0, source);
-                modalBody.appendChild(actItem);
-
-                act.scenes.forEach((scene, sceneIndex) => {
-                    const sceneItem = document.createElement('div');
-                    sceneItem.className = 'nav-item nav-scene';
-                    sceneItem.textContent = scene.title;
-                    sceneItem.onclick = () => navigateToScene(actIndex, sceneIndex, source);
-
-                    if (source === 'learn' && actIndex === learnState.actIndex && sceneIndex === learnState.sceneIndex) {
-                        sceneItem.classList.add('current');
-                    }
-
-                    modalBody.appendChild(sceneItem);
-                });
-            });
-
-            modal.classList.add('active');
-        }
-
-        // Close navigation modal
-        function closeNavigation(event) {
-            if (event.target.id === 'navigation-modal') {
-                document.getElementById('navigation-modal').classList.remove('active');
-            }
-        }
-
-        // Navigate to a specific scene
-        function navigateToScene(actIndex, sceneIndex, source) {
-            if (source === 'learn') {
-                learnState.actIndex = actIndex;
-                learnState.sceneIndex = sceneIndex;
-                learnState.lineIndex = 0;
-                saveSettings();
-                renderLearnTab();
-            } else if (source === 'read') {
-                readState.actIndex = actIndex;
-                readState.sceneIndex = sceneIndex;
-                saveSettings();
-                
-                // Scroll to the scene block
-                const sceneBlocks = document.querySelectorAll('#read-content .scene-block');
-                let totalSceneIndex = 0;
-                for (let i = 0; i < actIndex; i++) {
-                    totalSceneIndex += playData.acts[i].scenes.length;
-                }
-                totalSceneIndex += sceneIndex;
-                
-                if (sceneBlocks[totalSceneIndex]) {
-                    sceneBlocks[totalSceneIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }
-
-            closeNavigation({ target: { id: 'navigation-modal' } });
-        }
-
-        // Save settings to localStorage
+        // Persistence
         function saveSettings() {
             setStorage('selectedCharacter', selectedCharacter);
             setStorage('readState', JSON.stringify(readState));
             setStorage('learnState', JSON.stringify(learnState));
         }
 
-        // Load settings from localStorage
         function loadSettings() {
             const savedCharacter = getStorage('selectedCharacter');
-            if (savedCharacter) {
-                selectedCharacter = savedCharacter;
-                const select = document.getElementById('character-select');
-                if (select) {
-                    select.value = savedCharacter;
-                }
-            }
+            if (savedCharacter && characters.includes(savedCharacter)) selectedCharacter = savedCharacter;
 
-            const savedReadState = getStorage('readState');
-            if (savedReadState) {
-                try {
-                    readState = JSON.parse(savedReadState);
-                } catch (e) {
-                    console.error('Error parsing readState:', e);
-                }
-            }
+            try {
+                const saved = JSON.parse(getStorage('readState'));
+                if (saved && typeof saved === 'object') readState = Object.assign(readState, saved);
+            } catch (e) { /* ignore */ }
 
-            const savedLearnState = getStorage('learnState');
-            if (savedLearnState) {
-                try {
-                    learnState = JSON.parse(savedLearnState);
-                } catch (e) {
-                    console.error('Error parsing learnState:', e);
-                }
-            }
-            
-            // Load and apply text size
-            const textSize = getStorage('textSize') || 'normal';
-            applyTextSize(textSize);
+            try {
+                const saved = JSON.parse(getStorage('learnState'));
+                if (saved && typeof saved === 'object') learnState = Object.assign(learnState, saved);
+            } catch (e) { /* ignore */ }
+
+            applyTextSize(getStorage('textSize') || 'normal');
+            applyHighlight(getStorage('highlight') || 'ardoise');
         }
-        
-        // Apply text size to body
-        function applyTextSize(size) {
-            document.body.classList.remove('text-small', 'text-normal', 'text-large');
-            document.body.classList.add(`text-${size}`);
-            
-            // Update button states
-            document.querySelectorAll('.text-size-btn').forEach(btn => {
-                if (btn.dataset.size === size) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
+
+        function applyHighlight(name) {
+            if (!document.querySelector(`.hl-btn[data-hl="${name}"]`)) name = 'ardoise';
+            document.body.dataset.hl = name;
+            document.querySelectorAll('.hl-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.hl === name);
             });
         }
 
-        // Initialize the app when DOM is ready
+        function applyTextSize(size) {
+            document.body.classList.remove('text-small', 'text-normal', 'text-large');
+            document.body.classList.add(`text-${size}`);
+            document.querySelectorAll('.text-size-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.size === size);
+            });
+        }
+
+        // Init
+        function init() {
+            loadSettings();
+
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+            });
+            document.querySelectorAll('.text-size-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    applyTextSize(btn.dataset.size);
+                    setStorage('textSize', btn.dataset.size);
+                });
+            });
+            document.querySelectorAll('.hl-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    applyHighlight(btn.dataset.hl);
+                    setStorage('highlight', btn.dataset.hl);
+                });
+            });
+            document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
+            document.getElementById('role-chip').addEventListener('click', () => switchTab('settings'));
+
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') closeNavigation();
+                if (currentTab === 'learn' && (e.key === 'ArrowRight' || e.key === ' ') && !e.target.closest('button')) {
+                    e.preventDefault();
+                    nextLine();
+                }
+            });
+
+            if (window.matchMedia) {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', renderAll);
+            }
+
+            updateHeader();
+            renderPlayInfo();
+            renderCharacterChips();
+            renderStats();
+            switchTab(getStorage('currentTab') || 'read');
+        }
+
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
