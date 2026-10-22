@@ -6,6 +6,18 @@
     <meta name="theme-color" content="#f7f5f1" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#131211" media="(prefers-color-scheme: dark)">
     <title>Les jeudis en folie</title>
+    <script>
+        // Appearance shared by all pages: 'dark', 'light' or system default
+        (function () {
+            var theme = null;
+            try { theme = localStorage.getItem('theme'); } catch (e) { /* storage unavailable */ }
+            if (theme !== 'dark' && theme !== 'light') return;
+            document.documentElement.dataset.theme = theme;
+            document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) {
+                meta.content = theme === 'dark' ? '#131211' : '#f7f5f1';
+            });
+        })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
@@ -26,7 +38,7 @@
         }
 
         @media (prefers-color-scheme: dark) {
-            :root {
+            :root:not([data-theme="light"]) {
                 --bg: #131211;
                 --surface: #1d1c1a;
                 --surface-2: #282624;
@@ -39,6 +51,23 @@
                 --c1: #ff8a78; --c2: #79b8ff; --c3: #56d364; --c4: #c4a5ff; --c5: #fdba74; --c6: #67e8f9;
             }
         }
+
+        :root[data-theme="dark"] {
+            --bg: #131211;
+            --surface: #1d1c1a;
+            --surface-2: #282624;
+            --border: #34312d;
+            --ink: #f3f0ea;
+            --muted: #9d978d;
+            --accent: #ff8a78;
+            --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.25);
+            --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.4), 0 12px 32px rgba(0, 0, 0, 0.45);
+            --c1: #ff8a78; --c2: #79b8ff; --c3: #56d364; --c4: #c4a5ff; --c5: #fdba74; --c6: #67e8f9;
+        }
+
+        :root { color-scheme: light dark; }
+        :root[data-theme="light"] { color-scheme: light; }
+        :root[data-theme="dark"] { color-scheme: dark; }
 
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
